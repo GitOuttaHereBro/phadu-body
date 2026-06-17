@@ -26,6 +26,8 @@ import java.util.Locale
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
@@ -39,7 +41,8 @@ import java.util.UUID
 fun HomeScreen(
     repository: IronLogRepository,
     onStartWorkout: (templateId: String?) -> Unit,
-    onResumeWorkout: () -> Unit
+    onResumeWorkout: () -> Unit,
+    onProfileClick: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -155,14 +158,31 @@ fun HomeScreen(
             )
         }
 
-        Text(
-            text = "GYM KRTA H JI",
-            color = Color.White,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Black,
-            letterSpacing = 2.sp,
-            modifier = Modifier.padding(bottom = 24.dp, top = 16.dp)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp, top = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "GYM KRTA H JI",
+                color = Color.White,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 2.sp
+            )
+            IconButton(
+                onClick = onProfileClick,
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(com.example.ui.theme.GlassDark, shape = RoundedCornerShape(12.dp))
+            ) {
+                Icon(
+                    imageVector = androidx.compose.material.icons.Icons.Filled.Person,
+                    contentDescription = "Profile",
+                    tint = Color.White
+                )
+            }
+        }
 
         Button(
             onClick = {

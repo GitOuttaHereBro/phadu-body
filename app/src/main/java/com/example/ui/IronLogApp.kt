@@ -2,8 +2,10 @@ package com.example.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.material.icons.Icons
@@ -17,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import kotlinx.coroutines.flow.first
@@ -134,6 +137,64 @@ fun MainScreenWrapper(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") {
+                var showProfileDialog by remember { mutableStateOf(false) }
+                val auth = FirebaseAuth.getInstance()
+                val currentUser = auth.currentUser
+
+                if (showProfileDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showProfileDialog = false },
+                        containerColor = com.example.ui.theme.GrayDark,
+                        titleContentColor = Color.White,
+                        textContentColor = com.example.ui.theme.GrayMedium,
+                        shape = RoundedCornerShape(24.dp),
+                        title = { Text("PROFILE", fontWeight = androidx.compose.ui.text.font.FontWeight.Black) },
+                        text = {
+                            Column {
+                                if (currentUser != null) {
+                                    Text("Logged in as:")
+                                    Text(currentUser.email ?: "Unknown User", color = Color.White, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                                } else {
+                                    Text("You are not logged in.")
+                                }
+                            }
+                        },
+                        confirmButton = {
+                            if (currentUser != null) {
+                                Button(
+                                    onClick = {
+                                        auth.signOut()
+                                        showProfileDialog = false
+                                        rootNavController.navigate("login") {
+                                            popUpTo(0) { inclusive = true }
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.ErrorColor, contentColor = Color.White)
+                                ) {
+                                    Text("SIGN OUT")
+                                }
+                            } else {
+                                Button(
+                                    onClick = {
+                                        showProfileDialog = false
+                                        rootNavController.navigate("login") {
+                                            popUpTo(0) { inclusive = true }
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.White)
+                                ) {
+                                    Text("LOG IN / SIGN UP")
+                                }
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showProfileDialog = false }) {
+                                Text("CLOSE", color = Color.White)
+                            }
+                        }
+                    )
+                }
+
                 HomeScreen(
                     repository = repository,
                     onStartWorkout = { templateId ->
@@ -164,6 +225,9 @@ fun MainScreenWrapper(
                     },
                     onResumeWorkout = {
                         rootNavController.navigate("active_workout")
+                    },
+                    onProfileClick = {
+                        showProfileDialog = true
                     }
                 )
             }
