@@ -37,7 +37,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
     var showConfirmDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        val json = context.assets.open("bodybuilding_program.json").bufferedReader().use { it.readText() }
+        val json = context.assets.open("jeff_nippard.json").bufferedReader().use { it.readText() }
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val adapter = moshi.adapter(Program::class.java)
         program = adapter.fromJson(json)
@@ -121,7 +121,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
 
                                         repository.saveActiveProgramState(
                                             ActiveProgramState(
-                                                programKey = "bodybuilding_program.json",
+                                                programKey = "jeff_nippard.json",
                                                 currentWeekIndex = 0,
                                                 workoutsCompletedThisWeek = 0,
                                                 totalWorkoutsThisWeek = totalWorkoutsFirstWeek,

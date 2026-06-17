@@ -5,30 +5,27 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
     
-    <!-- Angled shadow for depth (optional, but adds aesthetic) -->
-    <path
-        android:fillColor="#33000000"
-        android:pathData="M 21.1,73 L 86.9,73 L 100,100 L 0,100 Z"/>
-
-    <!-- Hexagon Outer Ring -->
-    <path
-        android:strokeWidth="5"
-        android:strokeColor="#34C759"
-        android:strokeLineJoin="miter"
-        android:pathData="M 54,16 L 86.9,35 L 86.9,73 L 54,92 L 21.1,73 L 21.1,35 Z" />
-
-    <!-- Center Handle (White) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M 44,49 L 64,49 L 64,59 L 44,59 Z" />
-        
-    <!-- Inner Plates (White) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M 34,36 L 44,36 L 44,72 L 34,72 Z M 64,36 L 74,36 L 74,72 L 64,72 Z" />
-        
-    <!-- Outer Plates (Green) -->
+    <!-- Outer Shield / Peak -->
     <path
         android:fillColor="#34C759"
-        android:pathData="M 26,43 L 34,43 L 34,65 L 26,65 Z M 74,43 L 82,43 L 82,65 L 74,65 Z" />
+        android:pathData="M 54,12 L 86,28 L 86,60 C 86,80 54,98 54,98 C 54,98 22,80 22,60 L 22,28 Z" />
+
+    <!-- Inner Shield (Black hollow) -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 54,18 L 80,31 L 80,58 C 80,74 54,89 54,89 C 54,89 28,74 28,58 L 28,31 Z" />
+        
+    <!-- Aggressive Barbell (White) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 38,50 L 70,50 L 70,54 L 38,54 Z" />
+        
+    <!-- Plates (Green & White) -->
+    <path
+        android:fillColor="#34C759"
+        android:pathData="M 34,42 L 40,42 L 40,62 L 34,62 Z M 68,42 L 74,42 L 74,62 L 68,62 Z" />
+        
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 28,45 L 32,45 L 32,59 L 28,59 Z M 76,45 L 80,45 L 80,59 L 76,59 Z" />
 </vector>
