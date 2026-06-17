@@ -1,0 +1,256 @@
+{
+  "programName": "The Bodybuilding Transformation System - Intermediate-Advanced",
+  "author": "Jeff Nippard",
+  "weeks": {
+    "week1": {
+      "block": "Foundation Block",
+      "days": [
+        {
+          "dayName": "Upper (Strength Focus)",
+          "isRestDay": false,
+          "exercises": [
+            {
+              "name": "45° Incline Barbell Press",
+              "demoLink": "https://youtu.be/vqQ9ok0dEgk",
+              "warmupSets": "2-3",
+              "workingSets": "2",
+              "reps": "6-8"
+            },
+            {
+              "name": "Cable Crossover Ladder",
+              "demoLink": "https://youtu.be/0TP9kVcWGic?si=5lWdSFfUA27mop9-",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "Wide-Grip Lat Pulldown",
+              "demoLink": "https://youtu.be/IYXRrYXfVLc?si=8eUNzIQ9o7Y-XpSp",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "High-Cable Lateral Raise",
+              "demoLink": "https://youtu.be/MnMux3Wc0Ac?si=diOk1ZKwTwTa4Sx0",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "Smith Machine Row",
+              "demoLink": "https://youtu.be/Wmivm40AV3Q?si=pAcxmzGxP16bt5I5",
+              "workingSets": "2",
+              "reps": "6-8"
+            },
+            {
+              "name": "Overhead Cable Triceps Extension",
+              "demoLink": "https://youtu.be/GYoUoVNlbGc?si=mKlJH3mz_e7-RCu0",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "Bayesian Cable Curl",
+              "demoLink": "https://youtu.be/jQ9rkfvAbIc?si=m1Q5OHGTNvhD6TZ9",
+              "workingSets": "2",
+              "reps": "8-10"
+            }
+          ]
+        },
+        {
+          "dayName": "Lower (Strength Focus)",
+          "isRestDay": false,
+          "exercises": [
+            {
+              "name": "Seated Leg Curl",
+              "demoLink": "https://youtu.be/yv0aAY7M1mk?si=Z1Cx7ih-vWTSTqq-",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "DB Bulgarian Split Squat",
+              "demoLink": "https://youtu.be/htDXu61MPio?si=WNsXh0BmNMXONRHP",
+              "workingSets": "2",
+              "reps": "6-8"
+            },
+            {
+              "name": "Barbell RDL",
+              "demoLink": "https://youtu.be/3fJwfg51cv0",
+              "workingSets": "2",
+              "reps": "6-8"
+            },
+            {
+              "name": "Leg Extension",
+              "demoLink": "https://youtu.be/uFbNtqP966A?si=3mIG7OVH30gHjNhd",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "Standing Calf Raise",
+              "demoLink": "https://youtu.be/6lR2JdxUh7w?si=Q_4oyceNkI-WarRg",
+              "workingSets": "2",
+              "reps": "6-8"
+            },
+            {
+              "name": "Cable Crunch",
+              "demoLink": "https://youtu.be/epBrpaGHMcg?si=FMV9IKBOvBkuUOZM",
+              "workingSets": "2",
+              "reps": "8-10"
+            }
+          ]
+        },
+        {
+          "dayName": "Rest Day",
+          "isRestDay": true,
+          "exercises": []
+        },
+        {
+          "dayName": "Pull (Hypertrophy Focus)",
+          "isRestDay": false,
+          "exercises": [
+            {
+              "name": "Neutral-Grip Lat Pulldown",
+              "demoLink": "https://youtu.be/lA4_1F9EAFU?si=5Bh19rDwBplX5QUz",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "Chest-Supported Machine Row",
+              "demoLink": "https://youtu.be/ijsSiWSzYw0?si=ADBJRkNSajLiVayN",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "Neutral-Grip Seated Cable Row",
+              "demoLink": "https://youtu.be/hM7XHxQgvLk?si=NSpgHwt_kgLsKPBY",
+              "workingSets": "2",
+              "reps": "10-12"
+            },
+            {
+              "name": "1-Arm 45° Cable Rear Delt Flye",
+              "demoLink": "https://youtu.be/6G5DmVaocGM",
+              "workingSets": "2",
+              "reps": "10-12"
+            },
+            {
+              "name": "Machine Shrug",
+              "demoLink": "https://youtu.be/ua0XuKwKQ9M?si=Y-kGNEq_riqAF2Tn",
+              "workingSets": "2",
+              "reps": "10-12"
+            },
+            {
+              "name": "EZ-Bar Cable Curl",
+              "demoLink": "https://youtu.be/ck1zjNTnFew?si=EgggtiVFxulCoYXU",
+              "workingSets": "2",
+              "reps": "10-12"
+            },
+            {
+              "name": "Machine Preacher Curl",
+              "demoLink": "https://youtu.be/R2iUnBxFtis",
+              "workingSets": "1",
+              "reps": "12-15"
+            }
+          ]
+        },
+        {
+          "dayName": "Push (Hypertrophy Focus)",
+          "isRestDay": false,
+          "exercises": [
+            {
+              "name": "Barbell Bench Press",
+              "demoLink": "https://youtu.be/nQL5ieH39sw?si=RjZSWBZ3CGKg-pax",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "Machine Shoulder Press",
+              "demoLink": "https://youtu.be/SCQVmN1gYsk?si=Enyh4L6ZDiCc6RyU",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "Bottom-Half DB Flye",
+              "demoLink": "https://youtu.be/qJzc-iHKGdg?si=GGd61Dr4uoDUI9b6",
+              "workingSets": "2",
+              "reps": "10-12"
+            },
+            {
+              "name": "High-Cable Lateral Raise",
+              "demoLink": "https://youtu.be/MnMux3Wc0Ac?si=diOk1ZKwTwTa4Sx0",
+              "workingSets": "2",
+              "reps": "10-12"
+            },
+            {
+              "name": "Overhead Cable Triceps Extension",
+              "demoLink": "https://youtu.be/9_I1PqZAjdA?si=hLmz2aLH05YfsUTF",
+              "workingSets": "2",
+              "reps": "10-12"
+            },
+            {
+              "name": "Cable Triceps Kickback",
+              "demoLink": "https://youtu.be/oRxTKRtP8RE?si=S_C_5SZAal_SIFBq",
+              "workingSets": "1",
+              "reps": "12-15"
+            },
+            {
+              "name": "Roman Chair Leg Raise",
+              "demoLink": "https://youtu.be/irOzFVqJ0IE?si=T1jsVXxw_GUhXrPX",
+              "workingSets": "2",
+              "reps": "10-20"
+            }
+          ]
+        },
+        {
+          "dayName": "Legs (Hypertrophy Focus)",
+          "isRestDay": false,
+          "exercises": [
+            {
+              "name": "Leg Press",
+              "demoLink": "https://youtu.be/1yKAQLVV_XI?si=G0wEZEbz8Kq9vFnF",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "Seated Leg Curl",
+              "demoLink": "https://youtu.be/yv0aAY7M1mk?si=Z1Cx7ih-vWTSTqq-",
+              "workingSets": "2",
+              "reps": "10-12"
+            },
+            {
+              "name": "DB Bulgarian Split Squat",
+              "demoLink": "https://youtu.be/htDXu61MPio?si=WNsXh0BmNMXONRHP",
+              "workingSets": "2",
+              "reps": "8-10"
+            },
+            {
+              "name": "Leg Extension",
+              "demoLink": "https://youtu.be/uFbNtqP966A?si=3mIG7OVH30gHjNhd",
+              "workingSets": "2",
+              "reps": "10-12"
+            },
+            {
+              "name": "Machine Hip Adduction",
+              "demoLink": "https://youtu.be/FMSCZYu1JhE?si=iYXhWk9YxX6x5mcF",
+              "workingSets": "2",
+              "reps": "10-12"
+            },
+            {
+              "name": "Machine Hip Abduction",
+              "demoLink": "https://youtu.be/pozooPg6PBE?si=uVtC8JPKXvZKeVlE",
+              "workingSets": "2",
+              "reps": "10-12"
+            },
+            {
+              "name": "Standing Calf Raise",
+              "demoLink": "https://youtu.be/6lR2JdxUh7w?si=Q_4oyceNkI-WarRg",
+              "workingSets": "2",
+              "reps": "10-12"
+            }
+          ]
+        },
+        {
+          "dayName": "Rest Day",
+          "isRestDay": true,
+          "exercises": []
+        }
+      ]
+    }
+  }
+}

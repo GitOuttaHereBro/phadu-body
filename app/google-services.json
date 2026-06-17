@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "722107466473",
+    "project_id": "bodybuilding-tracker-92c87",
+    "storage_bucket": "bodybuilding-tracker-92c87.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:722107466473:android:5315f58adfb3688a2a2678",
+        "android_client_info": {
+          "package_name": "phadubody.vercel.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "722107466473-vma08f91datb7nl89c3thnokutfkfhv3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNvWdNYbrAi0buqkn58zXh78DFqPKe9jo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "722107466473-vma08f91datb7nl89c3thnokutfkfhv3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
