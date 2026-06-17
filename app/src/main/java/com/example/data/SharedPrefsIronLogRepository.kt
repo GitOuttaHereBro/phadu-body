@@ -151,5 +151,13 @@ class SharedPrefsIronLogRepository(context: Context) : IronLogRepository {
         saveActiveProgram()
     }
     
+    private val userProfileState = MutableStateFlow<UserProfile?>(null)
+    
+    override fun getUserProfile(): Flow<UserProfile?> = userProfileState
+    override suspend fun saveUserProfile(profile: UserProfile) {
+        userProfileState.value = profile
+        // Persistence not fully implemented locally to keep minimal
+    }
+    
     override suspend fun signOut() {}
 }

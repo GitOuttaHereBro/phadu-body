@@ -1,5 +1,6 @@
 package com.example.data
 
+import com.google.firebase.firestore.ListenerRegistration
 import com.example.model.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -305,6 +306,40 @@ class FirebaseIronLogRepository : IronLogRepository {
             }
         } catch (e: Exception) {
             Log.e("FirebaseRepo", "Error saving active program state", e)
+        }
+    }
+
+    override fun getUserProfile(): Flow<com.example.model.UserProfile?> = callbackFlow {
+        var listenerRegistration: ListenerRegistration? = null
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            val docRef = firestore.collection("users").document(uid).collection("settings").document("userProfile")
+            listenerRegistration = docRef.addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w("FirebaseRepo", "Listen failed.", e)
+                    trySend(null)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null && snapshot.exists()) {
+                    val profile = snapshot.toObject(com.example.model.UserProfile::class.java)
+                    trySend(profile)
+                } else {
+                    trySend(null)
+                }
+            }
+        } else {
+            trySend(null)
+        }
+        awaitClose { listenerRegistration?.remove() }
+    }
+
+    override suspend fun saveUserProfile(profile: com.example.model.UserProfile) {
+        val uid = auth.currentUser?.uid ?: return
+        try {
+            firestore.collection("users").document(uid).collection("settings").document("userProfile")
+                .set(profile).await()
+        } catch (e: Exception) {
+            Log.e("FirebaseRepo", "Error saving user profile", e)
         }
     }
 

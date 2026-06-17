@@ -142,54 +142,20 @@ fun MainScreenWrapper(
                 val currentUser = auth.currentUser
 
                 if (showProfileDialog) {
-                    AlertDialog(
-                        onDismissRequest = { showProfileDialog = false },
-                        containerColor = com.example.ui.theme.GrayDark,
-                        titleContentColor = Color.White,
-                        textContentColor = com.example.ui.theme.GrayMedium,
-                        shape = RoundedCornerShape(24.dp),
-                        title = { Text("PROFILE", fontWeight = androidx.compose.ui.text.font.FontWeight.Black) },
-                        text = {
-                            Column {
-                                if (currentUser != null) {
-                                    Text("Logged in as:")
-                                    Text(currentUser.email ?: "Unknown User", color = Color.White, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-                                } else {
-                                    Text("You are not logged in.")
-                                }
+                    com.example.ui.profile.ProfileDialog(
+                        repository = repository,
+                        onDismiss = { showProfileDialog = false },
+                        onSignOut = {
+                            auth.signOut()
+                            showProfileDialog = false
+                            rootNavController.navigate("login") {
+                                popUpTo(0) { inclusive = true }
                             }
                         },
-                        confirmButton = {
-                            if (currentUser != null) {
-                                Button(
-                                    onClick = {
-                                        auth.signOut()
-                                        showProfileDialog = false
-                                        rootNavController.navigate("login") {
-                                            popUpTo(0) { inclusive = true }
-                                        }
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.ErrorColor, contentColor = Color.White)
-                                ) {
-                                    Text("SIGN OUT")
-                                }
-                            } else {
-                                Button(
-                                    onClick = {
-                                        showProfileDialog = false
-                                        rootNavController.navigate("login") {
-                                            popUpTo(0) { inclusive = true }
-                                        }
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.White)
-                                ) {
-                                    Text("LOG IN / SIGN UP")
-                                }
-                            }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = { showProfileDialog = false }) {
-                                Text("CLOSE", color = Color.White)
+                        onLoginClick = {
+                            showProfileDialog = false
+                            rootNavController.navigate("login") {
+                                popUpTo(0) { inclusive = true }
                             }
                         }
                     )

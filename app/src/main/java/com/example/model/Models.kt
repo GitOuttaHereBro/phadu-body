@@ -76,6 +76,24 @@ data class RecordDetail(
 )
 
 @JsonClass(generateAdapter = true)
+data class UserProfile(
+    val name: String = "",
+    val age: Int = 0,
+    val weightKg: Double = 0.0,
+    val heightCm: Double = 0.0,
+    val gender: String = "Not specified",
+    val progressPhotos: List<ProgressPhoto> = emptyList()
+)
+
+@JsonClass(generateAdapter = true)
+data class ProgressPhoto(
+    val id: String = "",
+    val date: Long = 0L,
+    val localUri: String = "",
+    val weightKg: Double = 0.0
+)
+
+@JsonClass(generateAdapter = true)
 data class ActiveProgramState(
     val programKey: String = "", // e.g. the json filename or programName
     val currentWeekIndex: Int = 0,
