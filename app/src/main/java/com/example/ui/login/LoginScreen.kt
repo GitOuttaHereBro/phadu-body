@@ -54,9 +54,9 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "IRONLOG",
+            text = "GYM KRTA H JI",
             color = Color.White,
-            fontSize = 48.sp,
+            fontSize = 36.sp,
             fontWeight = FontWeight.Black,
             letterSpacing = 2.sp,
             modifier = Modifier.padding(bottom = 8.dp)

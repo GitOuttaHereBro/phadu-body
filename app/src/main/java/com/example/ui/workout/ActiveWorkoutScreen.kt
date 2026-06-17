@@ -49,6 +49,7 @@ fun ActiveWorkoutScreen(
     var activeWorkout by remember { mutableStateOf<Workout?>(null) }
     var availableExercises by remember { mutableStateOf<List<Exercise>>(emptyList()) }
     var showAddExerciseDialog by remember { mutableStateOf(false) }
+    var exerciseToSwapIndex by remember { mutableStateOf<Int?>(null) }
     var prs by remember { mutableStateOf<Map<String, com.example.model.PersonalRecord>>(emptyMap()) }
 
     LaunchedEffect(Unit) {
@@ -78,13 +79,17 @@ fun ActiveWorkoutScreen(
                 title = { Text((activeWorkout!!.templateName ?: "FREE WORKOUT").uppercase(), fontWeight = FontWeight.Black, fontSize = 20.sp, color = Color.White) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 actions = {
-                    TextButton(onClick = {
-                        coroutineScope.launch {
-                            repository.finishWorkout(activeWorkout!!)
-                            onFinish()
-                        }
-                    }) {
-                        Text("FINISH", color = Color.White, fontWeight = FontWeight.Black, letterSpacing = 1.sp)
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                repository.finishWorkout(activeWorkout!!)
+                                onFinish()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.White),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("FINISH", fontWeight = FontWeight.Black, letterSpacing = 1.sp)
                     }
                 }
             )
@@ -117,17 +122,22 @@ fun ActiveWorkoutScreen(
                         coroutineScope.launch {
                             repository.saveWorkout(activeWorkout!!.copy(loggedExercises = updatedList))
                         }
-                    }
+                    },
+                    onSwap = { exerciseToSwapIndex = index }
                 )
             }
             item { Spacer(modifier = Modifier.height(100.dp)) }
         }
     }
 
-    if (showAddExerciseDialog) {
+    if (showAddExerciseDialog || exerciseToSwapIndex != null) {
+        val isSwapping = exerciseToSwapIndex != null
         AlertDialog(
-            onDismissRequest = { showAddExerciseDialog = false },
-            title = { Text("ADD EXERCISE", fontWeight = FontWeight.Black) },
+            onDismissRequest = { 
+                showAddExerciseDialog = false
+                exerciseToSwapIndex = null
+            },
+            title = { Text(if (isSwapping) "SWAP EXERCISE" else "ADD EXERCISE", fontWeight = FontWeight.Black) },
             containerColor = Color.Black,
             titleContentColor = Color.White,
             textContentColor = Color(0xFFA0A0A0),
@@ -142,14 +152,29 @@ fun ActiveWorkoutScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    val newList = activeWorkout!!.loggedExercises + LoggedExercise(
-                                        exerciseId = ex.id,
-                                        exerciseName = ex.name,
-                                        sets = listOf(WorkoutSet())
-                                    )
-                                    coroutineScope.launch {
-                                        repository.saveWorkout(activeWorkout!!.copy(loggedExercises = newList))
-                                        showAddExerciseDialog = false
+                                    if (isSwapping) {
+                                        val indexStr = exerciseToSwapIndex!!
+                                        val oldSets = activeWorkout!!.loggedExercises[indexStr].sets
+                                        val newList = activeWorkout!!.loggedExercises.toMutableList()
+                                        newList[indexStr] = LoggedExercise(
+                                            exerciseId = ex.id,
+                                            exerciseName = ex.name,
+                                            sets = oldSets
+                                        )
+                                        coroutineScope.launch {
+                                            repository.saveWorkout(activeWorkout!!.copy(loggedExercises = newList))
+                                            exerciseToSwapIndex = null
+                                        }
+                                    } else {
+                                        val newList = activeWorkout!!.loggedExercises + LoggedExercise(
+                                            exerciseId = ex.id,
+                                            exerciseName = ex.name,
+                                            sets = listOf(WorkoutSet())
+                                        )
+                                        coroutineScope.launch {
+                                            repository.saveWorkout(activeWorkout!!.copy(loggedExercises = newList))
+                                            showAddExerciseDialog = false
+                                        }
                                     }
                                 }
                                 .padding(vertical = 16.dp)
@@ -159,7 +184,10 @@ fun ActiveWorkoutScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showAddExerciseDialog = false }) { Text("CANCEL", color = Color.White) }
+                TextButton(onClick = { 
+                    showAddExerciseDialog = false
+                    exerciseToSwapIndex = null 
+                }) { Text("CANCEL", color = Color.White) }
             }
         )
     }
@@ -170,7 +198,8 @@ fun LoggedExerciseCard(
     modifier: Modifier = Modifier,
     loggedExercise: LoggedExercise,
     pr: com.example.model.PersonalRecord? = null,
-    onUpdate: (LoggedExercise) -> Unit
+    onUpdate: (LoggedExercise) -> Unit,
+    onSwap: () -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
     
@@ -184,10 +213,15 @@ fun LoggedExerciseCard(
     ) {
         Column(modifier = Modifier.padding(16.dp).animateContentSize()) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(text = loggedExercise.exerciseName, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = Color.White)
-                if (loggedExercise.videoUrl != null) {
-                    IconButton(onClick = { uriHandler.openUri(loggedExercise.videoUrl) }) {
-                        Icon(Icons.Filled.PlayArrow, contentDescription = "Watch Video", tint = Color.Red)
+                Text(text = loggedExercise.exerciseName, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = Color.White, modifier = Modifier.weight(1f))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (loggedExercise.videoUrl != null) {
+                        IconButton(onClick = { uriHandler.openUri(loggedExercise.videoUrl!!) }) {
+                            Icon(Icons.Filled.PlayArrow, contentDescription = "Watch Video", tint = Color.Red)
+                        }
+                    }
+                    TextButton(onClick = onSwap) {
+                        Text("SWAP", color = com.example.ui.theme.AccentGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -255,7 +289,7 @@ fun LoggedExerciseCard(
                         )
                         
                         val isDone = set.completedAt != null
-                        val boxColor by animateColorAsState(if (isDone) Color.White else Color.Transparent, animationSpec = tween(300))
+                        val boxColor by animateColorAsState(if (isDone) com.example.ui.theme.AccentGreen else Color.Transparent, animationSpec = tween(300))
                         val borderColor by animateColorAsState(if (isDone) Color.Transparent else com.example.ui.theme.GlassBorderLight, animationSpec = tween(300))
                         
                         Box(
@@ -282,7 +316,7 @@ fun LoggedExerciseCard(
                             contentAlignment = Alignment.Center
                         ) {
                             if (isDone) {
-                                Icon(Icons.Filled.Check, contentDescription = "Done", tint = Color.Black)
+                                Icon(Icons.Filled.Check, contentDescription = "Done", tint = Color.White)
                             }
                         }
                     }

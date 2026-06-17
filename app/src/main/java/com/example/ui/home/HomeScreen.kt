@@ -156,7 +156,7 @@ fun HomeScreen(
         }
 
         Text(
-            text = "IRONLOG",
+            text = "GYM KRTA H JI",
             color = Color.White,
             fontSize = 32.sp,
             fontWeight = FontWeight.Black,
@@ -214,7 +214,7 @@ fun HomeScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(48.dp)
+                                    .defaultMinSize(minWidth = 56.dp, minHeight = 48.dp)
                                     .background(com.example.ui.theme.GrayDark, shape = RoundedCornerShape(12.dp)),
                                 contentAlignment = Alignment.Center
                             ) {

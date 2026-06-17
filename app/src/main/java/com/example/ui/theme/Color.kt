@@ -15,3 +15,4 @@ val GlassDark = Color.White.copy(alpha = 0.08f)
 val GlassBorderDark = Color.White.copy(alpha = 0.12f)
 
 val ErrorColor = Color(0xFFFF453A)
+val AccentGreen = Color(0xFF34C759)
