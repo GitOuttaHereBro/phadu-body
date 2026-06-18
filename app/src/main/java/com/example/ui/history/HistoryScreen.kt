@@ -10,10 +10,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,6 +37,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+
+import com.example.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,8 +100,7 @@ fun HistoryScreen(repository: IronLogRepository) {
                     // Modern high-contrast toggle with active borders
                     Row(
                         modifier = Modifier
-                            .background(com.example.ui.theme.GlassDark, RoundedCornerShape(8.dp))
-                            .border(1.dp, com.example.ui.theme.GlassBorderDark, RoundedCornerShape(8.dp))
+                            .glassCard()
                             .padding(2.dp)
                     ) {
                         IconButton(
@@ -113,7 +114,7 @@ fun HistoryScreen(repository: IronLogRepository) {
                                 .testTag("toggle_calendar_view")
                         ) {
                             Icon(
-                                imageVector = Icons.Default.CalendarMonth,
+                                imageVector = Icons.Outlined.CalendarMonth,
                                 contentDescription = "Calendar View",
                                 tint = if (isCalendarView) Color.Black else Color.White
                             )
@@ -129,7 +130,7 @@ fun HistoryScreen(repository: IronLogRepository) {
                                 .testTag("toggle_list_view")
                         ) {
                             Icon(
-                                imageVector = Icons.Default.List,
+                                imageVector = Icons.Outlined.List,
                                 contentDescription = "List View",
                                 tint = if (!isCalendarView) Color.Black else Color.White
                             )
@@ -212,18 +213,9 @@ fun HistoryScreen(repository: IronLogRepository) {
             ) {
                 if (history.isEmpty()) {
                     item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(40.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                "No workouts found in your history.",
-                                color = com.example.ui.theme.GrayMedium,
-                                fontSize = 14.sp
-                            )
-                        }
+                        EmptyState(
+                            message = "No workouts found in your history. Complete a workout to see it here."
+                        )
                     }
                 } else {
                     items(history.sortedByDescending { it.date }) { workout ->
@@ -414,8 +406,8 @@ fun TrainingCalendar(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { currentMonthOffset-- }) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous Month", tint = Color.White)
+                IconButton(onClick = {  currentMonthOffset--  }, modifier = Modifier.bouncy()) {
+                    Icon(imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowLeft, contentDescription = "Previous Month", tint = Color.White)
                 }
                 
                 Text(
@@ -426,8 +418,8 @@ fun TrainingCalendar(
                     letterSpacing = 1.5.sp
                 )
                 
-                IconButton(onClick = { currentMonthOffset++ }) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next Month", tint = Color.White)
+                IconButton(onClick = {  currentMonthOffset++  }, modifier = Modifier.bouncy()) {
+                    Icon(imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = "Next Month", tint = Color.White)
                 }
             }
             
@@ -511,7 +503,7 @@ fun TrainingCalendar(
                                                 },
                                                 shape = CircleShape
                                             )
-                                            .clickable { onDaySelected(dateStr) }
+                                            .bouncyClick { onDaySelected(dateStr) }
                                             .testTag("calendar_day_$dayOfMonth")
                                     ) {
                                         Box(

@@ -7,7 +7,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import com.example.ui.theme.*
 
 @Composable
 fun HomeScreen(
@@ -114,8 +115,8 @@ fun HomeScreen(
             if (activeProgramState == null) {
                 // ==================== ONBOARDING FLOW ====================
                 if (program == null || isLoadingProgram) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Color.White)
+                    Box(modifier = Modifier.fillMaxSize().padding(IronSpacing.Large), contentAlignment = Alignment.Center) {
+                        Box(modifier = Modifier.fillMaxWidth().height(200.dp).skeleton().clip(RoundedCornerShape(IronSpacing.CardCornerRadius)))
                     }
                 } else {
                     OnboardingWizard(
@@ -143,8 +144,8 @@ fun HomeScreen(
             } else {
                 // ==================== GUIDED TRAINING OS DASHBOARD ====================
                 if (program == null) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Color.White)
+                    Box(modifier = Modifier.fillMaxSize().padding(IronSpacing.Large), contentAlignment = Alignment.Center) {
+                        Box(modifier = Modifier.fillMaxWidth().height(200.dp).skeleton().clip(RoundedCornerShape(IronSpacing.CardCornerRadius)))
                     }
                 } else {
                     DashboardContent(
@@ -244,7 +245,7 @@ fun OnboardingWizard(
                     0 -> {
                         // Overview Step
                         Icon(
-                            imageVector = Icons.Default.Info,
+                            imageVector = Icons.Outlined.Info,
                             contentDescription = null,
                             tint = com.example.ui.theme.AccentGreen,
                             modifier = Modifier.size(64.dp)
@@ -316,7 +317,7 @@ fun OnboardingWizard(
                     2 -> {
                         // Split Step
                         Icon(
-                            imageVector = Icons.Default.PlayArrow,
+                            imageVector = Icons.Outlined.PlayArrow,
                             contentDescription = null,
                             tint = com.example.ui.theme.AccentGreen,
                             modifier = Modifier.size(64.dp)
@@ -374,7 +375,7 @@ fun OnboardingWizard(
                     3 -> {
                         // Final step
                         Icon(
-                            imageVector = Icons.Default.CheckCircle,
+                            imageVector = Icons.Outlined.CheckCircle,
                             contentDescription = null,
                             tint = com.example.ui.theme.AccentGreen,
                             modifier = Modifier.size(64.dp)
@@ -620,16 +621,106 @@ fun DashboardContent(
             }
             Box(
                 modifier = Modifier
-                    .background(com.example.ui.theme.GlassDark, RoundedCornerShape(12.dp))
-                    .border(1.dp, com.example.ui.theme.GlassBorderDark, RoundedCornerShape(12.dp))
-                    .clickable { onResetProgram() }
+                    .glassCard()
+                    .bouncyClick { onResetProgram() }
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Text("RESET ENGINE", color = com.example.ui.theme.ErrorColor, fontSize = 9.sp, fontWeight = FontWeight.Bold)
             }
         }
 
+        // ==================== PRIMARY CTA AREA ====================
+        val selectedDay = daysList.getOrNull(selectedDayIndex)
+        if (selectedDay != null) {
+            if (activeWorkout != null) {
+                Button(
+                    onClick = onResumeWorkout,
+                    colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.White),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth().height(60.dp).padding(bottom = 16.dp)
+                ) {
+                    Text("RESUME WORKOUT", fontWeight = FontWeight.Black, fontSize = 16.sp, letterSpacing = 2.sp)
+                }
+            } else if (selectedDay.isRestDay) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
+                    border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(Icons.Outlined.Favorite, contentDescription = null, tint = com.example.ui.theme.AccentGreen)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Today is a Rest Day",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            } else {
+                val isCompleted = completedMap["week${activeProgramState.currentWeekIndex + 1}_$selectedDayIndex"] == true
+                val btnLabel = if (isCompleted) "RESTART WORKOUT" else "START WORKOUT"
+                
+                Button(
+                    onClick = {
+                        var newW = selectedDay.toWorkout("week${activeProgramState.currentWeekIndex + 1}", selectedDayIndex)
+                                    // Prefill logic
+                                    val completedWorkouts = workoutsList.filter { it.status == "completed" }.sortedByDescending { it.date }
+                                    val newExs = newW.loggedExercises.map { ex ->
+                                        val lastEx = completedWorkouts.mapNotNull { w -> w.loggedExercises.find { it.exerciseId == ex.exerciseId } }.firstOrNull()
+                                        if (lastEx != null) {
+                                            val newSets = ex.sets.map { set ->
+                                                val pastSet = lastEx.sets.find { it.isWarmup == set.isWarmup && it.setNumber == set.setNumber }
+                                                    ?: lastEx.sets.lastOrNull { it.isWarmup == set.isWarmup }
+                                                if (pastSet != null) {
+                                                    set.copy(weight = pastSet.weight, reps = pastSet.reps)
+                                                } else {
+                                                    set.copy(reps = set.targetReps ?: 0)
+                                                }
+                                            }
+                                            ex.copy(sets = newSets)
+                                        } else {
+                                            val newSets = ex.sets.map { it.copy(reps = it.targetReps ?: 0) }
+                                            ex.copy(sets = newSets)
+                                        }
+                                    }
+                                    newW = newW.copy(loggedExercises = newExs)
+                                    
+                                    onStartWorkout(newW)
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth().height(60.dp).padding(bottom = 8.dp)
+                            ) {
+                                Text(btnLabel, fontWeight = FontWeight.Black, fontSize = 16.sp, letterSpacing = 2.sp)
+                            }
+                
+                // Warm Up - secondary action
+                TextButton(
+                    onClick = { /* TODO: Trigger Warm Up routine if needed */ },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                ) {
+                    Text(
+                        "WARM UP ROUTINE",
+                        color = com.example.ui.theme.AccentGreen,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp,
+                        letterSpacing = 1.sp
+                    )
+                }
+            }
+        }
+        
+        // ==================== SECONDARY METRICS ====================
+
         // Active Program Card
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -751,7 +842,7 @@ fun DashboardContent(
                 Card(
                     modifier = Modifier
                         .width(96.dp)
-                        .clickable {
+                        .bouncyClick {
                             if (isUnlocked) {
                                 onSelectDayIndex(idx)
                             } else {
@@ -784,11 +875,11 @@ fun DashboardContent(
                         
                         // Status indicators (Icon: Check, Lock, or Target Muscle)
                         if (isCompleted) {
-                            Icon(Icons.Default.CheckCircle, contentDescription = "Completed", tint = com.example.ui.theme.AccentGreen, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Outlined.CheckCircle, contentDescription = "Completed", tint = com.example.ui.theme.AccentGreen, modifier = Modifier.size(18.dp))
                         } else if (!isUnlocked) {
-                            Icon(Icons.Default.Lock, contentDescription = "Locked", tint = Color.Gray, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Outlined.Lock, contentDescription = "Locked", tint = Color.Gray, modifier = Modifier.size(18.dp))
                         } else if (day.isRestDay) {
-                            Icon(Icons.Default.Favorite, contentDescription = "Rest", tint = Color.LightGray, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Outlined.Favorite, contentDescription = "Rest", tint = Color.LightGray, modifier = Modifier.size(18.dp))
                         } else {
                             val abbreviation = if (day.dayName.contains("Upper", true)) "UPP"
                                                else if (day.dayName.contains("Lower", true)) "LOW"
@@ -804,7 +895,6 @@ fun DashboardContent(
         }
 
         // Target day overview box
-        val selectedDay = daysList.getOrNull(selectedDayIndex)
         if (selectedDay != null) {
             Text(
                 text = "SELECTED DAY DETAILS",
@@ -851,7 +941,7 @@ fun DashboardContent(
                     if (selectedDay.isRestDay) {
                         // Recovery Section
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Favorite, contentDescription = null, tint = com.example.ui.theme.AccentGreen, modifier = Modifier.padding(end = 8.dp))
+                            Icon(Icons.Outlined.Favorite, contentDescription = null, tint = com.example.ui.theme.AccentGreen, modifier = Modifier.padding(end = 8.dp))
                             Text("RECOVERY & MOBILITY DAY HUB", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         }
                         Spacer(modifier = Modifier.height(8.dp))
@@ -897,12 +987,12 @@ fun DashboardContent(
                                     }
                                     if (ex.videoUrl != null) {
                                         Icon(
-                                            Icons.Default.PlayArrow,
+                                            Icons.Outlined.PlayArrow,
                                             contentDescription = "Demo available",
                                             tint = Color.Red,
                                             modifier = Modifier
                                                 .size(20.dp)
-                                                .clickable { uriHandler.openUri(ex.videoUrl!!) }
+                                                .bouncyClick { uriHandler.openUri(ex.videoUrl!!) }
                                         )
                                     }
                                 }
@@ -910,31 +1000,6 @@ fun DashboardContent(
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        // Trigger actions
-                        if (activeWorkout != null) {
-                            Button(
-                                onClick = onResumeWorkout,
-                                colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.White),
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth().height(48.dp)
-                            ) {
-                                Text("RESUME ACTIVE WORKOUT Session 🔄", fontWeight = FontWeight.Black)
-                            }
-                        } else {
-                            val btnLabel = if (completedMap["week${activeProgramState.currentWeekIndex + 1}_$selectedDayIndex"] == true) "RESTART WORKOUT" else "START WORKOUT: ${selectedDay.dayName.uppercase()} 🔥"
-                            Button(
-                                onClick = {
-                                    val newW = selectedDay.toWorkout("week${activeProgramState.currentWeekIndex + 1}", selectedDayIndex)
-                                    onStartWorkout(newW)
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth().height(48.dp)
-                            ) {
-                                Text(btnLabel, fontWeight = FontWeight.Bold)
-                            }
-                        }
                     }
                 }
             }
@@ -1025,7 +1090,7 @@ fun DashboardContent(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(Icons.Filled.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Outlined.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(20.dp))
                     Text(text = "$currentStreak DAYS", fontWeight = FontWeight.Black, fontSize = 18.sp, color = Color.White)
                     Text(text = "CURRENT STREAK", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium)
                 }
@@ -1046,7 +1111,7 @@ fun DashboardContent(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(Icons.Filled.Timeline, contentDescription = null, tint = com.example.ui.theme.AccentGreen, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Outlined.Timeline, contentDescription = null, tint = com.example.ui.theme.AccentGreen, modifier = Modifier.size(20.dp))
                     Text(text = if (weeklyVolume > 0) "${weeklyVolume.toInt()} KG" else "0 KG", fontWeight = FontWeight.Black, fontSize = 18.sp, color = Color.White)
                     Text(text = "7-DAY VOLUME", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium)
                 }
@@ -1074,7 +1139,7 @@ fun DashboardContent(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(Icons.Filled.ThumbUp, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Outlined.ThumbUp, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
                     Text(text = "$totalCompletedDays WORKOUTS", fontWeight = FontWeight.Black, fontSize = 16.sp, color = Color.White)
                     Text(text = "COMPLETED TOTAL", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium)
                 }
@@ -1154,7 +1219,7 @@ fun DashboardContent(
                                     color = if (isWeekExpanded) Color.White.copy(alpha = 0.05f) else Color.Transparent,
                                     shape = RoundedCornerShape(8.dp)
                                 )
-                                .clickable {
+                                .bouncyClick {
                                     expandedWeekIndex = if (isWeekExpanded) null else wIdx
                                 }
                                 .padding(12.dp),
@@ -1214,7 +1279,7 @@ fun DashboardContent(
                                 )
                             }
                             Icon(
-                                imageVector = if (isWeekExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                imageVector = if (isWeekExpanded) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown,
                                 contentDescription = null,
                                 tint = Color.White.copy(alpha = 0.6f),
                                 modifier = Modifier.padding(start = 8.dp)
@@ -1240,7 +1305,7 @@ fun DashboardContent(
                                                 if (isDayCompleted) com.example.ui.theme.AccentGreen.copy(alpha = 0.2f) else Color.Transparent,
                                                 RoundedCornerShape(8.dp)
                                             )
-                                            .clickable {
+                                            .bouncyClick {
                                                 if (!dayObj.isRestDay) {
                                                     val newW = dayObj.toWorkout("week${wIdx + 1}", dayIdx)
                                                     onStartWorkout(newW)
@@ -1289,14 +1354,14 @@ fun DashboardContent(
                                         }
                                         if (isDayCompleted) {
                                             Icon(
-                                                imageVector = Icons.Default.CheckCircle,
+                                                imageVector = Icons.Outlined.CheckCircle,
                                                 contentDescription = "Completed",
                                                 tint = com.example.ui.theme.AccentGreen,
                                                 modifier = Modifier.size(16.dp)
                                             )
                                         } else if (!dayObj.isRestDay) {
                                             Icon(
-                                                imageVector = Icons.Default.PlayArrow,
+                                                imageVector = Icons.Outlined.PlayArrow,
                                                 contentDescription = "Start",
                                                 tint = Color.White.copy(alpha = 0.5f),
                                                 modifier = Modifier.size(16.dp)
@@ -1365,7 +1430,7 @@ fun ImportDiagnosticsPanel(program: Program?) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Build, contentDescription = null, tint = com.example.ui.theme.AccentGreen, modifier = Modifier.size(16.dp))
+                Icon(Icons.Outlined.Build, contentDescription = null, tint = com.example.ui.theme.AccentGreen, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("ENGINE IMPORT DIAGNOSTICS", color = com.example.ui.theme.AccentGreen, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.sp)
             }

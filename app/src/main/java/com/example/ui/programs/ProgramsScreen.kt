@@ -13,12 +13,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,6 +42,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
+import androidx.compose.ui.draw.clip
+import com.example.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -261,8 +263,8 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                 },
                 navigationIcon = {
                     if (!showSelector && activeProgramState == null) {
-                        IconButton(onClick = { selectedProgramKey = null }) {
-                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back to selection", tint = Color.White)
+                        IconButton(onClick = {  selectedProgramKey = null  }, modifier = Modifier.bouncy()) {
+                            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = "Back to selection", tint = Color.White)
                         }
                     }
                 },
@@ -308,8 +310,8 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
             )
         } else {
             if (isLoading || program == null) {
-                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Color.White)
+                Box(modifier = Modifier.fillMaxSize().padding(padding).padding(IronSpacing.Large), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.fillMaxWidth().height(200.dp).skeleton().clip(RoundedCornerShape(IronSpacing.CardCornerRadius)))
                 }
             } else {
             if (showConfirmDialog) {
@@ -388,14 +390,14 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             if (isLoading) {
-                                CircularProgressIndicator(color = Color.Black, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                                Box(modifier = Modifier.width(60.dp).height(20.dp).skeleton().clip(RoundedCornerShape(4.dp)))
                             } else {
                                 Text("Let's Go!", fontWeight = FontWeight.Bold)
                             }
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = { if (!isLoading) showConfirmDialog = false }) {
+                        TextButton(onClick = {  if (!isLoading) showConfirmDialog = false  }, modifier = Modifier.bouncy()) {
                             Text("Cancel", color = com.example.ui.theme.GrayMedium)
                         }
                     }
@@ -463,7 +465,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                 enabled = activeWeekIndex > 0
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.ArrowBack,
+                                    imageVector = Icons.Outlined.ArrowBack,
                                     contentDescription = "Previous Week",
                                     tint = if (activeWeekIndex > 0) Color.White else Color.White.copy(alpha = 0.3f)
                                 )
@@ -495,7 +497,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                 enabled = activeWeekIndex < 11
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.ArrowForward,
+                                    imageVector = Icons.Outlined.ArrowForward,
                                     contentDescription = "Next Week",
                                     tint = if (activeWeekIndex < 11) Color.White else Color.White.copy(alpha = 0.3f)
                                 )
@@ -516,7 +518,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                 modifier = Modifier
                                     .weight(1.0f)
                                     .padding(horizontal = 2.dp)
-                                    .clickable { activeTabDayIndex = idx },
+                                    .bouncyClick { activeTabDayIndex = idx },
                                 colors = CardDefaults.cardColors(
                                     containerColor = if (isSelected) com.example.ui.theme.AccentGreen else com.example.ui.theme.GlassDark
                                 ),
@@ -717,7 +719,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                 modifier = Modifier.size(32.dp).background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
                                             ) {
                                                 Icon(
-                                                    imageVector = Icons.Default.PlayArrow,
+                                                    imageVector = Icons.Outlined.PlayArrow,
                                                     contentDescription = "Watch Demo",
                                                     tint = com.example.ui.theme.AccentGreen
                                                 )
@@ -782,7 +784,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                         ) {
                                             Row(verticalAlignment = Alignment.Top) {
                                                 Icon(
-                                                    imageVector = Icons.Default.Info,
+                                                    imageVector = Icons.Outlined.Info,
                                                     contentDescription = "Note",
                                                     tint = com.example.ui.theme.GrayMedium,
                                                     modifier = Modifier.size(16.dp).padding(top = 2.dp)
@@ -897,7 +899,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                     )
                                             ) {
                                                 Icon(
-                                                    imageVector = Icons.Default.Check,
+                                                    imageVector = Icons.Outlined.Check,
                                                     contentDescription = "Log set",
                                                     tint = if (isCompleted) Color.Black else Color.White
                                                 )
@@ -925,7 +927,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                 Card(
                                                     modifier = Modifier
                                                         .fillMaxWidth()
-                                                        .clickable { activeSubstitutions.remove(primaryEx.name) },
+                                                        .bouncyClick { activeSubstitutions.remove(primaryEx.name) },
                                                     colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.4f)),
                                                     border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
                                                 ) {
@@ -936,7 +938,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                     ) {
                                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                                             Icon(
-                                                                imageVector = Icons.Default.SwapHoriz,
+                                                                imageVector = Icons.Outlined.SwapHoriz,
                                                                 contentDescription = "Swap",
                                                                 tint = com.example.ui.theme.AccentGreen,
                                                                 modifier = Modifier.size(16.dp)
@@ -960,7 +962,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                     Card(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
-                                                            .clickable { activeSubstitutions[primaryEx.name] = sub1 },
+                                                            .bouncyClick { activeSubstitutions[primaryEx.name] = sub1 },
                                                         colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.04f)),
                                                         shape = RoundedCornerShape(10.dp)
                                                     ) {
@@ -979,7 +981,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                                         onClick = { uriHandler.openUri(url) },
                                                                         modifier = Modifier.size(28.dp).padding(end = 4.dp)
                                                                     ) {
-                                                                        Icon(Icons.Default.PlayArrow, contentDescription = "Watch Demo", tint = com.example.ui.theme.GrayMedium)
+                                                                        Icon(Icons.Outlined.PlayArrow, contentDescription = "Watch Demo", tint = com.example.ui.theme.GrayMedium)
                                                                     }
                                                                 }
                                                                 TextButton(
@@ -1001,7 +1003,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                     Card(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
-                                                            .clickable { activeSubstitutions[primaryEx.name] = sub2 },
+                                                            .bouncyClick { activeSubstitutions[primaryEx.name] = sub2 },
                                                         colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.04f)),
                                                         shape = RoundedCornerShape(10.dp)
                                                     ) {
@@ -1020,7 +1022,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                                         onClick = { uriHandler.openUri(url) },
                                                                         modifier = Modifier.size(28.dp).padding(end = 4.dp)
                                                                     ) {
-                                                                        Icon(Icons.Default.PlayArrow, contentDescription = "Watch Demo", tint = com.example.ui.theme.GrayMedium)
+                                                                        Icon(Icons.Outlined.PlayArrow, contentDescription = "Watch Demo", tint = com.example.ui.theme.GrayMedium)
                                                                     }
                                                                 }
                                                                 TextButton(
@@ -1124,7 +1126,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
     }
 
     if (showPlateCalcWeight != null) {
-        com.example.ui.progress.PlateCalculatorDialog(
+        com.example.ui.workout.BarbellVisualizer(
             initialTargetWeight = showPlateCalcWeight!!,
             isKgInitially = true,
             onDismiss = { showPlateCalcWeight = null }
@@ -1160,7 +1162,7 @@ fun ProgramSelectionCatalog(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onSelect("jeff_nippard.json") },
+                    .bouncyClick { onSelect("jeff_nippard.json") },
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
                 border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
@@ -1230,7 +1232,7 @@ fun ProgramSelectionCatalog(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onImportClick() },
+                    .bouncyClick { onImportClick() },
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
                 border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
@@ -1308,7 +1310,7 @@ fun ProgramTimeline(
                 Card(
                     modifier = Modifier
                         .width(if (isExpanded) 195.dp else 125.dp)
-                        .clickable { onWeekSelect(weekIdx) },
+                        .bouncyClick { onWeekSelect(weekIdx) },
                     colors = CardDefaults.cardColors(
                         containerColor = if (isSelected) com.example.ui.theme.AccentGreen.copy(alpha = 0.15f) else com.example.ui.theme.GlassDark
                     ),
@@ -1338,7 +1340,7 @@ fun ProgramTimeline(
                             Box(
                                 modifier = Modifier
                                     .size(20.dp)
-                                    .clickable {
+                                    .bouncyClick {
                                         expandedWeeks[weekIdx] = !isExpanded
                                     }
                                     .background(Color.White.copy(alpha = 0.08f), androidx.compose.foundation.shape.CircleShape),
@@ -1488,7 +1490,7 @@ fun ImportErrorScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = Icons.Default.Info,
+            imageVector = Icons.Outlined.Info,
             contentDescription = "Error",
             tint = Color(0xFFE53935),
             modifier = Modifier.size(64.dp)

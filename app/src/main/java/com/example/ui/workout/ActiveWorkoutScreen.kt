@@ -13,11 +13,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,6 +28,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import com.example.data.IronLogRepository
 import com.example.model.Exercise
 import com.example.model.LoggedExercise
@@ -37,6 +42,8 @@ import kotlinx.coroutines.launch
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.clip
+import com.example.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +59,11 @@ fun ActiveWorkoutScreen(
     var exerciseToSwapIndex by remember { mutableStateOf<Int?>(null) }
     var prs by remember { mutableStateOf<Map<String, com.example.model.PersonalRecord>>(emptyMap()) }
     var showPlateCalcWeight by remember { mutableStateOf<Double?>(null) }
+    
+    val listState = rememberLazyListState()
+    var expandedExerciseIndex by remember { mutableStateOf(0) }
+    var activeRestTimerEnd by remember { mutableStateOf<Long?>(null) }
+    var activeRestTimerDuration by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
         launch { repository.getActiveWorkout().collect { activeWorkout = it } }
@@ -60,8 +72,8 @@ fun ActiveWorkoutScreen(
     }
 
     if (activeWorkout == null) {
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = Color.White)
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black).padding(IronSpacing.Large), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.fillMaxWidth().height(200.dp).skeleton().clip(RoundedCornerShape(IronSpacing.CardCornerRadius)))
         }
         return
     }
@@ -102,11 +114,21 @@ fun ActiveWorkoutScreen(
                 contentColor = Color.Black,
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add Exercise")
+                Icon(Icons.Outlined.Add, contentDescription = "Add Exercise")
+            }
+        },
+        bottomBar = {
+            if (activeRestTimerEnd != null) {
+                RestTimerBar(
+                    endTimeMillis = activeRestTimerEnd!!,
+                    totalDurationSeconds = activeRestTimerDuration,
+                    onDismiss = { activeRestTimerEnd = null }
+                )
             }
         }
     ) { padding ->
         LazyColumn(
+            state = listState,
             contentPadding = padding,
             modifier = Modifier.fillMaxSize()
         ) {
@@ -116,7 +138,11 @@ fun ActiveWorkoutScreen(
                 LoggedExerciseCard(
                     modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null, placementSpec = tween(300)),
                     loggedExercise = exercise,
+                    isExpanded = index == expandedExerciseIndex,
                     pr = pr,
+                    onToggleExpand = {
+                        expandedExerciseIndex = if (expandedExerciseIndex == index) -1 else index
+                    },
                     onUpdate = { updatedExercise ->
                         val updatedList = activeWorkout!!.loggedExercises.toMutableList()
                         updatedList[index] = updatedExercise
@@ -125,7 +151,19 @@ fun ActiveWorkoutScreen(
                         }
                     },
                     onSwap = { exerciseToSwapIndex = index },
-                    onCalculatePlates = { weight -> showPlateCalcWeight = weight }
+                    onCalculatePlates = { weight -> showPlateCalcWeight = weight },
+                    onSetCompleted = { restDurationSeconds, isLastSet ->
+                        if (restDurationSeconds > 0) {
+                            activeRestTimerDuration = restDurationSeconds
+                            activeRestTimerEnd = System.currentTimeMillis() + (restDurationSeconds * 1000L)
+                        }
+                        if (isLastSet && index < activeWorkout!!.loggedExercises.size - 1) {
+                            expandedExerciseIndex = index + 1
+                            coroutineScope.launch {
+                                listState.animateScrollToItem(index + 1)
+                            }
+                        }
+                    }
                 )
             }
             item { Spacer(modifier = Modifier.height(100.dp)) }
@@ -166,7 +204,7 @@ fun ActiveWorkoutScreen(
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable {
+                                        .bouncyClick {
                                             val newList = activeWorkout!!.loggedExercises.toMutableList()
                                             newList[indexStr] = currentEx.copy(
                                                 exerciseId = subName,
@@ -201,7 +239,7 @@ fun ActiveWorkoutScreen(
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
+                                .bouncyClick {
                                     if (isSwapping) {
                                         val indexStr = exerciseToSwapIndex!!
                                         val currentEx = activeWorkout!!.loggedExercises.getOrNull(indexStr)
@@ -236,16 +274,16 @@ fun ActiveWorkoutScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = { 
+                TextButton(onClick = {  
                     showAddExerciseDialog = false
                     exerciseToSwapIndex = null 
-                }) { Text("CANCEL", color = Color.White) }
+                 }, modifier = Modifier.bouncy()) { Text("CANCEL", color = Color.White) }
             }
         )
     }
 
     if (showPlateCalcWeight != null) {
-        com.example.ui.progress.PlateCalculatorDialog(
+        BarbellVisualizer(
             initialTargetWeight = showPlateCalcWeight!!,
             isKgInitially = true,
             onDismiss = { showPlateCalcWeight = null }
@@ -257,17 +295,22 @@ fun ActiveWorkoutScreen(
 fun LoggedExerciseCard(
     modifier: Modifier = Modifier,
     loggedExercise: LoggedExercise,
+    isExpanded: Boolean = true,
     pr: com.example.model.PersonalRecord? = null,
+    onToggleExpand: () -> Unit = {},
     onUpdate: (LoggedExercise) -> Unit,
     onSwap: () -> Unit,
-    onCalculatePlates: (Double) -> Unit
+    onCalculatePlates: (Double) -> Unit,
+    onSetCompleted: (Int, Boolean) -> Unit = { _, _ -> }
 ) {
     val uriHandler = LocalUriHandler.current
+    var editingSetIndex by remember { mutableStateOf<Int?>(null) }
     
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .bouncyClick { onToggleExpand() },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GrayDark), // Opaque backdrop for clear contrast
         border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
@@ -277,8 +320,8 @@ fun LoggedExerciseCard(
                 Text(text = loggedExercise.exerciseName, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = Color.White, modifier = Modifier.weight(1f))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (loggedExercise.videoUrl != null) {
-                        IconButton(onClick = { uriHandler.openUri(loggedExercise.videoUrl!!) }) {
-                            Icon(Icons.Filled.PlayArrow, contentDescription = "Watch Video", tint = Color.Red)
+                        IconButton(onClick = {  uriHandler.openUri(loggedExercise.videoUrl!!)  }, modifier = Modifier.bouncy()) {
+                            Icon(Icons.Outlined.PlayArrow, contentDescription = "Watch Video", tint = Color.Red)
                         }
                     }
                     TextButton(onClick = onSwap) {
@@ -288,7 +331,23 @@ fun LoggedExerciseCard(
             }
             Spacer(modifier = Modifier.height(6.dp))
             
-            if (loggedExercise.note != null || loggedExercise.targetRestStr != null || loggedExercise.techniqueRequirements != null) {
+            val totalSets = loggedExercise.sets.size
+            val completedSets = loggedExercise.sets.count { it.completedAt != null }
+            
+            if (!isExpanded) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("$completedSets / $totalSets Sets Completed", color = com.example.ui.theme.GrayMedium, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    if (completedSets == totalSets) {
+                        Icon(Icons.Outlined.Check, contentDescription = "Done", tint = com.example.ui.theme.AccentGreen)
+                    }
+                }
+            } else {
+            
+                if (loggedExercise.note != null || loggedExercise.targetRestStr != null || loggedExercise.techniqueRequirements != null) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -347,104 +406,165 @@ fun LoggedExerciseCard(
                         )
                     }
                 }
-            }
-            
-            Spacer(modifier = Modifier.height(10.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("SET", modifier = Modifier.weight(0.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
-                Text("KG", modifier = Modifier.weight(1.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
-                Text("REPS", modifier = Modifier.weight(1.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
-                Text("DONE", modifier = Modifier.weight(0.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
-            }
-            Spacer(modifier = Modifier.height(8.dp))
+                
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("SET", modifier = Modifier.weight(0.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
+                    Text("KG", modifier = Modifier.weight(1.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
+                    Text("REPS", modifier = Modifier.weight(1.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
+                    Text("DONE", modifier = Modifier.weight(0.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
 
-            loggedExercise.sets.forEachIndexed { setIndex, set ->
-                Column(modifier = Modifier.fillMaxWidth().animateContentSize()) {
-                    Row(
-                        modifier = Modifier
+                loggedExercise.sets.forEachIndexed { setIndex, set ->
+                    Column(modifier = Modifier.fillMaxWidth().animateContentSize()) {
+                        
+                        val isDone = set.completedAt != null
+                        val isPrTriggered = isDone && pr != null && pr.bestWeight != null && set.weight > pr.bestWeight.value
+                        val setScale by animateFloatAsState(
+                            targetValue = if (isPrTriggered) 1.03f else if (isDone) 1.02f else 1f, 
+                            animationSpec = spring(dampingRatio = 0.5f, stiffness = 400f)
+                        )
+                        
+                        val glowColor = if (isPrTriggered) com.example.ui.theme.ErrorColor else com.example.ui.theme.AccentGreen
+                        val baseModifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(0.5f),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            .scale(setScale)
+                        val glowModifier = if (isDone) {
+                            baseModifier.shadow(if (isPrTriggered) 12.dp else 4.dp, RoundedCornerShape(12.dp), spotColor = glowColor)
+                        } else {
+                            baseModifier
+                        }
+
+                        Row(
+                            modifier = glowModifier.padding(vertical = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                "${setIndex + 1}",
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
-                                color = Color.White
-                            )
-                            if (pr != null && pr.bestWeight != null && set.weight > pr.bestWeight.value) {
+                            Column(
+                                modifier = Modifier.weight(0.5f),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    "${setIndex + 1}",
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = Color.White
+                                )
+                                if (pr != null && pr.bestWeight != null && set.weight > pr.bestWeight.value) {
+                                    Box(
+                                        modifier = Modifier
+                                            .background(com.example.ui.theme.ErrorColor, RoundedCornerShape(4.dp))
+                                            .padding(horizontal = 4.dp, vertical = 2.dp)
+                                    ) {
+                                        Text("PR", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Black)
+                                    }
+                                }
+                            }
+                            
+                            if (editingSetIndex == setIndex) {
+                                Column(modifier = Modifier.weight(3f)) {
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                                        StepperControl(
+                                            value = set.weight,
+                                            step = 2.5,
+                                            onValueChange = { newVal ->
+                                                val newSets = loggedExercise.sets.toMutableList()
+                                                newSets[setIndex] = set.copy(weight = newVal)
+                                                onUpdate(loggedExercise.copy(sets = newSets))
+                                            },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        StepperControl(
+                                            value = set.reps.toDouble(),
+                                            step = 1.0,
+                                            onValueChange = { newVal ->
+                                                val newSets = loggedExercise.sets.toMutableList()
+                                                newSets[setIndex] = set.copy(reps = newVal.toInt())
+                                                onUpdate(loggedExercise.copy(sets = newSets))
+                                            },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+                                    Button(
+                                        onClick = { 
+                                            editingSetIndex = null 
+                                            if (set.completedAt == null) {
+                                                val newSets = loggedExercise.sets.toMutableList()
+                                                newSets[setIndex] = set.copy(completedAt = System.currentTimeMillis())
+                                                onUpdate(loggedExercise.copy(sets = newSets))
+                                                val isLastSetInExercise = setIndex == totalSets - 1
+                                                val rest = if (!set.isWarmup) (set.restTimeSeconds ?: 120) else 0
+                                                onSetCompleted(rest, isLastSetInExercise)
+                                            }
+                                        },
+                                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.GlassLight),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ) {
+                                        Text("CONFIRM", color = Color.White, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            } else {
+                                // View Mode
+                                val wText = if (set.weight % 1.0 == 0.0) set.weight.toInt().toString() else set.weight.toString()
                                 Box(
-                                    modifier = Modifier
-                                        .background(com.example.ui.theme.ErrorColor, RoundedCornerShape(4.dp))
-                                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                                    modifier = Modifier.weight(1.5f).height(44.dp).padding(horizontal = 4.dp).background(com.example.ui.theme.GlassDark, RoundedCornerShape(12.dp)).bouncyClick { editingSetIndex = setIndex },
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Text("PR", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Black)
+                                    Text(wText, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                                }
+                                Box(
+                                    modifier = Modifier.weight(1.5f).height(44.dp).padding(horizontal = 4.dp).background(com.example.ui.theme.GlassDark, RoundedCornerShape(12.dp)).bouncyClick { editingSetIndex = setIndex },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("${set.reps}", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                                }
+                            }
+                            
+                            
+                            val boxColor by animateColorAsState(if (isDone) com.example.ui.theme.AccentGreen else Color.Transparent, animationSpec = tween(300))
+                            val borderColor by animateColorAsState(if (isDone) Color.Transparent else com.example.ui.theme.GlassBorderLight, animationSpec = tween(300))
+                            
+                            Box(
+                                modifier = Modifier
+                                    .weight(0.5f)
+                                    .height(44.dp)
+                                    .padding(horizontal = 4.dp)
+                                    .background(
+                                        color = boxColor,
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .border(
+                                        1.dp,
+                                        borderColor,
+                                        RoundedCornerShape(12.dp)
+                                    )
+                                    .bouncyClick {
+                                        val newSets = loggedExercise.sets.toMutableList()
+                                        if (set.completedAt == null) {
+                                            newSets[setIndex] = set.copy(completedAt = System.currentTimeMillis())
+                                            onUpdate(loggedExercise.copy(sets = newSets))
+                                            // Trigger rest timer
+                                            val isLastSetInExercise = setIndex == totalSets - 1
+                                            val rest = if (!set.isWarmup) (set.restTimeSeconds ?: 120) else 0
+                                            onSetCompleted(rest, isLastSetInExercise)
+                                        } else {
+                                            newSets[setIndex] = set.copy(completedAt = null)
+                                            onUpdate(loggedExercise.copy(sets = newSets))
+                                        }
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (isDone) {
+                                    Icon(Icons.Outlined.Check, contentDescription = "Done", tint = Color.White)
                                 }
                             }
                         }
                         
-                        StepperControl(
-                            value = set.weight,
-                            step = 2.5,
-                            onValueChange = { newVal ->
-                                val newSets = loggedExercise.sets.toMutableList()
-                                newSets[setIndex] = set.copy(weight = newVal)
-                                onUpdate(loggedExercise.copy(sets = newSets))
-                            },
-                            modifier = Modifier.weight(1.5f)
-                        )
-                        
-                        StepperControl(
-                            value = set.reps.toDouble(),
-                            step = 1.0,
-                            onValueChange = { newVal ->
-                                val newSets = loggedExercise.sets.toMutableList()
-                                newSets[setIndex] = set.copy(reps = newVal.toInt())
-                                onUpdate(loggedExercise.copy(sets = newSets))
-                            },
-                            modifier = Modifier.weight(1.5f)
-                        )
-                        
-                        val isDone = set.completedAt != null
-                        val boxColor by animateColorAsState(if (isDone) com.example.ui.theme.AccentGreen else Color.Transparent, animationSpec = tween(300))
-                        val borderColor by animateColorAsState(if (isDone) Color.Transparent else com.example.ui.theme.GlassBorderLight, animationSpec = tween(300))
-                        
-                        Box(
-                            modifier = Modifier
-                                .weight(0.5f)
-                                .height(36.dp)
-                                .padding(horizontal = 4.dp)
-                                .background(
-                                    color = boxColor,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .border(
-                                    1.dp,
-                                    borderColor,
-                                    RoundedCornerShape(12.dp)
-                                )
-                                .clickable {
-                                    val newSets = loggedExercise.sets.toMutableList()
-                                    newSets[setIndex] = set.copy(
-                                        completedAt = if (set.completedAt == null) System.currentTimeMillis() else null
-                                    )
-                                    onUpdate(loggedExercise.copy(sets = newSets))
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (isDone) {
-                                Icon(Icons.Filled.Check, contentDescription = "Done", tint = Color.White)
-                            }
-                        }
-                    }
-                    
-                    // Target goals
+                        // Target goals
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -502,25 +622,27 @@ fun LoggedExerciseCard(
                         )
                     }
                 }
-            }
-            
-            Button(
-                onClick = {
-                    val lastSet = loggedExercise.sets.lastOrNull() ?: WorkoutSet()
-                    val newSets = loggedExercise.sets + lastSet.copy(completedAt = null, isWarmup = false)
-                    onUpdate(loggedExercise.copy(sets = newSets))
-                },
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.GlassLight, contentColor = Color.White),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderLight),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            ) {
-                Text("+ ADD SET", fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+            } // Close forEachIndexed
+                
+                Button(
+                    onClick = {
+                        val lastSet = loggedExercise.sets.lastOrNull() ?: WorkoutSet()
+                        val newSets = loggedExercise.sets + lastSet.copy(completedAt = null, isWarmup = false, setNumber = lastSet.setNumber + 1)
+                        onUpdate(loggedExercise.copy(sets = newSets))
+                    },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.GlassLight, contentColor = Color.White),
+                    border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderLight),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                ) {
+                    Text("+ ADD SET", fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+                }
             }
         }
     }
+}
 }
 
 @Composable
@@ -542,7 +664,7 @@ fun StepperControl(
             modifier = Modifier
                 .size(36.dp)
                 .background(com.example.ui.theme.GlassLight, RoundedCornerShape(12.dp))
-                .clickable { onValueChange((value - step).coerceAtLeast(0.0)) },
+                .bouncyClick { onValueChange((value - step).coerceAtLeast(0.0)) },
             contentAlignment = Alignment.Center
         ) {
             Text("-", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
@@ -561,7 +683,7 @@ fun StepperControl(
             modifier = Modifier
                 .size(36.dp)
                 .background(com.example.ui.theme.GlassLight, RoundedCornerShape(12.dp))
-                .clickable { onValueChange(value + step) },
+                .bouncyClick { onValueChange(value + step) },
             contentAlignment = Alignment.Center
         ) {
             Text("+", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)

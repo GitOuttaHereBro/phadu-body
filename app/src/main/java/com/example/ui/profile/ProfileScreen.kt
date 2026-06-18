@@ -21,7 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -60,6 +60,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
+import com.example.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -237,12 +238,12 @@ fun ProfileScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 actions = {
                     if (!isEditing) {
-                        IconButton(onClick = { isEditing = true }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Edit Profile Info", tint = AccentGreen)
+                        IconButton(onClick = {  isEditing = true  }, modifier = Modifier.bouncy()) {
+                            Icon(Icons.Outlined.Edit, contentDescription = "Edit Profile Info", tint = AccentGreen)
                         }
                     }
-                    IconButton(onClick = { showDiagnostics = true }) {
-                        Icon(Icons.Default.BugReport, contentDescription = "Developer Diagnostics", tint = Color.LightGray)
+                    IconButton(onClick = {  showDiagnostics = true  }, modifier = Modifier.bouncy()) {
+                        Icon(Icons.Outlined.BugReport, contentDescription = "Developer Diagnostics", tint = Color.LightGray)
                     }
                 }
             )
@@ -260,10 +261,10 @@ fun ProfileScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
+                    .padding(padding).padding(IronSpacing.Large),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = AccentGreen)
+                Box(modifier = Modifier.fillMaxWidth().height(200.dp).skeleton().clip(RoundedCornerShape(IronSpacing.CardCornerRadius)))
             }
         } else {
             Column(
@@ -297,7 +298,7 @@ fun ProfileScreen(
                                             colors = listOf(AccentGreen, Color(0xFF1E824C))
                                         )
                                     )
-                                    .clickable {
+                                    .bouncyClick {
                                         photoPickerLauncher.launch(
                                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                         )
@@ -314,10 +315,10 @@ fun ProfileScreen(
                                             modifier = Modifier.fillMaxSize()
                                         )
                                     } else {
-                                        Icon(Icons.Default.Person, contentDescription = "Default Avatar", tint = Color.Black, modifier = Modifier.size(40.dp))
+                                        Icon(Icons.Outlined.Person, contentDescription = "Default Avatar", tint = Color.Black, modifier = Modifier.size(40.dp))
                                     }
                                 } else {
-                                    Icon(Icons.Default.Person, contentDescription = "Default Avatar", tint = Color.Black, modifier = Modifier.size(40.dp))
+                                    Icon(Icons.Outlined.Person, contentDescription = "Default Avatar", tint = Color.Black, modifier = Modifier.size(40.dp))
                                 }
                             }
                             
@@ -414,8 +415,8 @@ fun ProfileScreen(
                                         readOnly = true,
                                         label = { Text("Gender", color = Color.Gray) },
                                         trailingIcon = {
-                                            IconButton(onClick = { genderExpanded = true }) {
-                                                Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown Action", tint = Color.White)
+                                            IconButton(onClick = {  genderExpanded = true  }, modifier = Modifier.bouncy()) {
+                                                Icon(Icons.Outlined.ArrowDropDown, contentDescription = "Dropdown Action", tint = Color.White)
                                             }
                                         },
                                         colors = OutlinedTextFieldDefaults.colors(
@@ -425,12 +426,12 @@ fun ProfileScreen(
                                             unfocusedTextColor = Color.White
                                         ),
                                         singleLine = true,
-                                        modifier = Modifier.fillMaxWidth().clickable { genderExpanded = true }
+                                        modifier = Modifier.fillMaxWidth().bouncyClick { genderExpanded = true }
                                     )
                                     Box(
                                         modifier = Modifier
                                             .matchParentSize()
-                                            .clickable { genderExpanded = true }
+                                            .bouncyClick { genderExpanded = true }
                                     )
                                     DropdownMenu(
                                         expanded = genderExpanded,
@@ -509,7 +510,7 @@ fun ProfileScreen(
                                     shape = RoundedCornerShape(12.dp),
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Icon(Icons.Default.Done, contentDescription = "Save", modifier = Modifier.size(18.dp))
+                                    Icon(Icons.Outlined.Done, contentDescription = "Save", modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text("SAVE", fontWeight = FontWeight.Bold)
                                 }
@@ -528,7 +529,7 @@ fun ProfileScreen(
                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Icon(Icons.Default.Close, contentDescription = "Cancel", modifier = Modifier.size(18.dp))
+                                    Icon(Icons.Outlined.Close, contentDescription = "Cancel", modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text("CANCEL")
                                 }
@@ -552,7 +553,7 @@ fun ProfileScreen(
                                         color = AccentGreen,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.clickable { isEditing = true }
+                                        modifier = Modifier.bouncyClick { isEditing = true }
                                     )
                                 }
                             }
@@ -617,7 +618,7 @@ fun ProfileScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Star, contentDescription = "Active Program", tint = AccentGreen, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Outlined.Star, contentDescription = "Active Program", tint = AccentGreen, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(currentProgram, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         }
@@ -644,14 +645,14 @@ fun ProfileScreen(
                         statLargeBox(
                             metric = "$totalWorkouts",
                             label = "TOTAL WORKOUTS",
-                            icon = Icons.Default.FitnessCenter,
+                            icon = Icons.Outlined.FitnessCenter,
                             tint = Color.White,
                             modifier = Modifier.weight(1f)
                         )
                         statLargeBox(
                             metric = "$prCount",
                             label = "PR RECORD COUNT",
-                            icon = Icons.Default.EmojiEvents,
+                            icon = Icons.Outlined.EmojiEvents,
                             tint = AccentGreen,
                             modifier = Modifier.weight(1f)
                         )
@@ -661,14 +662,14 @@ fun ProfileScreen(
                         statLargeBox(
                             metric = "$currentStreak days",
                             label = "CURRENT STREAK",
-                            icon = Icons.Default.LocalFireDepartment,
+                            icon = Icons.Outlined.LocalFireDepartment,
                             tint = Color(0xFFFC5A5A),
                             modifier = Modifier.weight(1f)
                         )
                         statLargeBox(
                             metric = "$longestStreak days",
                             label = "LONGEST STREAK",
-                            icon = Icons.Default.MilitaryTech,
+                            icon = Icons.Outlined.MilitaryTech,
                             tint = Color(0xFFFFD700),
                             modifier = Modifier.weight(1f)
                         )
@@ -691,7 +692,7 @@ fun ProfileScreen(
                                 Text("TOTAL ACCUMULATED VOLUME", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                 Text(formattedVolume, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
                             }
-                            Icon(Icons.Default.TrendingUp, contentDescription = "Volume", tint = AccentGreen, modifier = Modifier.size(36.dp))
+                            Icon(Icons.Outlined.TrendingUp, contentDescription = "Volume", tint = AccentGreen, modifier = Modifier.size(36.dp))
                         }
                     }
                 }
@@ -750,8 +751,8 @@ fun ProfileScreen(
                         fontSize = 14.sp,
                         letterSpacing = 1.sp
                     )
-                    IconButton(onClick = { photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
-                        Icon(Icons.Default.AddAPhoto, contentDescription = "Add Track Photo", tint = AccentGreen)
+                    IconButton(onClick = {  photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))  }, modifier = Modifier.bouncy()) {
+                        Icon(Icons.Outlined.AddAPhoto, contentDescription = "Add Track Photo", tint = AccentGreen)
                     }
                 }
                 
@@ -767,7 +768,7 @@ fun ProfileScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(Icons.Default.AddPhotoAlternate, contentDescription = "Empty", tint = Color.Gray, modifier = Modifier.size(40.dp))
+                                Icon(Icons.Outlined.AddPhotoAlternate, contentDescription = "Empty", tint = Color.Gray, modifier = Modifier.size(40.dp))
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text("No progress photos tracked.", color = Color.Gray, fontSize = 13.sp)
                             }
@@ -821,7 +822,7 @@ fun ProfileScreen(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth().height(48.dp)
                     ) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Sign Out", modifier = Modifier.size(20.dp))
+                        Icon(Icons.Outlined.ExitToApp, contentDescription = "Sign Out", modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("LOG OUT SECURE SESSION", fontWeight = FontWeight.Bold)
                     }
@@ -832,7 +833,7 @@ fun ProfileScreen(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth().height(48.dp)
                     ) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Sign In", modifier = Modifier.size(20.dp))
+                        Icon(Icons.Outlined.ExitToApp, contentDescription = "Sign In", modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("SIGN IN / REGISTER ACCOUNT", fontWeight = FontWeight.Bold)
                     }
@@ -966,7 +967,7 @@ fun DeveloperDiagnosticsDialog(
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.LogoDev, contentDescription = "Diag", tint = AccentGreen, modifier = Modifier.size(32.dp))
+                Icon(Icons.Outlined.LogoDev, contentDescription = "Diag", tint = AccentGreen, modifier = Modifier.size(32.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("DEVELOPER DIAGNOSTICS", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
             }

@@ -12,9 +12,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.combine
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,7 +137,7 @@ fun PRsScreen(repository: IronLogRepository) {
                                 color = if (isSelected) Color.White else com.example.ui.theme.GlassBorderDark,
                                 shape = RoundedCornerShape(10.dp)
                             )
-                            .clickable { selectedMuscleGroup = group }
+                            .bouncyClick { selectedMuscleGroup = group }
                             .padding(horizontal = 14.dp, vertical = 8.dp)
                             .testTag("muscle_filter_$group")
                     ) {
@@ -169,15 +170,14 @@ fun PRsScreen(repository: IronLogRepository) {
 
                 Row(
                     modifier = Modifier
-                        .background(com.example.ui.theme.GlassDark, RoundedCornerShape(8.dp))
-                        .border(1.dp, com.example.ui.theme.GlassBorderDark, RoundedCornerShape(8.dp))
-                        .clickable { sortByDate = !sortByDate }
+                        .glassCard()
+                        .bouncyClick { sortByDate = !sortByDate }
                         .padding(horizontal = 10.dp, vertical = 6.dp)
                         .testTag("sort_toggle_button"),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = if (sortByDate) Icons.Default.ArrowDownward else Icons.Default.FilterList,
+                        imageVector = if (sortByDate) Icons.Outlined.ArrowDownward else Icons.Outlined.FilterList,
                         contentDescription = "Sort Icon",
                         tint = com.example.ui.theme.AccentGreen,
                         modifier = Modifier.size(14.dp)
@@ -196,35 +196,10 @@ fun PRsScreen(repository: IronLogRepository) {
             Spacer(modifier = Modifier.height(8.dp))
 
             if (recordItems.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "🏆 EXERCISE HALL OF FAME",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            text = if (selectedMuscleGroup != "ALL") 
+                val message = if (selectedMuscleGroup != "ALL") 
                                 "No records found for $selectedMuscleGroup muscle group." 
-                                else "No Personal Records logged yet. Finish a program workout to establish your targets!",
-                            color = com.example.ui.theme.GrayMedium,
-                            fontSize = 12.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(horizontal = 24.dp)
-                        )
-                    }
-                }
+                                else "No Personal Records logged yet. Finish a program workout to establish your targets!"
+                EmptyState(message = message, modifier = Modifier.weight(1f))
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),

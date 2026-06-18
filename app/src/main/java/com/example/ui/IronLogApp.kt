@@ -14,7 +14,7 @@ import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
@@ -53,6 +53,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.text.style.TextAlign
+import com.example.ui.theme.*
 
 @Composable
 fun IronLogApp(repository: IronLogRepository) {
@@ -190,11 +191,7 @@ fun IronLogApp(repository: IronLogRepository) {
 
                 Spacer(modifier = Modifier.height(48.dp))
 
-                CircularProgressIndicator(
-                    color = Color(0xFF39FF14),
-                    strokeWidth = 3.dp,
-                    modifier = Modifier.size(36.dp)
-                )
+                Box(modifier = Modifier.width(120.dp).height(8.dp).skeleton().clip(RoundedCornerShape(4.dp)))
 
                 Spacer(modifier = Modifier.height(18.dp))
 
@@ -288,7 +285,7 @@ fun ProtectedRoute(
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                CircularProgressIndicator(color = Color(0xFF39FF14), strokeWidth = 3.dp)
+                Box(modifier = Modifier.width(100.dp).height(8.dp).skeleton().clip(RoundedCornerShape(4.dp)))
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "RESOLVING IDENTITY STATE...",
@@ -311,7 +308,7 @@ fun ProtectedRoute(
                 .background(Color.Black),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = Color.White)
+            Box(modifier = Modifier.width(40.dp).height(40.dp).skeleton().clip(RoundedCornerShape(20.dp)))
         }
     } else {
         content()
@@ -329,7 +326,7 @@ fun MainScreenWrapper(
         Triple("home", Icons.Outlined.Home, "HOME"),
         Triple("programs", Icons.Outlined.Star, "PROGRAM"),
         Triple("progress", Icons.Outlined.Timeline, "PROGRESS"),
-        Triple("prs", Icons.Filled.Star, "PRS"),
+        Triple("prs", Icons.Outlined.Star, "PRS"),
         Triple("history", Icons.Outlined.History, "HISTORY"),
         Triple("profile", Icons.Outlined.Person, "PROFILE")
     )

@@ -14,9 +14,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -47,6 +47,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.security.MessageDigest
 import java.util.UUID
+import androidx.compose.ui.draw.clip
 
 enum class AuthMode {
     Landing,
@@ -629,7 +630,7 @@ fun EmailLoginContent(
         ) {
             IconButton(onClick = onBackClick, enabled = !isLoading) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                     contentDescription = "Go Back",
                     tint = Color.White
                 )
@@ -684,7 +685,7 @@ fun EmailLoginContent(
             visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(onClick = onPasswordVisibilityToggle, enabled = !isLoading) {
-                    val icon = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                    val icon = if (isPasswordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility
                     Icon(icon, contentDescription = "Toggle password visibility", tint = GrayMedium)
                 }
             },
@@ -729,11 +730,7 @@ fun EmailLoginContent(
             enabled = !isLoading
         ) {
             if (isLoading) {
-                CircularProgressIndicator(
-                    color = Color.Black,
-                    modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.5.dp
-                )
+                Box(modifier = Modifier.width(80.dp).height(24.dp).skeleton().clip(RoundedCornerShape(4.dp)))
             } else {
                 Text(
                     text = "SIGN IN",
@@ -775,7 +772,7 @@ fun CreateAccountContent(
         ) {
             IconButton(onClick = onBackClick, enabled = !isLoading) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                     contentDescription = "Go Back",
                     tint = Color.White
                 )
@@ -854,7 +851,7 @@ fun CreateAccountContent(
             visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(onClick = onPasswordVisibilityToggle, enabled = !isLoading) {
-                    val icon = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                    val icon = if (isPasswordVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility
                     Icon(icon, contentDescription = "Toggle password visibility", tint = GrayMedium)
                 }
             },
@@ -909,11 +906,7 @@ fun CreateAccountContent(
             enabled = !isLoading
         ) {
             if (isLoading) {
-                CircularProgressIndicator(
-                    color = Color.Black,
-                    modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.5.dp
-                )
+                Box(modifier = Modifier.width(80.dp).height(24.dp).skeleton().clip(RoundedCornerShape(4.dp)))
             } else {
                 Text(
                     text = "REGISTER ACCOUNT",
@@ -947,7 +940,7 @@ fun ForgotPasswordContent(
         ) {
             IconButton(onClick = onBackClick, enabled = !isLoading) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                     contentDescription = "Go Back",
                     tint = Color.White
                 )
@@ -1009,11 +1002,7 @@ fun ForgotPasswordContent(
             enabled = !isLoading
         ) {
             if (isLoading) {
-                CircularProgressIndicator(
-                    color = Color.Black,
-                    modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.5.dp
-                )
+                Box(modifier = Modifier.width(80.dp).height(24.dp).skeleton().clip(RoundedCornerShape(4.dp)))
             } else {
                 Text(
                     text = "SEND RESET LINK",

@@ -16,8 +16,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,8 +91,7 @@ fun ProgressScreen(repository: IronLogRepository) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .background(com.example.ui.theme.GlassDark, RoundedCornerShape(16.dp))
-                    .border(1.dp, com.example.ui.theme.GlassBorderDark, RoundedCornerShape(16.dp))
+                    .glassCard()
                     .padding(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
@@ -104,7 +104,7 @@ fun ProgressScreen(repository: IronLogRepository) {
                                 if (selected) com.example.ui.theme.AccentGreen else Color.Transparent,
                                 RoundedCornerShape(12.dp)
                             )
-                            .clickable { activeTab = index }
+                            .bouncyClick { activeTab = index }
                             .padding(vertical = 12.dp),
                         contentAlignment = Alignment.Center
                     ) {
@@ -148,21 +148,9 @@ fun ProgressionAndPrsContent(
             if (history.isNotEmpty()) {
                 VolumeDashboard(history)
             } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .background(com.example.ui.theme.GlassDark, RoundedCornerShape(16.dp))
-                        .border(1.dp, com.example.ui.theme.GlassBorderDark, RoundedCornerShape(16.dp))
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("No completed workouts yet", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("Finish a workout session from programs or home to view charts!", color = com.example.ui.theme.GrayMedium, fontSize = 12.sp)
-                    }
-                }
+                EmptyState(
+                    message = "Finish a workout session from programs or home to view volume charts!"
+                )
             }
         }
 
@@ -185,8 +173,7 @@ fun ProgressionAndPrsContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .background(com.example.ui.theme.GlassDark, RoundedCornerShape(16.dp))
-                        .border(1.dp, com.example.ui.theme.GlassBorderDark, RoundedCornerShape(16.dp))
+                        .glassCard()
                         .padding(24.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -206,7 +193,7 @@ fun ProgressionAndPrsContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .clickable {
+                        .bouncyClick {
                             expandedExerciseId = if (isExpanded) null else ex.id
                         },
                     shape = RoundedCornerShape(16.dp),
@@ -711,7 +698,7 @@ fun PlateCalculatorContent() {
                                             if (isSelected) com.example.ui.theme.AccentGreen else Color.Transparent,
                                             RoundedCornerShape(6.dp)
                                         )
-                                        .clickable {
+                                        .bouncyClick {
                                             isKg = value
                                             // Auto-convert standard barbell weight
                                             barbellWeight = if (value) 20.0 else 45.0
@@ -786,7 +773,7 @@ fun PlateCalculatorContent() {
                                         if (selected) com.example.ui.theme.AccentGreen else com.example.ui.theme.GlassDark,
                                         RoundedCornerShape(12.dp)
                                     )
-                                    .clickable { barbellWeight = wt }
+                                    .bouncyClick { barbellWeight = wt }
                                     .padding(vertical = 12.dp),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -922,7 +909,7 @@ fun PlateCalculatorContent() {
                                             if (available) com.example.ui.theme.AccentGreen else com.example.ui.theme.GlassBorderDark,
                                             RoundedCornerShape(8.dp)
                                         )
-                                        .clickable {
+                                        .bouncyClick {
                                             val mutable = availableKgPlates.toMutableMap()
                                             mutable[wt] = !available
                                             availableKgPlates = mutable
@@ -951,7 +938,7 @@ fun PlateCalculatorContent() {
                                             if (available) com.example.ui.theme.AccentGreen else com.example.ui.theme.GlassBorderDark,
                                             RoundedCornerShape(8.dp)
                                         )
-                                        .clickable {
+                                        .bouncyClick {
                                             val mutable = availableLbsPlates.toMutableMap()
                                             mutable[wt] = !available
                                             availableLbsPlates = mutable
@@ -1018,8 +1005,7 @@ fun VisualBarbellSleeve(
         modifier = Modifier
             .fillMaxWidth()
             .height(140.dp)
-            .background(com.example.ui.theme.GlassDark, RoundedCornerShape(16.dp))
-            .border(1.dp, com.example.ui.theme.GlassBorderDark, RoundedCornerShape(16.dp)),
+            .glassCard(),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
