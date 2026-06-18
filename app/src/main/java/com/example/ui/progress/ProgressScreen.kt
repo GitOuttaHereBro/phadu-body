@@ -639,9 +639,13 @@ fun VolumeDashboard(workouts: List<Workout>) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlateCalculatorContent() {
-    var targetWeightInput by remember { mutableStateOf("100") }
     var isKg by remember { mutableStateOf(true) }
     var barbellWeight by remember { mutableStateOf(20.0) }
+    var targetWeightDouble by remember { mutableStateOf(100.0) }
+
+    var targetWeightInput by remember(targetWeightDouble) {
+        mutableStateOf(if (targetWeightDouble % 1.0 == 0.0) "${targetWeightDouble.toInt()}" else "$targetWeightDouble")
+    }
 
     // Multi-select for plate inventory (KG and LBS inventory states)
     var availableKgPlates by remember {
@@ -657,7 +661,6 @@ fun PlateCalculatorContent() {
         ))
     }
 
-    val targetWeightDouble = targetWeightInput.toDoubleOrNull() ?: 0.0
     val inventory = if (isKg) {
         availableKgPlates.filter { it.value }.keys.sortedDescending()
     } else {
@@ -710,9 +713,9 @@ fun PlateCalculatorContent() {
                                         )
                                         .clickable {
                                             isKg = value
-                                            // Auto-convert standard barbell weigh
+                                            // Auto-convert standard barbell weight
                                             barbellWeight = if (value) 20.0 else 45.0
-                                            targetWeightInput = if (value) "100" else "225"
+                                            targetWeightDouble = if (value) 100.0 else 225.0
                                         }
                                         .padding(horizontal = 12.dp, vertical = 6.dp)
                                 ) {
@@ -732,7 +735,13 @@ fun PlateCalculatorContent() {
                     // TextField Input
                     OutlinedTextField(
                         value = targetWeightInput,
-                        onValueChange = { targetWeightInput = it },
+                        onValueChange = {
+                            targetWeightInput = it
+                            val entered = it.toDoubleOrNull()
+                            if (entered != null) {
+                                targetWeightDouble = entered
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = LocalTextStyle.current.copy(color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -747,34 +756,6 @@ fun PlateCalculatorContent() {
                         ),
                         singleLine = true
                     )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Fast Increments presets Row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        val steps = if (isKg) listOf(-20.0, -5.0, -2.5, 2.5, 5.0, 20.0) else listOf(-45.0, -10.0, -5.0, 5.0, 10.0, 45.0)
-                        steps.forEach { step ->
-                            val label = if (step > 0) "+${step.toInt()}" else "${step.toInt()}"
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .background(com.example.ui.theme.GlassDark, RoundedCornerShape(10.dp))
-                                    .border(0.5.dp, com.example.ui.theme.GlassBorderDark, RoundedCornerShape(10.dp))
-                                    .clickable {
-                                        val current = targetWeightInput.toDoubleOrNull() ?: 0.0
-                                        val nextVal = (current + step).coerceAtLeast(barbellWeight)
-                                        targetWeightInput = if (nextVal % 1.0 == 0.0) "${nextVal.toInt()}" else "$nextVal"
-                                    }
-                                    .padding(vertical = 10.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(label, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -822,78 +803,18 @@ fun PlateCalculatorContent() {
             }
         }
 
-        // Live visual loaded barbell preview
+        // Premium Interactive BarbellVisualizer Section
         item {
-            Text(
-                "SLEEVE PREVIEW (ON EACH SIDE)",
-                color = com.example.ui.theme.GrayMedium,
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
-                letterSpacing = 1.5.sp,
-                modifier = Modifier.padding(bottom = 8.dp)
+            BarbellVisualizer(
+                weight = targetWeightDouble,
+                onWeightChange = { newWeight ->
+                    targetWeightDouble = newWeight
+                },
+                availablePlates = inventory,
+                isKg = isKg,
+                barbellWeight = barbellWeight,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
-            VisualBarbellSleeve(platesResult, isKg)
-        }
-
-        // Detail load card breakdown
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
-            ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("TOTAL LOADED", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                        Text(
-                            text = "${if (loadedWeight % 1.0 == 0.0) loadedWeight.toInt() else loadedWeight} ${if (isKg) "KG" else "LBS"}",
-                            color = com.example.ui.theme.AccentGreen,
-                            fontWeight = FontWeight.Black,
-                            fontSize = 22.sp
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Barbell Weight", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
-                        Text("${if (barbellWeight % 1.0 == 0.0) barbellWeight.toInt() else barbellWeight} ${if (isKg) "kg" else "lbs"}", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Plates Weight (Both Sides)", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
-                        val platesTotalWeight = loadedWeight - barbellWeight
-                        Text("${if (platesTotalWeight % 1.0 == 0.0) platesTotalWeight.toInt() else platesTotalWeight} ${if (isKg) "kg" else "lbs"}", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    }
-
-                    if (unresolved > 0.0) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Divider(color = com.example.ui.theme.GlassBorderDark)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("Unresolved Weight", color = com.example.ui.theme.ErrorColor, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                            Text("${if (unresolved % 1.0 == 0.0) unresolved.toInt() else unresolved} ${if (isKg) "kg" else "lbs"}", color = com.example.ui.theme.ErrorColor, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-            }
         }
 
         // Warm-up ramp suggestion card

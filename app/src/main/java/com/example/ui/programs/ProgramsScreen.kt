@@ -94,7 +94,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                 if (doc.exists()) {
                     val fetched = doc.toObject(Program::class.java)
                     if (fetched != null) {
-                        program = fetched
+                        program = ProgramValidator.validateAndSanitize(fetched)
                         fetchedFromFirestore = true
                     }
                 }
@@ -108,7 +108,8 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                 val json = context.assets.open(key).bufferedReader().use { it.readText() }
                 val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
                 val adapter = moshi.adapter(Program::class.java)
-                program = adapter.fromJson(json)
+                val rawProgram = adapter.fromJson(json)
+                program = ProgramValidator.validateAndSanitize(rawProgram)
             } catch (e: Exception) {
                 Log.e("ProgramsScreen", "Failed to load local asset fallback", e)
             }
