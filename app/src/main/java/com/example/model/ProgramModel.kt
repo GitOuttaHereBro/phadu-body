@@ -25,6 +25,7 @@ data class ProgramDay(
 data class ProgramExercise(
     val name: String = "",
     val demoLink: String? = null,
+    val link: String? = null,
     val warmupSets: String? = null,
     val workingSets: String? = null,
     val repRange: String? = null,
@@ -32,5 +33,12 @@ data class ProgramExercise(
     val earlySetRPE: String? = null,
     val lastSetRPE: Any? = null,
     val rest: String? = null,
-    val notes: String? = null
-)
+    val lastSetTechnique: String? = "N/A",
+    val muscleGroup: String? = null,
+    val notes: String? = null,
+    val substitution1: ProgramExercise? = null,
+    val substitution2: ProgramExercise? = null
+) {
+    val videoUrl: String? get() = demoLink ?: link
+    val lastSetRPEStr: String get() = lastSetRPE?.toString() ?: "N/A"
+}

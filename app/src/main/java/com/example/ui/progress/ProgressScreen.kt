@@ -896,6 +896,79 @@ fun PlateCalculatorContent() {
             }
         }
 
+        // Warm-up ramp suggestion card
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
+                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "WARM-UP PROGRESSION (40% / 60% / 80%)",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp,
+                        letterSpacing = 1.sp
+                    )
+                    Text(
+                        text = "Ramp sets scaled to reach your target working weight of ${if (targetWeightDouble % 1.0 == 0.0) targetWeightDouble.toInt() else targetWeightDouble} ${if (isKg) "kg" else "lbs"}.",
+                        color = com.example.ui.theme.GrayMedium,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    val stepsPercent = listOf(0.40, 0.60, 0.80)
+                    stepsPercent.forEach { pct ->
+                        val stepTarget = targetWeightDouble * pct
+                        val roundedStepResult = calculatePlates(stepTarget, barbellWeight, inventory)
+                        val roundedTotal = barbellWeight + 2.0 * roundedStepResult.sumOf { it.first * it.second }
+                        
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .background(Color.Black.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                                .padding(10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = "${(pct * 100).toInt()}% RAMP",
+                                    color = com.example.ui.theme.AccentGreen,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 10.sp,
+                                    letterSpacing = 0.5.sp
+                                )
+                                Text(
+                                    text = "${if (roundedTotal % 1.0 == 0.0) roundedTotal.toInt() else roundedTotal} ${if (isKg) "kg" else "lbs"}",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 16.sp,
+                                    letterSpacing = 0.5.sp
+                                )
+                            }
+                            
+                            val platesText = if (roundedStepResult.isEmpty()) "BAR ONLY" else {
+                                roundedStepResult.joinToString(" + ") { "${it.second}x${if (it.first % 1.0 == 0.0) it.first.toInt() else it.first}" }
+                            }
+                            Text(
+                                text = platesText,
+                                color = Color.White.copy(alpha = 0.9f),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(start = 12.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         // Gym Plate Inventory management
         item {
             Card(

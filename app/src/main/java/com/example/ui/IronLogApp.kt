@@ -14,6 +14,7 @@ import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
@@ -103,10 +104,10 @@ fun MainScreenWrapper(
     
     val items = listOf(
         Triple("home", Icons.Outlined.Home, "HOME"),
-        Triple("programs", Icons.Outlined.Star, "PROGRAMS"),
+        Triple("programs", Icons.Outlined.Star, "PROGRAM"),
         Triple("progress", Icons.Outlined.Timeline, "PROGRESS"),
-        Triple("history", Icons.Outlined.History, "HISTORY"),
-        Triple("profile", Icons.Outlined.Person, "PROFILE")
+        Triple("prs", Icons.Filled.Star, "PRS"),
+        Triple("history", Icons.Outlined.History, "HISTORY")
     )
 
     Scaffold(
@@ -220,6 +221,13 @@ fun MainScreenWrapper(
                         bottomNavController.navigate("profile") {
                             launchSingleTop = true
                         }
+                    },
+                    onNavigateToTab = { route ->
+                        bottomNavController.navigate(route) {
+                            popUpTo(bottomNavController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 )
             }
@@ -237,6 +245,9 @@ fun MainScreenWrapper(
             }
             composable("progress") {
                 ProgressScreen(repository)
+            }
+            composable("prs") {
+                com.example.ui.prs.PRsScreen(repository = repository)
             }
             composable("history") {
                 HistoryScreen(repository)
