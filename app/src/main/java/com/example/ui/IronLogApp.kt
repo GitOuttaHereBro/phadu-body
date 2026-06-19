@@ -70,7 +70,7 @@ fun IronLogApp(repository: IronLogRepository) {
 
         LaunchedEffect(authContext.isAuthResolved) {
             if (!authContext.isAuthResolved) return@LaunchedEffect
-            Log.d("IronLogApp", "=== APP STARTUP SEQUENCE INITIATED ===")
+            Log.d("GymKrtaHJi", "=== APP STARTUP SEQUENCE INITIATED ===")
             try {
                 // Step 1: Splash Screen
                 currentPhase = "Splash Screen"

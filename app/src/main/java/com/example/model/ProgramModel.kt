@@ -112,6 +112,7 @@ fun ProgramDay.toWorkout(weekKey: String, dayIndex: Int): Workout {
         LoggedExercise(
             exerciseId = pex.name,
             exerciseName = pex.name,
+            muscleGroup = pex.muscleGroup ?: "General",
             videoUrl = pex.videoUrl,
             sets = setsList,
             targetRestStr = pex.rest,

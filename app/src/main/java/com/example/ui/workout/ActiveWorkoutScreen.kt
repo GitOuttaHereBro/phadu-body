@@ -3,6 +3,7 @@ package com.example.ui.workout
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,6 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Calculate
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,8 +23,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.data.IronLogRepository
 import com.example.model.Exercise
 import com.example.model.LoggedExercise
@@ -70,30 +75,36 @@ fun ActiveWorkoutScreen(
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = IronSpacing.x16, vertical = IronSpacing.x12)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Outlined.ArrowBack, contentDescription = "Back", tint = TextPrimaryColor)
+                    }
+                    Spacer(modifier = Modifier.width(IronSpacing.x8))
                     Text(
                         text = workout.templateName ?: "Workout",
-                        style = IronTypography.Title3
+                        style = IronTypography.Title3,
+                        modifier = Modifier.weight(1f)
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = onNavigateToPlateCalc) {
-                            Icon(androidx.compose.ui.res.painterResource(android.R.drawable.ic_menu_sort_by_size), contentDescription = "Plate Calculator", tint = TextPrimaryColor)
+                            Icon(Icons.Outlined.Calculate, contentDescription = "Plate Calculator", tint = TextPrimaryColor)
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .glassRecipe(RoundedCornerShape(IronCorner.RadiusSm))
-                                .padding(horizontal = 20.dp, vertical = 10.dp)
-                                .bouncyClick {
-                                    coroutineScope.launch {
-                                        repository.finishWorkout(workout)
-                                        onFinish()
-                                    }
+                        Button(
+                            onClick = {
+                                coroutineScope.launch {
+                                    repository.finishWorkout(workout)
+                                    onFinish()
                                 }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = TextPrimaryColor, contentColor = BgColor),
+                            shape = RoundedCornerShape(IronCorner.RadiusSm),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                            modifier = Modifier.height(40.dp)
                         ) {
-                            Text("Finish", style = IronTypography.Headline, color = TextPrimaryColor)
+                            Text("FINISH", style = IronTypography.Headline, fontSize = 12.sp, color = BgColor)
                         }
                     }
                 }
@@ -119,7 +130,7 @@ fun ActiveWorkoutScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 120.dp)
             ) {
-                itemsIndexed(workout.loggedExercises, key = { _, ex -> ex.exerciseId }) { index, ex ->
+            itemsIndexed(workout.loggedExercises, key = { index, ex -> "${ex.exerciseId}_$index" }) { index, ex ->
                     val isActive = index == expandedExerciseIndex
                     val isCompleted = ex.sets.isNotEmpty() && ex.sets.all { it.completedAt != null }
                     
@@ -192,53 +203,53 @@ fun ActiveWorkoutScreen(
 
                                 Spacer(modifier = Modifier.height(IronSpacing.x24))
                                 Text("LOG WORKING SETS", style = IronTypography.Caption.copy(color = TextTertiaryColor))
-                                Spacer(modifier = Modifier.height(IronSpacing.x12))
+                                Spacer(modifier = Modifier.height(IronSpacing.x16))
                                 
                                 ex.sets.forEachIndexed { setIdx, set ->
                                     val isSetCompleted = set.completedAt != null
                                     Row(
-                                        modifier = Modifier.fillMaxWidth().padding(bottom = IronSpacing.x12),
+                                        modifier = Modifier.fillMaxWidth().padding(bottom = IronSpacing.x16),
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                                     ) {
-                                        Text("${setIdx + 1}", style = IronTypography.Headline, modifier = Modifier.width(20.dp))
+                                        Text("${setIdx + 1}", style = IronTypography.Headline, modifier = Modifier.width(24.dp))
                                         
-                                        // Weight Box 
-                                        Box(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .height(48.dp)
-                                                .glassRecipe(RoundedCornerShape(IronCorner.RadiusMd))
-                                                .bouncyClick {
-                                                    // Stepper handled natively or show bottom sheet
-                                                },
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Text(if (set.weight > 0) "${set.weight} kg" else "—", style = IronTypography.Body)
-                                        }
+                                        StepperChip(
+                                            value = set.weight,
+                                            unit = "KG",
+                                            onValueChange = { newVal ->
+                                                val updatedSets = ex.sets.toMutableList()
+                                                updatedSets[setIdx] = set.copy(weight = newVal)
+                                                val updatedEx = ex.copy(sets = updatedSets)
+                                                val updatedList = workout.loggedExercises.toMutableList()
+                                                updatedList[index] = updatedEx
+                                                coroutineScope.launch { repository.saveWorkout(workout.copy(loggedExercises = updatedList)) }
+                                            },
+                                            modifier = Modifier.weight(1.2f)
+                                        )
 
-                                        // Reps Box
-                                        Box(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .height(48.dp)
-                                                .glassRecipe(RoundedCornerShape(IronCorner.RadiusMd))
-                                                .bouncyClick {
-                                                    // Reps stepper via custom bottom sheet
-                                                },
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Text("${set.reps} reps", style = IronTypography.Body)
-                                        }
+                                        StepperChip(
+                                            value = set.reps.toDouble(),
+                                            unit = "REPS",
+                                            onValueChange = { newVal ->
+                                                val updatedSets = ex.sets.toMutableList()
+                                                updatedSets[setIdx] = set.copy(reps = newVal.toInt())
+                                                val updatedEx = ex.copy(sets = updatedSets)
+                                                val updatedList = workout.loggedExercises.toMutableList()
+                                                updatedList[index] = updatedEx
+                                                coroutineScope.launch { repository.saveWorkout(workout.copy(loggedExercises = updatedList)) }
+                                            },
+                                            modifier = Modifier.weight(1.1f),
+                                            step = 1.0
+                                        )
 
-                                        // Checkmark
                                         Box(
                                             modifier = Modifier
-                                                .size(48.dp)
-                                                .background(if (isSetCompleted) TextPrimaryColor else Color.Transparent, RoundedCornerShape(IronCorner.RadiusMd))
+                                                .size(44.dp)
+                                                .background(if (isSetCompleted) TextPrimaryColor else Color.White.copy(alpha = 0.05f), RoundedCornerShape(IronCorner.RadiusMd))
                                                 .border(
                                                     1.dp,
-                                                    if (isSetCompleted) Color.Transparent else Color(0xFFFFFFFF).copy(alpha = 0.2f),
+                                                    if (isSetCompleted) Color.Transparent else Color.White.copy(alpha = 0.25f),
                                                     RoundedCornerShape(IronCorner.RadiusMd)
                                                 )
                                                 .bouncyClick {
@@ -246,7 +257,6 @@ fun ActiveWorkoutScreen(
                                                     val updatedSets = ex.sets.toMutableList()
                                                     updatedSets[setIdx] = set.copy(completedAt = if (nowDone) System.currentTimeMillis() else null)
                                                     
-                                                    // RPE populating
                                                     if (nowDone && set.rpe == null) {
                                                         updatedSets[setIdx] = updatedSets[setIdx].copy(rpe = 8.0f)
                                                     }
@@ -257,15 +267,14 @@ fun ActiveWorkoutScreen(
                                                     coroutineScope.launch { repository.saveWorkout(workout.copy(loggedExercises = updatedList)) }
                                                     
                                                     if (nowDone) {
-                                                        // trigger rest timer
-                                                        val restSecs = 90
+                                                        val restSecs = set.restTimeSeconds ?: 90
                                                         activeRestTimerDuration = restSecs
                                                         activeRestTimerEnd = System.currentTimeMillis() + (restSecs * 1000L)
                                                     }
                                                 },
                                             contentAlignment = Alignment.Center
                                         ) {
-                                            Icon(Icons.Outlined.Check, contentDescription = "Done", tint = if (isSetCompleted) BgColor else TextPrimaryColor)
+                                            Icon(Icons.Outlined.Check, contentDescription = "Done", tint = if (isSetCompleted) BgColor else TextPrimaryColor, modifier = Modifier.size(20.dp))
                                         }
                                     }
                                 }
@@ -295,7 +304,7 @@ fun ActiveWorkoutScreen(
                 Box(
                     modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(IronSpacing.x16)
                 ) {
-                    RestTimerBar(
+                    com.example.ui.workout.RestTimerBar(
                         endTimeMillis = activeRestTimerEnd!!,
                         totalDurationSeconds = activeRestTimerDuration,
                         onDismiss = { activeRestTimerEnd = null }
@@ -308,13 +317,13 @@ fun ActiveWorkoutScreen(
     if (showAddExerciseDialog) {
         AlertDialog(
             onDismissRequest = { showAddExerciseDialog = false },
-            containerColor = BgColor,
+            containerColor = Color(0xFF1C1C1E),
             confirmButton = {
                 TextButton(onClick = { showAddExerciseDialog = false }) { Text("Cancel", color = TextPrimaryColor) }
             },
             title = { Text("Add Exercise", style = IronTypography.Title3, color = TextPrimaryColor) },
             text = {
-                LazyColumn {
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
                     items(availableExercises) { ex ->
                         Text(
                             text = ex.name,
@@ -326,11 +335,68 @@ fun ActiveWorkoutScreen(
                                     repository.saveWorkout(workout.copy(loggedExercises = newList))
                                     showAddExerciseDialog = false
                                 }
-                            }.padding(vertical = 12.dp)
+                            }.padding(vertical = 14.dp)
                         )
                     }
                 }
             }
         )
+    }
+}
+
+@Composable
+fun StepperChip(
+    value: Double,
+    unit: String,
+    onValueChange: (Double) -> Unit,
+    modifier: Modifier = Modifier,
+    step: Double = 2.5
+) {
+    Row(
+        modifier = modifier
+            .height(44.dp)
+            .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(IronCorner.RadiusMd))
+            .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(IronCorner.RadiusMd)),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .width(36.dp)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(topStart = IronCorner.RadiusMd, bottomStart = IronCorner.RadiusMd))
+                .clickable { onValueChange(maxOf(0.0, value - step)) },
+            contentAlignment = Alignment.Center
+        ) {
+            Text("-", style = IronTypography.Headline, color = TextPrimaryColor)
+        }
+        
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                val displayVal = if (value % 1.0 == 0.0) "${value.toInt()}" else String.format("%.1f", value)
+                Text(
+                    text = displayVal,
+                    style = IronTypography.Headline,
+                    fontSize = 13.sp
+                )
+                Text(
+                    text = unit,
+                    style = IronTypography.Caption.copy(fontSize = 8.sp, color = TextSecondaryColor, fontWeight = FontWeight.Bold)
+                )
+            }
+        }
+        
+        Box(
+            modifier = Modifier
+                .width(36.dp)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(topEnd = IronCorner.RadiusMd, bottomEnd = IronCorner.RadiusMd))
+                .clickable { onValueChange(value + step) },
+            contentAlignment = Alignment.Center
+        ) {
+            Text("+", style = IronTypography.Headline, color = TextPrimaryColor)
+        }
     }
 }

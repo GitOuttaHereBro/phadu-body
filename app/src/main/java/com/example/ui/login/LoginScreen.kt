@@ -4,6 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,7 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.ui.auth.LocalAuthProvider
 import com.example.ui.theme.*
 import kotlinx.coroutines.launch
@@ -21,6 +26,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
     val authContext = LocalAuthProvider.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
@@ -34,7 +40,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             modifier = Modifier.padding(IronSpacing.x24).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("IRON LOG", style = IronTypography.LargeTitle)
+            Text("GYM KRTA H JI", style = IronTypography.LargeTitle)
             Spacer(modifier = Modifier.height(IronSpacing.x8))
             Text("Precision Strength Intelligence", style = IronTypography.Caption.copy(color = TextSecondaryColor))
             
@@ -46,7 +52,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 label = { Text("Email", style = IronTypography.Caption.copy(color = TextSecondaryColor)) },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = TextPrimaryColor,
-                    unfocusedBorderColor = BorderColor,
+                    unfocusedBorderColor = BorderStrongColor,
                     focusedTextColor = TextPrimaryColor,
                     unfocusedTextColor = TextPrimaryColor,
                     cursorColor = TextPrimaryColor
@@ -61,10 +67,19 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password", style = IronTypography.Caption.copy(color = TextSecondaryColor)) },
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                            tint = TextSecondaryColor
+                        )
+                    }
+                },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = TextPrimaryColor,
-                    unfocusedBorderColor = BorderColor,
+                    unfocusedBorderColor = BorderStrongColor,
                     focusedTextColor = TextPrimaryColor,
                     unfocusedTextColor = TextPrimaryColor,
                     cursorColor = TextPrimaryColor
@@ -109,7 +124,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 if (isLoading) {
                     CircularProgressIndicator(color = BgColor, modifier = Modifier.size(24.dp))
                 } else {
-                    Text("Sign In", style = IronTypography.Headline)
+                    Text("Sign In", style = IronTypography.Headline, color = BgColor)
                 }
             }
 
@@ -139,6 +154,30 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 }
             ) {
                 Text("Create Account", style = IronTypography.Body.copy(color = TextPrimaryColor))
+            }
+
+            Spacer(modifier = Modifier.height(IronSpacing.x32))
+            
+            TextButton(
+                onClick = {
+                    isLoading = true
+                    errorMessage = null
+                    coroutineScope.launch {
+                        try {
+                            authContext.firebaseAuth.signInAnonymously()
+                                .addOnSuccessListener { onLoginSuccess() }
+                                .addOnFailureListener { e -> 
+                                    errorMessage = e.localizedMessage
+                                    isLoading = false
+                                }
+                        } catch(e: Exception) {
+                            errorMessage = e.localizedMessage
+                            isLoading = false
+                        }
+                    }
+                }
+            ) {
+                Text("CONTINUE AS GUEST", style = IronTypography.Caption.copy(color = TextPrimaryColor, letterSpacing = 1.sp))
             }
         }
     }

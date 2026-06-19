@@ -31,7 +31,7 @@ import java.util.Locale
 @Composable
 fun HistoryScreen(repository: IronLogRepository) {
     var history by remember { mutableStateOf<List<Workout>>(emptyList()) }
-    var selectedDateStr by remember { mutableStateOf("") }
+    var selectedDateStr by remember { mutableStateOf(SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())) }
     var currentMonth by remember { mutableStateOf(Calendar.getInstance()) }
     var isCalendarView by remember { mutableStateOf(true) }
 
@@ -97,8 +97,12 @@ fun HistoryScreen(repository: IronLogRepository) {
                 val matchedWorkouts = history.filter { sdf.format(Date(it.date)) == selectedDateStr }
                 
                 item {
-                    val dateObj = sdf.parse(selectedDateStr)
-                    val formatted = if (dateObj != null) displayDf.format(dateObj) else selectedDateStr
+                    val formatted = try {
+                        val dateObj = sdf.parse(selectedDateStr)
+                        if (dateObj != null) displayDf.format(dateObj) else selectedDateStr
+                    } catch (e: Exception) {
+                        selectedDateStr
+                    }
                     Text(
                         text = "Workout on $formatted",
                         style = IronTypography.Caption.copy(color = TextSecondaryColor),

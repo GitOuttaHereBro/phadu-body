@@ -2,6 +2,7 @@ package com.example.ui.workout
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -52,7 +53,8 @@ fun RestTimerBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .glassRecipe(androidx.compose.foundation.shape.RoundedCornerShape(IronCorner.RadiusMd))
+                .background(Color.White.copy(alpha = 0.05f), androidx.compose.foundation.shape.RoundedCornerShape(IronCorner.RadiusMd))
+                .border(1.dp, Color.White.copy(alpha = 0.1f), androidx.compose.foundation.shape.RoundedCornerShape(IronCorner.RadiusMd))
                 .height(64.dp)
                 .bouncyClick { onDismiss() }
         ) {
