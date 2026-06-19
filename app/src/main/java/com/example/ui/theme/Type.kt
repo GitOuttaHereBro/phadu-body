@@ -13,14 +13,14 @@ val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = SystemFontStack,
         fontWeight = FontWeight.Black,
-        fontSize = 42.sp,
+        fontSize = 48.sp,
         lineHeight = 48.sp,
         letterSpacing = (-1.5).sp
     ),
     displayMedium = TextStyle(
         fontFamily = SystemFontStack,
         fontWeight = FontWeight.Bold,
-        fontSize = 32.sp,
+        fontSize = 34.sp,
         lineHeight = 38.sp,
         letterSpacing = (-1).sp
     ),
@@ -34,35 +34,35 @@ val Typography = Typography(
     titleMedium = TextStyle(
         fontFamily = SystemFontStack,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
+        fontSize = 17.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.sp
     ),
     bodyLarge = TextStyle(
         fontFamily = SystemFontStack,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
+        fontSize = 15.sp,
         lineHeight = 26.sp, // Generous line height
         letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = SystemFontStack,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
+        fontSize = 13.sp,
         lineHeight = 22.sp, // Generous line height
         letterSpacing = 0.25.sp
     ),
     labelLarge = TextStyle(
         fontFamily = SystemFontStack,
         fontWeight = FontWeight.Bold,
-        fontSize = 14.sp,
+        fontSize = 13.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.5.sp
     ),
     labelSmall = TextStyle(
         fontFamily = SystemFontStack,
         fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
+        fontSize = 13.sp,
         lineHeight = 16.sp,
         letterSpacing = 1.sp
     )

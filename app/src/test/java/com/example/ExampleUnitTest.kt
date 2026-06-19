@@ -56,8 +56,8 @@ class ExampleUnitTest {
         val sanitized = ProgramValidator.validateAndSanitize(malformedProgram)
 
         // Verify program name and author fallbacks
-        assertEquals("Standard Training Program", sanitized.programName)
-        assertEquals("Precision System Team", sanitized.author)
+        assertEquals("The Bodybuilding Transformation System - Intermediate-Advanced", sanitized.programName)
+        assertEquals("Jeff Nippard", sanitized.author)
 
         // Verify exercise fields fallbacks
         val sanitWeek = sanitized.weeks["week1"]

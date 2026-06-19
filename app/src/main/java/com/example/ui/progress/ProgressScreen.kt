@@ -76,7 +76,7 @@ fun ProgressScreen(repository: IronLogRepository) {
         ),
         topBar = {
             TopAppBar(
-                title = { Text("ANALYTICS", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp, letterSpacing = 2.sp) },
+                title = { Text("ANALYTICS", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp, letterSpacing = 2.sp) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         }
@@ -95,13 +95,13 @@ fun ProgressScreen(repository: IronLogRepository) {
                     .padding(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                listOf("PROGRESS & PRS", "PLATE CALCULATOR").forEachIndexed { index, title ->
+                listOf("PROGRESS", "PLATE CALCULATOR").forEachIndexed { index, title ->
                     val selected = activeTab == index
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .background(
-                                if (selected) com.example.ui.theme.AccentGreen else Color.Transparent,
+                                if (selected) Color.White else Color.Transparent,
                                 RoundedCornerShape(12.dp)
                             )
                             .bouncyClick { activeTab = index }
@@ -112,7 +112,7 @@ fun ProgressScreen(repository: IronLogRepository) {
                             text = title,
                             color = if (selected) Color.White else Color.White.copy(alpha = 0.6f),
                             fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                             letterSpacing = 1.sp
                         )
                     }
@@ -156,16 +156,16 @@ fun ProgressionAndPrsContent(
 
         item {
             Text(
-                text = "PERSONAL RECORDS",
+                text = "EXERCISE PROGRESSION",
                 fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
+                fontSize = 13.sp,
                 color = com.example.ui.theme.GrayMedium,
                 letterSpacing = 1.5.sp,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
             )
         }
 
-        val list = exercises.filter { prs.containsKey(it.id) }
+        val list = exercises.filter { ex -> history.any { w -> w.loggedExercises.any { le -> le.exerciseId == ex.id } } }
         
         if (list.isEmpty()) {
             item {
@@ -178,15 +178,14 @@ fun ProgressionAndPrsContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("No Personal Records set yet 🏋️", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                        Text("No progression data yet", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("Perform high-weight exercises to track records here.", color = com.example.ui.theme.GrayMedium, fontSize = 11.sp)
+                        Text("Log exercises to see your progress charts here.", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
                     }
                 }
             }
         } else {
             items(list) { ex ->
-                val pr = prs[ex.id]
                 val isExpanded = expandedExerciseId == ex.id
                 
                 Card(
@@ -198,7 +197,7 @@ fun ProgressionAndPrsContent(
                         },
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                    border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                    border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(
@@ -207,11 +206,11 @@ fun ProgressionAndPrsContent(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column {
-                                Text(ex.name.uppercase(), fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = Color.White)
+                                Text(ex.name.uppercase(), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = Color.White)
                                 Text(
                                     text = if (isExpanded) "Click to collapse chart" else "Click to visualize progression",
-                                    color = com.example.ui.theme.AccentGreen.copy(alpha = 0.8f),
-                                    fontSize = 11.sp,
+                                    color = Color.White.copy(alpha = 0.8f),
+                                    fontSize = 13.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                             }
@@ -226,25 +225,8 @@ fun ProgressionAndPrsContent(
                                     text = if (isExpanded) "−" else "+",
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 14.sp
+                                    fontSize = 13.sp
                                 )
-                            }
-                        }
-                        
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Column {
-                                Text("${pr?.bestWeight?.value ?: 0.0} ${ex.unit} x ${pr?.bestWeight?.reps ?: 0}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
-                                Text("BEST WEIGHT", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium, letterSpacing = 1.sp)
-                            }
-                            Column {
-                                Text("${pr?.bestVolume?.value ?: 0.0} ${ex.unit}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
-                                Text("BEST VOLUME", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium, letterSpacing = 1.sp)
-                            }
-                            Column {
-                                Text("${pr?.bestEstimated1RM?.value?.toInt() ?: 0} ${ex.unit}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
-                                Text("EST 1RM", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium, letterSpacing = 1.sp)
                             }
                         }
 
@@ -304,7 +286,7 @@ fun ExerciseProgressionChart(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("No weight records found in history.", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
-                Text("Log sets with weights for this exercise to populate graph! 📈", color = com.example.ui.theme.GrayMedium, fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+                Text("Log sets with weights for this exercise to populate graph!", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
             }
         }
         return
@@ -326,7 +308,7 @@ fun ExerciseProgressionChart(
         border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark.copy(alpha = 0.5f))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Weight Lifted Progress ($unit)", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text("Weight Lifted Progress ($unit)", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
             Spacer(modifier = Modifier.height(16.dp))
 
             Box(modifier = Modifier.fillMaxWidth().height(160.dp)) {
@@ -385,7 +367,7 @@ fun ExerciseProgressionChart(
                             
                             // Highlight individual node
                             drawCircle(
-                                color = com.example.ui.theme.AccentGreen,
+                                color = Color.White,
                                 radius = 7f,
                                 center = Offset(x, y)
                             )
@@ -432,7 +414,7 @@ fun ExerciseProgressionChart(
                             path = fillPath,
                             brush = Brush.verticalGradient(
                                 colors = listOf(
-                                    com.example.ui.theme.AccentGreen.copy(alpha = 0.25f),
+                                    Color.White.copy(alpha = 0.25f),
                                     Color.Transparent
                                 ),
                                 startY = paddingY,
@@ -443,14 +425,14 @@ fun ExerciseProgressionChart(
                         // Draw elegant line stroke
                         drawPath(
                             path = path,
-                            color = com.example.ui.theme.AccentGreen,
+                            color = Color.White,
                             style = Stroke(width = 4f)
                         )
                     } else if (dataPoints.size == 1) {
                         val x = width / 2f
                         val y = height / 2f
                         drawCircle(
-                            color = com.example.ui.theme.AccentGreen,
+                            color = Color.White,
                             radius = 8f,
                             center = Offset(x, y)
                         )
@@ -503,11 +485,11 @@ fun VolumeDashboard(workouts: List<Workout>) {
             .padding(16.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-        border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+        border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            Text("Volume Progression (30 Days)", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text("Total volume lifted across all exercises", color = com.example.ui.theme.GrayMedium, fontSize = 12.sp)
+            Text("Volume Progression (30 Days)", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            Text("Total volume lifted across all exercises", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
             
             Spacer(modifier = Modifier.height(24.dp))
             
@@ -670,7 +652,7 @@ fun PlateCalculatorContent() {
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
                     // Title and toggle
@@ -679,7 +661,7 @@ fun PlateCalculatorContent() {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("TARGET LOAD WEIGHT", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text("TARGET LOAD WEIGHT", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                         
                         // KG vs LBS Unit Switcher
                         Row(
@@ -695,7 +677,7 @@ fun PlateCalculatorContent() {
                                 Box(
                                     modifier = Modifier
                                         .background(
-                                            if (isSelected) com.example.ui.theme.AccentGreen else Color.Transparent,
+                                            if (isSelected) Color.White else Color.Transparent,
                                             RoundedCornerShape(6.dp)
                                         )
                                         .bouncyClick {
@@ -709,7 +691,7 @@ fun PlateCalculatorContent() {
                                     Text(
                                         text = label,
                                         color = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f),
-                                        fontSize = 11.sp,
+                                        fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
@@ -730,13 +712,13 @@ fun PlateCalculatorContent() {
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        textStyle = LocalTextStyle.current.copy(color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold),
+                        textStyle = LocalTextStyle.current.copy(color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         trailingIcon = {
-                            Text(if (isKg) "kg" else "lbs", color = com.example.ui.theme.GrayMedium, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
+                            Text(if (isKg) "kg" else "lbs", color = com.example.ui.theme.GrayMedium, fontWeight = FontWeight.Bold, fontSize = 17.sp, modifier = Modifier.padding(end = 8.dp))
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = com.example.ui.theme.AccentGreen,
+                            focusedBorderColor = Color.White,
                             unfocusedBorderColor = com.example.ui.theme.GlassBorderDark,
                             focusedContainerColor = Color.Black.copy(alpha = 0.3f),
                             unfocusedContainerColor = Color.Black.copy(alpha = 0.3f)
@@ -753,10 +735,10 @@ fun PlateCalculatorContent() {
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("BARBELL WEIGHT", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, letterSpacing = 1.sp)
+                    Text("BARBELL WEIGHT", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, letterSpacing = 1.sp)
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     Row(
@@ -770,7 +752,7 @@ fun PlateCalculatorContent() {
                                 modifier = Modifier
                                     .weight(1f)
                                     .background(
-                                        if (selected) com.example.ui.theme.AccentGreen else com.example.ui.theme.GlassDark,
+                                        if (selected) Color.White else com.example.ui.theme.GlassDark,
                                         RoundedCornerShape(12.dp)
                                     )
                                     .bouncyClick { barbellWeight = wt }
@@ -780,7 +762,7 @@ fun PlateCalculatorContent() {
                                 Text(
                                     text = "${if (wt % 1.0 == 0.0) wt.toInt() else wt} ${if (isKg) "kg" else "lbs"}",
                                     color = Color.White,
-                                    fontSize = 12.sp,
+                                    fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -812,20 +794,20 @@ fun PlateCalculatorContent() {
                     .padding(bottom = 16.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "WARM-UP PROGRESSION (40% / 60% / 80%)",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
+                        fontSize = 13.sp,
                         letterSpacing = 1.sp
                     )
                     Text(
                         text = "Ramp sets scaled to reach your target working weight of ${if (targetWeightDouble % 1.0 == 0.0) targetWeightDouble.toInt() else targetWeightDouble} ${if (isKg) "kg" else "lbs"}.",
                         color = com.example.ui.theme.GrayMedium,
-                        fontSize = 11.sp,
+                        fontSize = 13.sp,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
 
@@ -847,16 +829,16 @@ fun PlateCalculatorContent() {
                             Column {
                                 Text(
                                     text = "${(pct * 100).toInt()}% RAMP",
-                                    color = com.example.ui.theme.AccentGreen,
+                                    color = Color.White,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 10.sp,
+                                    fontSize = 13.sp,
                                     letterSpacing = 0.5.sp
                                 )
                                 Text(
                                     text = "${if (roundedTotal % 1.0 == 0.0) roundedTotal.toInt() else roundedTotal} ${if (isKg) "kg" else "lbs"}",
                                     color = Color.White,
                                     fontWeight = FontWeight.ExtraBold,
-                                    fontSize = 16.sp,
+                                    fontSize = 15.sp,
                                     letterSpacing = 0.5.sp
                                 )
                             }
@@ -868,7 +850,7 @@ fun PlateCalculatorContent() {
                                 text = platesText,
                                 color = Color.White.copy(alpha = 0.9f),
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp,
+                                fontSize = 13.sp,
                                 modifier = Modifier.padding(start = 12.dp)
                             )
                         }
@@ -883,11 +865,11 @@ fun PlateCalculatorContent() {
                 modifier = Modifier.fillMaxWidth().padding(bottom = 100.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("GYM PLATE INVENTORY", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp, letterSpacing = 1.sp)
-                    Text("Toggle off plates that are not available in your gym.", color = com.example.ui.theme.GrayMedium, fontSize = 11.sp, modifier = Modifier.padding(bottom = 12.dp))
+                    Text("GYM PLATE INVENTORY", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, letterSpacing = 1.sp)
+                    Text("Toggle off plates that are not available in your gym.", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp, modifier = Modifier.padding(bottom = 12.dp))
                     
                     val scrollState = rememberScrollState()
                     Row(
@@ -901,12 +883,12 @@ fun PlateCalculatorContent() {
                                 Box(
                                     modifier = Modifier
                                         .background(
-                                            if (available) com.example.ui.theme.AccentGreen.copy(alpha = 0.25f) else Color.Transparent,
+                                            if (available) Color.White.copy(alpha = 0.25f) else Color.Transparent,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .border(
                                             1.dp,
-                                            if (available) com.example.ui.theme.AccentGreen else com.example.ui.theme.GlassBorderDark,
+                                            if (available) Color.White else com.example.ui.theme.GlassBorderDark,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .bouncyClick {
@@ -920,7 +902,7 @@ fun PlateCalculatorContent() {
                                     Text(
                                         text = "${if (wt % 1.0 == 0.0) wt.toInt() else wt} kg",
                                         color = if (available) Color.White else Color.White.copy(alpha = 0.5f),
-                                        fontSize = 12.sp,
+                                        fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
@@ -930,12 +912,12 @@ fun PlateCalculatorContent() {
                                 Box(
                                     modifier = Modifier
                                         .background(
-                                            if (available) com.example.ui.theme.AccentGreen.copy(alpha = 0.25f) else Color.Transparent,
+                                            if (available) Color.White.copy(alpha = 0.25f) else Color.Transparent,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .border(
                                             1.dp,
-                                            if (available) com.example.ui.theme.AccentGreen else com.example.ui.theme.GlassBorderDark,
+                                            if (available) Color.White else com.example.ui.theme.GlassBorderDark,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .bouncyClick {
@@ -949,7 +931,7 @@ fun PlateCalculatorContent() {
                                     Text(
                                         text = "${if (wt % 1.0 == 0.0) wt.toInt() else wt} lbs",
                                         color = if (available) Color.White else Color.White.copy(alpha = 0.5f),
-                                        fontSize = 12.sp,
+                                        fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }

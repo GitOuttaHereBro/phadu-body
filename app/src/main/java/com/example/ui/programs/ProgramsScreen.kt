@@ -257,7 +257,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                         text = if (showSelector) "CHOOSE PROGRAM" else "PROGRAM DETAILS",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
+                        fontSize = 22.sp,
                         letterSpacing = 2.sp
                     )
                 },
@@ -280,7 +280,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                 }
                             }
                         ) {
-                            Text("SWITCH", color = com.example.ui.theme.AccentGreen, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            Text("SWITCH", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                         }
                     }
                 },
@@ -438,7 +438,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                     Card(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                         colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                        border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark),
+                        border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Row(
@@ -475,7 +475,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                 text = "Week ${activeWeekIndex + 1} of 12",
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
+                                fontSize = 17.sp
                             )
 
                             IconButton(
@@ -520,7 +520,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                     .padding(horizontal = 2.dp)
                                     .bouncyClick { activeTabDayIndex = idx },
                                 colors = CardDefaults.cardColors(
-                                    containerColor = if (isSelected) com.example.ui.theme.AccentGreen else com.example.ui.theme.GlassDark
+                                    containerColor = if (isSelected) Color.White else com.example.ui.theme.GlassDark
                                 ),
                                 border = BorderStroke(1.dp, if (isSelected) Color.White else com.example.ui.theme.GlassBorderDark),
                                 shape = RoundedCornerShape(12.dp)
@@ -533,20 +533,20 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                         text = dayAbbrev.uppercase(),
                                         color = if (isSelected) Color.Black else Color.White,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp
+                                        fontSize = 13.sp
                                     )
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        text = if (title.contains("Rest", true)) "REST" else {
-                                            if (title.contains("Upper", true)) "UPP"
-                                            else if (title.contains("Lower", true)) "LOW"
-                                            else if (title.contains("Push", true)) "PSH"
-                                            else if (title.contains("Pull", true)) "PLL"
-                                            else if (title.contains("Legs", true)) "LGS"
-                                            else "WKT"
+                                        text = if (title.contains("Rest", true)) "Rest" else {
+                                            if (title.contains("Upper", true)) "Upper"
+                                            else if (title.contains("Lower", true)) "Lower"
+                                            else if (title.contains("Push", true)) "Push"
+                                            else if (title.contains("Pull", true)) "Pull"
+                                            else if (title.contains("Legs", true) || title.contains("Leg", true)) "Legs"
+                                            else "W/O"
                                         },
                                         color = if (isSelected) Color.Black.copy(alpha = 0.8f) else com.example.ui.theme.GrayMedium,
-                                        fontSize = 8.sp,
+                                        fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
@@ -561,7 +561,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                         Card(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                            border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark),
+                            border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark),
                             shape = RoundedCornerShape(16.dp)
                         ) {
                             Column(
@@ -569,16 +569,16 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "🧘 RECOVERY & REST DAY",
-                                    color = com.example.ui.theme.AccentGreen,
+                                    text = "RECOVERY & REST DAY",
+                                    color = Color.White,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp
+                                    fontSize = 17.sp
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     text = "Rest and recovery is when muscle hypertrophy and adaptation actually happen! Perform Jeff Nippard's suggested general recovery stretches, sleep well, log your nutrition progress, and prepare your body to target the next training session.",
                                     color = Color.White.copy(alpha = 0.8f),
-                                    fontSize = 14.sp,
+                                    fontSize = 13.sp,
                                     lineHeight = 22.sp,
                                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                 )
@@ -608,7 +608,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                         Card(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                            border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark),
+                            border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark),
                             shape = RoundedCornerShape(16.dp)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
@@ -621,18 +621,18 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                         text = sanitizeUiText(mappedDay.dayName).uppercase(),
                                         color = Color.White,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp,
+                                        fontSize = 17.sp,
                                         modifier = Modifier.weight(1f)
                                     )
                                     
                                     Button(
                                         onClick = { showConfirmDialog = true },
                                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
-                                        colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.Black),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                                         shape = RoundedCornerShape(8.dp),
                                         modifier = Modifier.height(30.dp)
                                     ) {
-                                        Text("ACTIVATE WEEK", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                        Text("ACTIVATE WEEK", fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                                 Spacer(modifier = Modifier.height(12.dp))
@@ -641,15 +641,15 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Column {
-                                        Text("Exercises", color = com.example.ui.theme.GrayMedium, fontSize = 11.sp)
+                                        Text("Exercises", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
                                         Text("${actualExercises.size} Items", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                     }
                                     Column {
-                                        Text("Est. Duration", color = com.example.ui.theme.GrayMedium, fontSize = 11.sp)
-                                        Text("${computedDurationTotal.toInt()} mins", color = com.example.ui.theme.AccentGreen, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                        Text("Est. Duration", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
+                                        Text("${computedDurationTotal.toInt()} mins", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                     }
                                     Column {
-                                        Text("Est. Rest Time", color = com.example.ui.theme.GrayMedium, fontSize = 11.sp)
+                                        Text("Est. Rest Time", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
                                         Text("${computedRestTotal.toInt()} mins", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                     }
                                 }
@@ -664,9 +664,9 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                 Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
                                     Text(
                                         text = muscleGrp,
-                                        color = com.example.ui.theme.AccentGreen,
+                                        color = Color.White,
                                         fontWeight = FontWeight.ExtraBold,
-                                        fontSize = 14.sp,
+                                        fontSize = 13.sp,
                                         letterSpacing = 1.sp
                                     )
                                     HorizontalDivider(
@@ -683,12 +683,9 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                             val resolvedEx = activeSubstitutions[primaryEx.name] ?: primaryEx
 
                             Card(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                                colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                                border = BorderStroke(
-                                    width = 1.dp,
-                                    color = if (activeSubstitutions.containsKey(primaryEx.name)) com.example.ui.theme.AccentGreen.copy(alpha = 0.6f) else com.example.ui.theme.GlassBorderDark
-                                ),
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).glassCard(RoundedCornerShape(16.dp)),
+                                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                                border = if (activeSubstitutions.containsKey(primaryEx.name)) BorderStroke(1.dp, Color.White.copy(alpha = 0.6f)) else null,
                                 shape = RoundedCornerShape(16.dp)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
@@ -703,13 +700,13 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                 text = resolvedEx.name,
                                                 color = Color.White,
                                                 fontWeight = FontWeight.Bold,
-                                                fontSize = 18.sp
+                                                fontSize = 17.sp
                                             )
                                             Text(
                                                 text = resolvedEx.muscleGroup ?: "General",
-                                                color = com.example.ui.theme.AccentGreen,
+                                                color = Color.White,
                                                 fontWeight = FontWeight.SemiBold,
-                                                fontSize = 12.sp
+                                                fontSize = 13.sp
                                             )
                                         }
 
@@ -721,7 +718,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                 Icon(
                                                     imageVector = Icons.Outlined.PlayArrow,
                                                     contentDescription = "Watch Demo",
-                                                    tint = com.example.ui.theme.AccentGreen
+                                                    tint = Color.White
                                                 )
                                             }
                                         }
@@ -735,20 +732,20 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Column {
-                                            Text("Warm-up", color = com.example.ui.theme.GrayMedium, fontSize = 10.sp)
-                                            Text(resolvedEx.warmupSets ?: "N/A", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                            Text("Warm-up", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
+                                            Text(resolvedEx.warmupSets ?: "N/A", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                         }
                                         Column {
-                                            Text("Working Sets", color = com.example.ui.theme.GrayMedium, fontSize = 10.sp)
-                                            Text(resolvedEx.workingSets ?: "3", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                            Text("Working Sets", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
+                                            Text(resolvedEx.workingSets ?: "3", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                         }
                                         Column {
-                                            Text("Reps Target", color = com.example.ui.theme.GrayMedium, fontSize = 10.sp)
-                                            Text(resolvedEx.reps ?: resolvedEx.repRange ?: "10", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                            Text("Reps Target", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
+                                            Text(resolvedEx.reps ?: resolvedEx.repRange ?: "10", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                         }
                                         Column {
-                                            Text("Rest Target", color = com.example.ui.theme.GrayMedium, fontSize = 10.sp)
-                                            Text(resolvedEx.rest ?: "2m", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                            Text("Rest Target", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
+                                            Text(resolvedEx.rest ?: "2m", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                         }
                                     }
 
@@ -760,15 +757,15 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Column {
-                                            Text("Early Set RPE", color = com.example.ui.theme.GrayMedium, fontSize = 10.sp)
+                                            Text("Early Set RPE", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
                                             Text(resolvedEx.earlySetRPE ?: "7-8", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                         }
                                         Column {
-                                            Text("Last Set RPE", color = com.example.ui.theme.GrayMedium, fontSize = 10.sp)
-                                            Text(resolvedEx.lastSetRPEStr, color = com.example.ui.theme.AccentGreen, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                            Text("Last Set RPE", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
+                                            Text(resolvedEx.lastSetRPEStr, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                         }
                                         Column {
-                                            Text("Technique", color = com.example.ui.theme.GrayMedium, fontSize = 10.sp)
+                                            Text("Technique", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
                                             Text(resolvedEx.lastSetTechnique ?: "N/A", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                         }
                                     }
@@ -793,7 +790,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                 Text(
                                                     text = note,
                                                     color = com.example.ui.theme.GrayMedium,
-                                                    fontSize = 11.sp,
+                                                    fontSize = 13.sp,
                                                     lineHeight = 15.sp
                                                 )
                                             }
@@ -819,7 +816,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                             text = "LOG WORKING SETS",
                                             color = com.example.ui.theme.GrayMedium,
                                             fontWeight = FontWeight.Bold,
-                                            fontSize = 11.sp,
+                                            fontSize = 13.sp,
                                             letterSpacing = 1.sp
                                         )
 
@@ -833,8 +830,8 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                             ) {
                                                 Text(
                                                     text = "CALCULATED PLATES \uD83C\uDFCB\uFE0F",
-                                                    color = com.example.ui.theme.AccentGreen,
-                                                    fontSize = 11.sp,
+                                                    color = Color.White,
+                                                    fontSize = 13.sp,
                                                     fontWeight = FontWeight.Bold
                                                 )
                                             }
@@ -844,7 +841,11 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                     for (sNum in 1..totalWorkingSets) {
                                         val logKeyPrefix = "${resolvedEx.name}_set_${sNum}"
                                         val weightVal = loggedWeights[logKeyPrefix] ?: ""
-                                        val repsVal = loggedReps[logKeyPrefix] ?: ""
+                                        val targetRepsParsed = run {
+                                            val cleaned = (resolvedEx.reps ?: resolvedEx.repRange)?.trim() ?: "10"
+                                            "\\d+".toRegex().findAll(cleaned).map { it.value.toIntOrNull() ?: 10 }.lastOrNull() ?: 10
+                                        }
+                                        val repsVal = loggedReps[logKeyPrefix] ?: targetRepsParsed.toString()
                                         val isCompleted = completedSets[logKeyPrefix] ?: false
 
                                         Row(
@@ -855,15 +856,15 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                             Text(
                                                 text = "S$sNum",
                                                 fontWeight = FontWeight.Bold,
-                                                fontSize = 12.sp,
-                                                color = if (isCompleted) com.example.ui.theme.AccentGreen else Color.White,
+                                                fontSize = 13.sp,
+                                                color = if (isCompleted) Color.White else Color.White,
                                                 modifier = Modifier.width(28.dp)
                                             )
                                             
                                             OutlinedTextField(
                                                 value = weightVal,
                                                 onValueChange = { loggedWeights[logKeyPrefix] = it },
-                                                label = { Text("Weight (kg)", fontSize = 10.sp) },
+                                                label = { Text("Weight (kg)", fontSize = 13.sp) },
                                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                                 colors = OutlinedTextFieldDefaults.colors(
                                                     focusedBorderColor = Color.White,
@@ -877,7 +878,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                             OutlinedTextField(
                                                 value = repsVal,
                                                 onValueChange = { loggedReps[logKeyPrefix] = it },
-                                                label = { Text("Reps", fontSize = 10.sp) },
+                                                label = { Text("Reps", fontSize = 13.sp) },
                                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                                 singleLine = true,
                                                 colors = OutlinedTextFieldDefaults.colors(
@@ -894,7 +895,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                 modifier = Modifier
                                                     .size(40.dp)
                                                     .background(
-                                                        if (isCompleted) com.example.ui.theme.AccentGreen else Color.White.copy(alpha = 0.08f),
+                                                        if (isCompleted) Color.White else Color.White.copy(alpha = 0.08f),
                                                         RoundedCornerShape(8.dp)
                                                     )
                                             ) {
@@ -915,7 +916,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                             text = "SUBSTITUTIONS AVAILABLE",
                                             color = com.example.ui.theme.GrayMedium,
                                             fontWeight = FontWeight.Bold,
-                                            fontSize = 9.sp,
+                                            fontSize = 13.sp,
                                             letterSpacing = 1.sp
                                         )
                                         Spacer(modifier = Modifier.height(6.dp))
@@ -929,7 +930,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                         .fillMaxWidth()
                                                         .bouncyClick { activeSubstitutions.remove(primaryEx.name) },
                                                     colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.4f)),
-                                                    border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                                                    border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
                                                 ) {
                                                     Row(
                                                         modifier = Modifier.padding(10.dp),
@@ -940,18 +941,18 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                             Icon(
                                                                 imageVector = Icons.Outlined.SwapHoriz,
                                                                 contentDescription = "Swap",
-                                                                tint = com.example.ui.theme.AccentGreen,
+                                                                tint = Color.White,
                                                                 modifier = Modifier.size(16.dp)
                                                             )
                                                             Spacer(modifier = Modifier.width(6.dp))
                                                             Text(
                                                                 text = "Restore original: ${primaryEx.name}",
                                                                 color = Color.White,
-                                                                fontSize = 12.sp,
+                                                                fontSize = 13.sp,
                                                                 fontWeight = FontWeight.Medium
                                                             )
                                                         }
-                                                        Text("TAP TO RESET", color = com.example.ui.theme.AccentGreen, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                                        Text("TAP TO RESET", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                                     }
                                                 }
                                             }
@@ -973,7 +974,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                         ) {
                                                             Column(modifier = Modifier.weight(1f)) {
                                                                 Text(sub1.name, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-                                                                Text("Sets: ${sub1.workingSets ?: "3"} • Reps: ${sub1.reps ?: "8-10"} • Rest: ${sub1.rest ?: "2m"}", color = com.example.ui.theme.GrayMedium, fontSize = 10.sp)
+                                                                Text("Sets: ${sub1.workingSets ?: "3"} • Reps: ${sub1.reps ?: "8-10"} • Rest: ${sub1.rest ?: "2m"}", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
                                                             }
                                                             Row {
                                                                 sub1.videoUrl?.let { url ->
@@ -989,7 +990,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                                     contentPadding = PaddingValues(0.dp),
                                                                     modifier = Modifier.height(30.dp)
                                                                 ) {
-                                                                    Text("SWAP", color = com.example.ui.theme.AccentGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                                                    Text("SWAP", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                                                 }
                                                             }
                                                         }
@@ -1014,7 +1015,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                         ) {
                                                             Column(modifier = Modifier.weight(1f)) {
                                                                 Text(sub2.name, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-                                                                Text("Sets: ${sub2.workingSets ?: "3"} • Reps: ${sub2.reps ?: "8-10"} • Rest: ${sub2.rest ?: "2m"}", color = com.example.ui.theme.GrayMedium, fontSize = 10.sp)
+                                                                Text("Sets: ${sub2.workingSets ?: "3"} • Reps: ${sub2.reps ?: "8-10"} • Rest: ${sub2.rest ?: "2m"}", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp)
                                                             }
                                                             Row {
                                                                 sub2.videoUrl?.let { url ->
@@ -1030,7 +1031,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                                                     contentPadding = PaddingValues(0.dp),
                                                                     modifier = Modifier.height(30.dp)
                                                                 ) {
-                                                                    Text("SWAP", color = com.example.ui.theme.AccentGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                                                    Text("SWAP", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                                                 }
                                                             }
                                                         }
@@ -1090,11 +1091,11 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                     showLoggedSuccessDialog = true
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.Black),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                             shape = RoundedCornerShape(16.dp),
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(56.dp)
                         ) {
-                            Text("COMPLETE & LOG TODAYS WORKOUT 🎉", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text("COMPLETE & LOG TODAYS WORKOUT", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                         }
                     }
                 }
@@ -1110,7 +1111,7 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
             titleContentColor = Color.White,
             textContentColor = Color.White.copy(alpha = 0.8f),
             shape = RoundedCornerShape(24.dp),
-            title = { Text("Workout Logged! 💪", fontWeight = FontWeight.Bold, fontSize = 22.sp) },
+            title = { Text("Workout Logged!", fontWeight = FontWeight.Bold, fontSize = 22.sp) },
             text = { Text("Great work! Your daily stats have been mapped, calculated, and successfully synced to Firestore. Rest up for your next session!", fontSize = 15.sp, lineHeight = 22.sp) },
             confirmButton = {
                 Button(
@@ -1152,7 +1153,7 @@ fun ProgramSelectionCatalog(
                 text = "SCIENCE-BASED SPLITS",
                 color = com.example.ui.theme.GrayMedium,
                 fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
+                fontSize = 13.sp,
                 letterSpacing = 2.sp,
                 modifier = Modifier.padding(bottom = 4.dp, top = 8.dp)
             )
@@ -1165,7 +1166,7 @@ fun ProgramSelectionCatalog(
                     .bouncyClick { onSelect("jeff_nippard.json") },
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
                     Row(
@@ -1175,21 +1176,21 @@ fun ProgramSelectionCatalog(
                     ) {
                         Text(
                             text = "RECOMMENDED BY PLATFORM",
-                            color = com.example.ui.theme.AccentGreen,
+                            color = Color.White,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 10.sp,
+                            fontSize = 13.sp,
                             letterSpacing = 1.sp
                         )
                         Box(
                             modifier = Modifier
-                                .background(com.example.ui.theme.AccentGreen.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+                                .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Text(
                                 text = "12 WEEKS",
-                                color = com.example.ui.theme.AccentGreen,
+                                color = Color.White,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 10.sp
+                                fontSize = 13.sp
                             )
                         }
                     }
@@ -1198,7 +1199,7 @@ fun ProgramSelectionCatalog(
                         text = "The Bodybuilding Transformation System",
                         color = Color.White,
                         fontWeight = FontWeight.Black,
-                        fontSize = 20.sp,
+                        fontSize = 22.sp,
                         lineHeight = 26.sp
                     )
                     Text(
@@ -1218,11 +1219,11 @@ fun ProgramSelectionCatalog(
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(
                         onClick = { onSelect("jeff_nippard.json") },
-                        colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.Black),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.fillMaxWidth().height(44.dp)
                     ) {
-                        Text("EXPLORE & START PROGRAM", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text("EXPLORE & START PROGRAM", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     }
                 }
             }
@@ -1235,14 +1236,14 @@ fun ProgramSelectionCatalog(
                     .bouncyClick { onImportClick() },
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
                     Text(
                         text = "CUSTOM IMPORT",
-                        color = com.example.ui.theme.AccentGreen,
+                        color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp,
+                        fontSize = 13.sp,
                         letterSpacing = 1.sp
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -1250,7 +1251,7 @@ fun ProgramSelectionCatalog(
                         text = "Import Custom JSON",
                         color = Color.White,
                         fontWeight = FontWeight.Black,
-                        fontSize = 20.sp,
+                        fontSize = 22.sp,
                         lineHeight = 26.sp
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -1267,7 +1268,7 @@ fun ProgramSelectionCatalog(
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.fillMaxWidth().height(44.dp)
                     ) {
-                        Text("BROWSE FILES...", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text("BROWSE FILES...", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     }
                 }
             }
@@ -1291,7 +1292,7 @@ fun ProgramTimeline(
         Text(
             text = "PROGRAM TIMELINE (12-WEEK OVERVIEW)",
             color = Color.LightGray.copy(alpha = 0.7f),
-            fontSize = 11.sp,
+            fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.2.sp,
             modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
@@ -1312,11 +1313,11 @@ fun ProgramTimeline(
                         .width(if (isExpanded) 195.dp else 125.dp)
                         .bouncyClick { onWeekSelect(weekIdx) },
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) com.example.ui.theme.AccentGreen.copy(alpha = 0.15f) else com.example.ui.theme.GlassDark
+                        containerColor = if (isSelected) Color.White.copy(alpha = 0.15f) else com.example.ui.theme.GlassDark
                     ),
                     border = BorderStroke(
                         1.dp,
-                        if (isSelected) com.example.ui.theme.AccentGreen else com.example.ui.theme.GlassBorderDark
+                        if (isSelected) Color.White else com.example.ui.theme.GlassBorderDark
                     ),
                     shape = RoundedCornerShape(14.dp)
                 ) {
@@ -1332,9 +1333,9 @@ fun ProgramTimeline(
                         ) {
                             Text(
                                 text = "WEEK ${weekIdx + 1}",
-                                color = if (isSelected) com.example.ui.theme.AccentGreen else Color.White,
+                                color = if (isSelected) Color.White else Color.White,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp
+                                fontSize = 13.sp
                             )
                             
                             Box(
@@ -1348,27 +1349,14 @@ fun ProgramTimeline(
                             ) {
                                 Text(
                                     text = if (isExpanded) "−" else "+",
-                                    color = if (isExpanded) com.example.ui.theme.AccentGreen else Color.White,
-                                    fontSize = 11.sp,
+                                    color = if (isExpanded) Color.White else Color.White,
+                                    fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
                         }
 
                         Spacer(modifier = Modifier.height(6.dp))
-
-                        val rawBlock = weekData?.block ?: "Accumulation"
-                        val cleanBlock = rawBlock.replace("Block", "N/A", ignoreCase = true)
-                            .replace("Phase", "N/A", ignoreCase = true)
-                            .replace("Accumulation", "Focus", ignoreCase = true)
-                            .replace("Intensification", "Hypertrophy", ignoreCase = true)
-
-                        Text(
-                            text = cleanBlock,
-                            color = Color.Gray,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Medium
-                        )
 
                         if (isExpanded) {
                             Spacer(modifier = Modifier.height(10.dp))
@@ -1380,7 +1368,7 @@ fun ProgramTimeline(
                                 Text(
                                     text = "No days configured",
                                     color = Color.White.copy(alpha = 0.4f),
-                                    fontSize = 9.sp
+                                    fontSize = 13.sp
                                 )
                             } else {
                                 days.forEachIndexed { dayIdx, day ->
@@ -1404,7 +1392,7 @@ fun ProgramTimeline(
                                         Text(
                                             text = "Day ${dayIdx + 1}",
                                             color = Color.LightGray,
-                                            fontSize = 9.sp,
+                                            fontSize = 13.sp,
                                             fontWeight = FontWeight.Normal
                                         )
                                         Box(
@@ -1416,7 +1404,7 @@ fun ProgramTimeline(
                                             Text(
                                                 text = split.uppercase(),
                                                 color = badgeColor,
-                                                fontSize = 7.5.sp,
+                                                fontSize = 13.sp,
                                                 fontWeight = FontWeight.Black
                                             )
                                         }
@@ -1428,7 +1416,7 @@ fun ProgramTimeline(
                             Text(
                                 text = "Tap + to view splits",
                                 color = Color.White.copy(alpha = 0.25f),
-                                fontSize = 8.5.sp
+                                fontSize = 13.sp
                             )
                         }
                     }
@@ -1500,14 +1488,14 @@ fun ImportErrorScreen(
             text = "IMPORT FAILED",
             color = Color(0xFFE53935),
             fontWeight = FontWeight.Black,
-            fontSize = 24.sp,
+            fontSize = 22.sp,
             letterSpacing = 2.sp
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "The uploaded JSON file does not match the required schema structure.",
             color = Color.White.copy(alpha = 0.8f),
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
@@ -1523,7 +1511,7 @@ fun ImportErrorScreen(
                     Text(
                         text = "• $error",
                         color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 12.sp,
+                        fontSize = 13.sp,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }

@@ -14,6 +14,8 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.List
+import androidx.compose.material.icons.outlined.LocalFireDepartment
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -66,6 +68,7 @@ fun HistoryScreen(repository: IronLogRepository) {
         history.associate { workout ->
             val groups = workout.loggedExercises.mapNotNull {
                 exercisesMap[it.exerciseId]?.muscleGroup?.lowercase()
+                    ?: exercisesMap.values.find { ex -> ex.name.equals(it.exerciseName, ignoreCase = true) }?.muscleGroup?.lowercase()
             }
             val primaryGroup = groups.groupBy { it }
                 .maxByOrNull { it.value.size }?.key ?: "general"
@@ -94,7 +97,7 @@ fun HistoryScreen(repository: IronLogRepository) {
         ),
         topBar = {
             TopAppBar(
-                title = { Text("TRAINING LOGS", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp, letterSpacing = 2.sp) },
+                title = { Text("TRAINING LOGS", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp, letterSpacing = 2.sp) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 actions = {
                     // Modern high-contrast toggle with active borders
@@ -164,7 +167,7 @@ fun HistoryScreen(repository: IronLogRepository) {
                         text = "WORKOUTS ON " + if (selectedDateStr == sdf.format(Date())) "TODAY" else selectedDateStr,
                         color = com.example.ui.theme.GrayMedium,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
+                        fontSize = 13.sp,
                         letterSpacing = 1.5.sp,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                     )
@@ -178,7 +181,7 @@ fun HistoryScreen(repository: IronLogRepository) {
                                 .padding(horizontal = 16.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                            border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                            border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
                         ) {
                             Box(
                                 modifier = Modifier
@@ -187,7 +190,7 @@ fun HistoryScreen(repository: IronLogRepository) {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "🧘 RECOVERY & OFF DAY\n(No logs completed on this date)",
+                                    text = "RECOVERY & OFF DAY\n(No logs completed on this date)",
                                     color = com.example.ui.theme.GrayMedium,
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 13.sp,
@@ -249,7 +252,7 @@ fun WorkoutDetailCard(
             .testTag("workout_history_card_${workout.id}"),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-        border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+        border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -261,12 +264,12 @@ fun WorkoutDetailCard(
                     Text(
                         text = (workout.templateName ?: "AD-HOC WORKOUT").uppercase(),
                         fontWeight = FontWeight.Black,
-                        fontSize = 18.sp,
+                        fontSize = 17.sp,
                         color = Color.White
                     )
                     if (isPrDay) {
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("🔥", fontSize = 16.sp) // PR Flame Indicator!
+                        Icon(Icons.Outlined.LocalFireDepartment, contentDescription = "PR", tint = com.example.ui.theme.ErrorColor, modifier = Modifier.size(16.dp))
                     }
                 }
                 
@@ -279,7 +282,7 @@ fun WorkoutDetailCard(
                         Text(
                             text = "PR SET",
                             color = Color.Black,
-                            fontSize = 8.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Black,
                             letterSpacing = 0.5.sp
                         )
@@ -290,7 +293,7 @@ fun WorkoutDetailCard(
             Text(
                 text = dateStr,
                 color = com.example.ui.theme.GrayMedium,
-                fontSize = 11.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp
             )
@@ -306,7 +309,9 @@ fun WorkoutDetailCard(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 workout.loggedExercises.forEach { loggedEx ->
-                    val mGroup = exercisesMap[loggedEx.exerciseId]?.muscleGroup?.uppercase() ?: "GENERAL"
+                    val mGroup = exercisesMap[loggedEx.exerciseId]?.muscleGroup?.uppercase() 
+                        ?: exercisesMap.values.find { it.name.equals(loggedEx.exerciseName, ignoreCase = true) }?.muscleGroup?.uppercase() 
+                        ?: "GENERAL"
                     Column {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -321,9 +326,9 @@ fun WorkoutDetailCard(
                             )
                             Text(
                                 text = mGroup,
-                                color = com.example.ui.theme.AccentGreen,
+                                color = Color.White,
                                 fontWeight = FontWeight.ExtraBold,
-                                fontSize = 9.sp,
+                                fontSize = 13.sp,
                                 letterSpacing = 0.5.sp
                             )
                         }
@@ -335,7 +340,7 @@ fun WorkoutDetailCard(
                         Text(
                             text = if (setsRepLine.isNotEmpty()) setsRepLine else "No completed sets",
                             color = Color.White.copy(alpha = 0.65f),
-                            fontSize = 11.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
                             lineHeight = 14.sp
                         )
@@ -351,11 +356,11 @@ fun WorkoutDetailCard(
             ) {
                 Column {
                     Text("${workout.totalVolume.toInt()}", fontWeight = FontWeight.Black, fontSize = 22.sp, color = Color.White)
-                    Text("VOLUME (KG)", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium, letterSpacing = 1.sp)
+                    Text("VOLUME (KG)", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium, letterSpacing = 1.sp)
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text("${workout.durationMinutes}", fontWeight = FontWeight.Black, fontSize = 22.sp, color = Color.White)
-                    Text("DURATION MINUTES", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium, letterSpacing = 1.sp)
+                    Text("DURATION MINUTES", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium, letterSpacing = 1.sp)
                 }
             }
         }
@@ -397,7 +402,7 @@ fun TrainingCalendar(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-        border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+        border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Header
@@ -432,7 +437,7 @@ fun TrainingCalendar(
                         text = day,
                         color = com.example.ui.theme.GrayMedium,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 11.sp,
+                        fontSize = 13.sp,
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center
                     )
@@ -498,7 +503,7 @@ fun TrainingCalendar(
                                                 width = 1.dp,
                                                 color = when {
                                                     isSelected -> Color.White
-                                                    isToday -> com.example.ui.theme.AccentGreen.copy(alpha = 0.5f)
+                                                    isToday -> Color.White.copy(alpha = 0.5f)
                                                     else -> Color.Transparent
                                                 },
                                                 shape = CircleShape
@@ -513,7 +518,7 @@ fun TrainingCalendar(
                                                 text = dayOfMonth.toString(),
                                                 color = when {
                                                     isSelected -> Color.White
-                                                    isToday -> com.example.ui.theme.AccentGreen
+                                                    isToday -> Color.White
                                                     else -> Color.White
                                                 },
                                                 fontSize = 13.sp,
@@ -527,7 +532,7 @@ fun TrainingCalendar(
                                                         .align(Alignment.TopEnd)
                                                         .offset(x = 10.dp, y = (-8).dp)
                                                 ) {
-                                                    Text("⭐", fontSize = 8.sp)
+                                                    Icon(Icons.Outlined.Star, contentDescription = "Starred", tint = com.example.ui.theme.ErrorColor, modifier = Modifier.size(14.dp))
                                                 }
                                             }
                                         }

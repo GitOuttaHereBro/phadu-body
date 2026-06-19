@@ -88,24 +88,36 @@ fun ActiveWorkoutScreen(
             )
         ),
         topBar = {
-            TopAppBar(
-                title = { Text((activeWorkout!!.templateName ?: "FREE WORKOUT").uppercase(), fontWeight = FontWeight.Black, fontSize = 20.sp, color = Color.White) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                actions = {
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                repository.finishWorkout(activeWorkout!!)
-                                onFinish()
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.White),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text("FINISH", fontWeight = FontWeight.Black, letterSpacing = 1.sp)
+            Column {
+                TopAppBar(
+                    title = { Text((activeWorkout!!.templateName ?: "FREE WORKOUT").uppercase(), fontWeight = FontWeight.Black, fontSize = 22.sp, color = Color.White) },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    actions = {
+                        Button(
+                            onClick = {
+                                coroutineScope.launch {
+                                    repository.finishWorkout(activeWorkout!!)
+                                    onFinish()
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.White),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("FINISH", fontWeight = FontWeight.Black, letterSpacing = 1.sp)
+                        }
                     }
-                }
-            )
+                )
+                val completedExCount = activeWorkout!!.loggedExercises.count { ex -> ex.sets.isNotEmpty() && ex.sets.all { it.completedAt != null } }
+                val totalExCount = activeWorkout!!.loggedExercises.size
+                Text(
+                    text = "EXERCISE ${completedExCount.takeIf { it < totalExCount }?.plus(1) ?: totalExCount} OF $totalExCount",
+                    color = com.example.ui.theme.GrayMedium,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp,
+                    modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 8.dp)
+                )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -163,6 +175,14 @@ fun ActiveWorkoutScreen(
                                 listState.animateScrollToItem(index + 1)
                             }
                         }
+                    },
+                    onNextExercise = {
+                        if (index < activeWorkout!!.loggedExercises.size - 1) {
+                            expandedExerciseIndex = index + 1
+                            coroutineScope.launch {
+                                listState.animateScrollToItem(index + 1)
+                            }
+                        }
                     }
                 )
             }
@@ -191,8 +211,8 @@ fun ActiveWorkoutScreen(
                             item {
                                 Text(
                                     "RECOMMENDED SUBSTITUTIONS",
-                                    color = com.example.ui.theme.AccentGreen,
-                                    fontSize = 11.sp,
+                                    color = Color.White,
+                                    fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                                 )
@@ -224,7 +244,7 @@ fun ActiveWorkoutScreen(
                                 Text(
                                     "ALL EXERCISES",
                                     color = Color.Gray,
-                                    fontSize = 11.sp,
+                                    fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
                                 )
@@ -301,7 +321,8 @@ fun LoggedExerciseCard(
     onUpdate: (LoggedExercise) -> Unit,
     onSwap: () -> Unit,
     onCalculatePlates: (Double) -> Unit,
-    onSetCompleted: (Int, Boolean) -> Unit = { _, _ -> }
+    onSetCompleted: (Int, Boolean) -> Unit = { _, _ -> },
+    onNextExercise: () -> Unit = {}
 ) {
     val uriHandler = LocalUriHandler.current
     var editingSetIndex by remember { mutableStateOf<Int?>(null) }
@@ -310,22 +331,22 @@ fun LoggedExerciseCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp)
-            .bouncyClick { onToggleExpand() },
+            .bouncyClick { onToggleExpand() }
+            .glassCard(RoundedCornerShape(20.dp)),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GrayDark), // Opaque backdrop for clear contrast
-        border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Column(modifier = Modifier.padding(16.dp).animateContentSize()) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(text = loggedExercise.exerciseName, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = Color.White, modifier = Modifier.weight(1f))
+                Text(text = loggedExercise.exerciseName, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = Color.White, modifier = Modifier.weight(1f))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (loggedExercise.videoUrl != null) {
                         IconButton(onClick = {  uriHandler.openUri(loggedExercise.videoUrl!!)  }, modifier = Modifier.bouncy()) {
-                            Icon(Icons.Outlined.PlayArrow, contentDescription = "Watch Video", tint = Color.Red)
+                            Icon(Icons.Outlined.PlayArrow, contentDescription = "Watch Video", tint = Color.White)
                         }
                     }
                     TextButton(onClick = onSwap) {
-                        Text("SWAP", color = com.example.ui.theme.AccentGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text("SWAP", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -340,9 +361,9 @@ fun LoggedExerciseCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("$completedSets / $totalSets Sets Completed", color = com.example.ui.theme.GrayMedium, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("$completedSets / $totalSets Sets Completed", color = com.example.ui.theme.GrayMedium, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     if (completedSets == totalSets) {
-                        Icon(Icons.Outlined.Check, contentDescription = "Done", tint = com.example.ui.theme.AccentGreen)
+                        Icon(Icons.Outlined.Check, contentDescription = "Done", tint = Color.White)
                     }
                 }
             } else {
@@ -356,7 +377,7 @@ fun LoggedExerciseCard(
                     loggedExercise.targetRestStr?.let {
                         AssistChip(
                             onClick = {},
-                            label = { Text("Rest: $it", color = Color.White, fontSize = 10.sp) },
+                            label = { Text("Rest: $it", color = Color.White, fontSize = 13.sp) },
                             colors = AssistChipDefaults.assistChipColors(containerColor = Color(0x1Fffffff))
                         )
                     }
@@ -364,7 +385,7 @@ fun LoggedExerciseCard(
                         if (it != "N/A" && it.isNotEmpty()) {
                             AssistChip(
                                 onClick = {},
-                                label = { Text("Technique: $it", color = com.example.ui.theme.AccentGreen, fontSize = 10.sp, fontWeight = FontWeight.Bold) },
+                                label = { Text("Technique: $it", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold) },
                                 colors = AssistChipDefaults.assistChipColors(containerColor = Color(0x3300FF66))
                             )
                         }
@@ -373,7 +394,7 @@ fun LoggedExerciseCard(
                 loggedExercise.note?.let {
                     Text(
                         text = "Cue: $it",
-                        fontSize = 11.sp,
+                        fontSize = 13.sp,
                         color = Color.LightGray,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
@@ -400,8 +421,8 @@ fun LoggedExerciseCard(
                     ) {
                         Text(
                             text = "CALCULATE PLATES \uD83C\uDFCB\uFE0F",
-                            color = com.example.ui.theme.AccentGreen,
-                            fontSize = 11.sp,
+                            color = Color.White,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -409,10 +430,10 @@ fun LoggedExerciseCard(
                 
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("SET", modifier = Modifier.weight(0.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
-                    Text("KG", modifier = Modifier.weight(1.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
-                    Text("REPS", modifier = Modifier.weight(1.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
-                    Text("DONE", modifier = Modifier.weight(0.5f), textAlign = TextAlign.Center, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
+                    Text("SET", modifier = Modifier.weight(0.5f), textAlign = TextAlign.Center, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
+                    Text("KG", modifier = Modifier.weight(1.5f), textAlign = TextAlign.Center, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
+                    Text("REPS", modifier = Modifier.weight(1.5f), textAlign = TextAlign.Center, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
+                    Text("DONE", modifier = Modifier.weight(0.5f), textAlign = TextAlign.Center, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = com.example.ui.theme.GrayMedium)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -426,7 +447,7 @@ fun LoggedExerciseCard(
                             animationSpec = spring(dampingRatio = 0.5f, stiffness = 400f)
                         )
                         
-                        val glowColor = if (isPrTriggered) com.example.ui.theme.ErrorColor else com.example.ui.theme.AccentGreen
+                        val glowColor = if (isPrTriggered) com.example.ui.theme.ErrorColor else Color.White
                         val baseModifier = Modifier
                             .fillMaxWidth()
                             .scale(setScale)
@@ -449,7 +470,7 @@ fun LoggedExerciseCard(
                                     "${setIndex + 1}",
                                     textAlign = TextAlign.Center,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
+                                    fontSize = 15.sp,
                                     color = Color.White
                                 )
                                 if (pr != null && pr.bestWeight != null && set.weight > pr.bestWeight.value) {
@@ -458,7 +479,7 @@ fun LoggedExerciseCard(
                                             .background(com.example.ui.theme.ErrorColor, RoundedCornerShape(4.dp))
                                             .padding(horizontal = 4.dp, vertical = 2.dp)
                                     ) {
-                                        Text("PR", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Black)
+                                        Text("PR", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Black)
                                     }
                                 }
                             }
@@ -509,23 +530,24 @@ fun LoggedExerciseCard(
                                 }
                             } else {
                                 // View Mode
-                                val wText = if (set.weight % 1.0 == 0.0) set.weight.toInt().toString() else set.weight.toString()
+                                val wText = if (set.weight == 0.0) "-" else if (set.weight % 1.0 == 0.0) set.weight.toInt().toString() else set.weight.toString()
+                                val rText = if (set.reps == 0) "-" else set.reps.toString()
                                 Box(
                                     modifier = Modifier.weight(1.5f).height(44.dp).padding(horizontal = 4.dp).background(com.example.ui.theme.GlassDark, RoundedCornerShape(12.dp)).bouncyClick { editingSetIndex = setIndex },
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(wText, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                                    Text(wText, color = Color.White, fontWeight = FontWeight.Black, fontSize = 17.sp)
                                 }
                                 Box(
                                     modifier = Modifier.weight(1.5f).height(44.dp).padding(horizontal = 4.dp).background(com.example.ui.theme.GlassDark, RoundedCornerShape(12.dp)).bouncyClick { editingSetIndex = setIndex },
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("${set.reps}", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                                    Text(rText, color = Color.White, fontWeight = FontWeight.Black, fontSize = 17.sp)
                                 }
                             }
                             
                             
-                            val boxColor by animateColorAsState(if (isDone) com.example.ui.theme.AccentGreen else Color.Transparent, animationSpec = tween(300))
+                            val boxColor by animateColorAsState(if (isDone) Color.White else Color.Transparent, animationSpec = tween(300))
                             val borderColor by animateColorAsState(if (isDone) Color.Transparent else com.example.ui.theme.GlassBorderLight, animationSpec = tween(300))
                             
                             Box(
@@ -570,20 +592,26 @@ fun LoggedExerciseCard(
                             .fillMaxWidth()
                             .padding(start = 32.dp, end = 16.dp, bottom = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.Top
                     ) {
                         Text(
-                            text = "Target: ${set.targetReps ?: "-"} reps @ RPE ${set.targetRpe ?: "-"}${if (set.isWarmup) " (WARM-UP)" else ""}",
-                            color = if (set.isWarmup) Color(0xFFFFD700) else com.example.ui.theme.AccentGreen,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
+                            text = if (set.isWarmup) {
+                                "${set.notes?.replace("target load", "working weight") ?: "Warm-up set"} — ${set.targetReps ?: "-"} reps"
+                            } else {
+                                "Target: ${set.targetReps ?: "-"} reps @ RPE ${set.targetRpe ?: "-"}"
+                            },
+                            color = if (set.isWarmup) Color(0xFFFFD700) else Color.White,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f)
                         )
-                        if (set.notes != null) {
+                        if (!set.isWarmup && set.notes != null) {
                             Text(
                                 text = set.notes,
                                 color = Color.Gray,
-                                fontSize = 10.sp,
-                                modifier = Modifier.padding(start = 8.dp)
+                                fontSize = 13.sp,
+                                modifier = Modifier.padding(start = 8.dp).weight(1f),
+                                textAlign = TextAlign.End
                             )
                         }
                     }
@@ -599,7 +627,7 @@ fun LoggedExerciseCard(
                         Text(
                             text = "RPE: ${set.rpe ?: "-"}", 
                             color = com.example.ui.theme.GrayMedium, 
-                            fontSize = 12.sp, 
+                            fontSize = 13.sp, 
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.width(16.dp))
@@ -624,20 +652,29 @@ fun LoggedExerciseCard(
                 }
             } // Close forEachIndexed
                 
-                Button(
-                    onClick = {
-                        val lastSet = loggedExercise.sets.lastOrNull() ?: WorkoutSet()
-                        val newSets = loggedExercise.sets + lastSet.copy(completedAt = null, isWarmup = false, setNumber = lastSet.setNumber + 1)
-                        onUpdate(loggedExercise.copy(sets = newSets))
-                    },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.GlassLight, contentColor = Color.White),
-                    border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderLight),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
-                ) {
-                    Text("+ ADD SET", fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+                Row(modifier = Modifier.fillMaxWidth().padding(top = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = {
+                            val lastSet = loggedExercise.sets.lastOrNull() ?: WorkoutSet()
+                            val newSets = loggedExercise.sets + lastSet.copy(completedAt = null, isWarmup = false, setNumber = lastSet.setNumber + 1)
+                            onUpdate(loggedExercise.copy(sets = newSets))
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.GlassLight, contentColor = Color.White),
+                        border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderLight),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("+ ADD SET", fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+                    }
+                    
+                    Button(
+                        onClick = onNextExercise,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("NEXT \u2192", fontWeight = FontWeight.Black, letterSpacing = 1.sp)
+                    }
                 }
             }
         }
@@ -667,13 +704,13 @@ fun StepperControl(
                 .bouncyClick { onValueChange((value - step).coerceAtLeast(0.0)) },
             contentAlignment = Alignment.Center
         ) {
-            Text("-", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+            Text("-", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp)
         }
         
         Text(
-            text = if (value % 1.0 == 0.0) value.toInt().toString() else value.toString(),
+            text = if (value == 0.0) "-" else if (value % 1.0 == 0.0) value.toInt().toString() else value.toString(),
             fontWeight = FontWeight.Bold,
-            fontSize = 18.sp,
+            fontSize = 17.sp,
             color = Color.White,
             textAlign = TextAlign.Center,
             modifier = Modifier.weight(1f)
@@ -686,7 +723,7 @@ fun StepperControl(
                 .bouncyClick { onValueChange(value + step) },
             contentAlignment = Alignment.Center
         ) {
-            Text("+", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text("+", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 17.sp)
         }
     }
 }

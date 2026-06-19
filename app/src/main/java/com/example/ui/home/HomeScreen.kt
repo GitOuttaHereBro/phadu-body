@@ -131,7 +131,7 @@ fun HomeScreen(
                                     currentWeekIndex = 0,
                                     currentDayIndex = 0,
                                     completedWorkoutsMap = emptyMap(),
-                                    freeNavigationEnabled = false,
+                                    freeNavigationEnabled = true,
                                     workoutsCompletedThisWeek = 0,
                                     totalWorkoutsThisWeek = daysList.count { !it.isRestDay }
                                 )
@@ -222,7 +222,7 @@ fun OnboardingWizard(
                     modifier = Modifier
                         .size(8.dp)
                         .background(
-                            color = if (step == i) com.example.ui.theme.AccentGreen else Color.White.copy(alpha = 0.2f),
+                            color = if (step == i) Color.White else Color.White.copy(alpha = 0.2f),
                             shape = RoundedCornerShape(4.dp)
                         )
                 )
@@ -231,7 +231,7 @@ fun OnboardingWizard(
 
         Surface(
             color = com.example.ui.theme.GrayDark,
-            border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark),
+            border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -247,16 +247,16 @@ fun OnboardingWizard(
                         Icon(
                             imageVector = Icons.Outlined.Info,
                             contentDescription = null,
-                            tint = com.example.ui.theme.AccentGreen,
+                            tint = Color.White,
                             modifier = Modifier.size(64.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         
                         Text(
                             text = "GUIDED OPERATING SYSTEM",
-                            fontSize = 11.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
-                            color = com.example.ui.theme.AccentGreen,
+                            color = Color.White,
                             letterSpacing = 1.5.sp
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -271,7 +271,7 @@ fun OnboardingWizard(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "by ${program.author}",
-                            fontSize = 14.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = com.example.ui.theme.GrayMedium,
                             textAlign = TextAlign.Center
@@ -279,7 +279,7 @@ fun OnboardingWizard(
                         Spacer(modifier = Modifier.height(24.dp))
                         Text(
                             text = "This isn't a spreadsheet clicker. Beautifully engineered around modern science, this system will guide you set by set, with specific targets, warmups, substitutions, and rest days configured directly from the certified program instructions.",
-                            fontSize = 14.sp,
+                            fontSize = 13.sp,
                             lineHeight = 22.sp,
                             color = Color.LightGray,
                             textAlign = TextAlign.Center
@@ -291,13 +291,13 @@ fun OnboardingWizard(
                         Icon(
                             imageVector = Icons.Outlined.Star,
                             contentDescription = null,
-                            tint = com.example.ui.theme.AccentGreen,
+                            tint = Color.White,
                             modifier = Modifier.size(64.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = "SCIENCE & RPE PRINCIPLES",
-                            fontSize = 20.sp,
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Black,
                             color = Color.White
                         )
@@ -319,13 +319,13 @@ fun OnboardingWizard(
                         Icon(
                             imageVector = Icons.Outlined.PlayArrow,
                             contentDescription = null,
-                            tint = com.example.ui.theme.AccentGreen,
+                            tint = Color.White,
                             modifier = Modifier.size(64.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = "THE WEEKLY TRAINING SPLIT",
-                            fontSize = 20.sp,
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Black,
                             color = Color.White
                         )
@@ -365,8 +365,8 @@ fun OnboardingWizard(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(day, fontWeight = FontWeight.Bold, color = com.example.ui.theme.AccentGreen, fontSize = 12.sp)
-                                    Text(target, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 12.sp)
+                                    Text(day, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 13.sp)
+                                    Text(target, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 13.sp)
                                 }
                             }
                         }
@@ -377,20 +377,20 @@ fun OnboardingWizard(
                         Icon(
                             imageVector = Icons.Outlined.CheckCircle,
                             contentDescription = null,
-                            tint = com.example.ui.theme.AccentGreen,
+                            tint = Color.White,
                             modifier = Modifier.size(64.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = "SYSTEM INITIALIZED",
-                            fontSize = 20.sp,
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Black,
                             color = Color.White
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = "By clicking below, you'll spin up your active program instance of 'The Bodybuilding Transformation System'. Your metrics (completion percentage, streak, weekly volume, and PR history) will update automatically in real-time.",
-                            fontSize = 14.sp,
+                            fontSize = 13.sp,
                             lineHeight = 22.sp,
                             color = Color.LightGray,
                             textAlign = TextAlign.Center
@@ -430,13 +430,13 @@ fun OnboardingWizard(
                     }
                 },
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.White),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 12.dp)
                     .height(48.dp)
             ) {
-                Text(if (step < 3) "CONTINUE" else "START GUIDED PROGRAM NOW 🚀", fontWeight = FontWeight.Black)
+                Text(if (step < 3) "CONTINUE" else "START GUIDED PROGRAM NOW", fontWeight = FontWeight.Black)
             }
         }
         Spacer(modifier = Modifier.height(60.dp))
@@ -492,7 +492,7 @@ fun DashboardContent(
     val shownWeekIndex = activeProgramState.currentWeekIndex
     val shownWeekKey = "week${shownWeekIndex + 1}"
     val shownWeekObj = program.weeks[shownWeekKey]
-    val currentWeekName = "${shownWeekObj?.block ?: "Foundation Block"} - Week ${shownWeekIndex + 1}"
+    val currentWeekName = "Week ${shownWeekIndex + 1} of 12"
 
     // Calculated metrics
     val totalScheduledDays = remember(program) {
@@ -605,27 +605,12 @@ fun DashboardContent(
         ) {
             Column {
                 Text(
-                    text = "IRON LOGG OS",
+                    text = "IRON LOG",
                     color = Color.White,
-                    fontSize = 28.sp,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Black,
                     letterSpacing = 1.5.sp
                 )
-                Text(
-                    text = "PRECISION GUIDED ATHLETE HARDWARE",
-                    color = com.example.ui.theme.AccentGreen,
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .glassCard()
-                    .bouncyClick { onResetProgram() }
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                Text("RESET ENGINE", color = com.example.ui.theme.ErrorColor, fontSize = 9.sp, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -635,31 +620,31 @@ fun DashboardContent(
             if (activeWorkout != null) {
                 Button(
                     onClick = onResumeWorkout,
-                    colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.White),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth().height(60.dp).padding(bottom = 16.dp)
                 ) {
-                    Text("RESUME WORKOUT", fontWeight = FontWeight.Black, fontSize = 16.sp, letterSpacing = 2.sp)
+                    Text("RESUME WORKOUT", fontWeight = FontWeight.Black, fontSize = 15.sp, letterSpacing = 2.sp)
                 }
             } else if (selectedDay.isRestDay) {
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                    border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                    border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Icon(Icons.Outlined.Favorite, contentDescription = null, tint = com.example.ui.theme.AccentGreen)
+                        Icon(Icons.Outlined.Favorite, contentDescription = null, tint = Color.White)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Today is a Rest Day",
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
+                            fontSize = 13.sp
                         )
                     }
                 }
@@ -698,7 +683,7 @@ fun DashboardContent(
                                 shape = RoundedCornerShape(16.dp),
                                 modifier = Modifier.fillMaxWidth().height(60.dp).padding(bottom = 8.dp)
                             ) {
-                                Text(btnLabel, fontWeight = FontWeight.Black, fontSize = 16.sp, letterSpacing = 2.sp)
+                                Text(btnLabel, fontWeight = FontWeight.Black, fontSize = 15.sp, letterSpacing = 2.sp)
                             }
                 
                 // Warm Up - secondary action
@@ -708,9 +693,9 @@ fun DashboardContent(
                 ) {
                     Text(
                         "WARM UP ROUTINE",
-                        color = com.example.ui.theme.AccentGreen,
+                        color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
+                        fontSize = 13.sp,
                         letterSpacing = 1.sp
                     )
                 }
@@ -727,12 +712,12 @@ fun DashboardContent(
                 .padding(bottom = 16.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-            border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+            border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     "CURRENT ACTIVE LESSON",
-                    fontSize = 10.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     color = com.example.ui.theme.GrayMedium,
                     letterSpacing = 1.sp
@@ -746,32 +731,32 @@ fun DashboardContent(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             program.programName,
-                            fontSize = 18.sp,
+                            fontSize = 17.sp,
                             fontWeight = FontWeight.Black,
                             color = Color.White,
                             lineHeight = 22.sp
                         )
                         Text(
                             currentWeekName.uppercase(),
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
-                            color = com.example.ui.theme.AccentGreen,
+                            color = Color.White,
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }
                     Box(
                         modifier = Modifier
                             .background(
-                                color = com.example.ui.theme.AccentGreen.copy(alpha = 0.2f),
+                                color = Color.White.copy(alpha = 0.2f),
                                 shape = RoundedCornerShape(24.dp)
                             )
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
                         Text(
                             text = "${completionPercent}%",
-                            color = com.example.ui.theme.AccentGreen,
+                            color = Color.White,
                             fontWeight = FontWeight.Black,
-                            fontSize = 12.sp
+                            fontSize = 13.sp
                         )
                     }
                 }
@@ -790,7 +775,7 @@ fun DashboardContent(
                 text = "PROGRAM TIMELINE",
                 color = com.example.ui.theme.GrayMedium,
                 fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
+                fontSize = 13.sp,
                 letterSpacing = 1.sp
             )
             Row(
@@ -798,8 +783,8 @@ fun DashboardContent(
             ) {
                 Text(
                     text = "FREE NAV",
-                    color = if (activeProgramState.freeNavigationEnabled) com.example.ui.theme.AccentGreen else com.example.ui.theme.GrayMedium,
-                    fontSize = 10.sp,
+                    color = if (activeProgramState.freeNavigationEnabled) Color.White else com.example.ui.theme.GrayMedium,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(end = 6.dp)
                 )
@@ -808,7 +793,7 @@ fun DashboardContent(
                     onCheckedChange = onToggleFreeNav,
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
-                        checkedTrackColor = com.example.ui.theme.AccentGreen,
+                        checkedTrackColor = Color.White,
                         uncheckedThumbColor = Color.LightGray,
                         uncheckedTrackColor = Color.Black
                     )
@@ -857,11 +842,11 @@ fun DashboardContent(
                         },
                     shape = RoundedCornerShape(14.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) com.example.ui.theme.GlassLight else if (isCompleted) Color(0x3300FF66) else if (!isUnlocked) Color(0x11FFFFFF) else com.example.ui.theme.GrayDark
+                        containerColor = if (isSelected) com.example.ui.theme.GlassLight else if (isCompleted) Color(0x3300FF66) else if (!isUnlocked) Color(0x11FFFFFF) else com.example.ui.theme.GlassDark
                     ),
                     border = BorderStroke(
                         width = if (isSelected) 2.dp else 1.dp,
-                        color = if (isSelected) com.example.ui.theme.AccentGreen else if (isCompleted) com.example.ui.theme.AccentGreen.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.12f)
+                        color = if (isSelected) Color.White else if (isCompleted) Color.White.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.12f)
                     )
                 ) {
                     Column(
@@ -870,24 +855,24 @@ fun DashboardContent(
                             .padding(vertical = 12.dp, horizontal = 8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(dayLabel, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = if (isSelected) Color.White else com.example.ui.theme.GrayMedium)
+                        Text(dayLabel, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = if (isSelected) Color.White else com.example.ui.theme.GrayMedium)
                         Spacer(modifier = Modifier.height(4.dp))
                         
                         // Status indicators (Icon: Check, Lock, or Target Muscle)
                         if (isCompleted) {
-                            Icon(Icons.Outlined.CheckCircle, contentDescription = "Completed", tint = com.example.ui.theme.AccentGreen, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Outlined.CheckCircle, contentDescription = "Completed", tint = Color.White, modifier = Modifier.size(18.dp))
                         } else if (!isUnlocked) {
                             Icon(Icons.Outlined.Lock, contentDescription = "Locked", tint = Color.Gray, modifier = Modifier.size(18.dp))
                         } else if (day.isRestDay) {
                             Icon(Icons.Outlined.Favorite, contentDescription = "Rest", tint = Color.LightGray, modifier = Modifier.size(18.dp))
                         } else {
-                            val abbreviation = if (day.dayName.contains("Upper", true)) "UPP"
-                                               else if (day.dayName.contains("Lower", true)) "LOW"
-                                               else if (day.dayName.contains("Push", true)) "PSH"
-                                               else if (day.dayName.contains("Pull", true)) "PLL"
-                                               else if (day.dayName.contains("Legs", true)) "LGS"
-                                               else "WKT"
-                            Text(abbreviation, fontWeight = FontWeight.Black, fontSize = 12.sp, color = Color.White)
+                            val abbreviation = if (day.dayName.contains("Upper", true)) "Upper"
+                                               else if (day.dayName.contains("Lower", true)) "Lower"
+                                               else if (day.dayName.contains("Push", true)) "Push"
+                                               else if (day.dayName.contains("Pull", true)) "Pull"
+                                               else if (day.dayName.contains("Legs", true) || day.dayName.contains("Leg", true)) "Legs"
+                                               else "W/O"
+                            Text(abbreviation, fontWeight = FontWeight.Black, fontSize = 13.sp, color = Color.White)
                         }
                     }
                 }
@@ -900,7 +885,7 @@ fun DashboardContent(
                 text = "SELECTED DAY DETAILS",
                 color = com.example.ui.theme.GrayMedium,
                 fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
+                fontSize = 13.sp,
                 letterSpacing = 1.sp,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -911,7 +896,7 @@ fun DashboardContent(
                     .padding(bottom = 16.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(
@@ -921,17 +906,17 @@ fun DashboardContent(
                     ) {
                         Text(
                             text = selectedDay.dayName.uppercase(),
-                            fontSize = 20.sp,
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Black,
                             color = Color.White
                         )
                         if (completedMap["week${activeProgramState.currentWeekIndex + 1}_$selectedDayIndex"] == true) {
                             Box(
                                 modifier = Modifier
-                                    .background(com.example.ui.theme.AccentGreen.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
+                                    .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                             ) {
-                                Text("COMPLETED", color = com.example.ui.theme.AccentGreen, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                                Text("COMPLETED", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Black)
                             }
                         }
                     }
@@ -941,8 +926,8 @@ fun DashboardContent(
                     if (selectedDay.isRestDay) {
                         // Recovery Section
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.Favorite, contentDescription = null, tint = com.example.ui.theme.AccentGreen, modifier = Modifier.padding(end = 8.dp))
-                            Text("RECOVERY & MOBILITY DAY HUB", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Icon(Icons.Outlined.Favorite, contentDescription = null, tint = Color.White, modifier = Modifier.padding(end = 8.dp))
+                            Text("RECOVERY & MOBILITY DAY HUB", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
@@ -951,7 +936,7 @@ fun DashboardContent(
                                     "• Mobility Work: Perform 10-15 mins of dynamic active stretches (Arm circles, Front-to-back swings, dynamic hips).\n" +
                                     "• Optional Cardio: Low-intensity steady-state (LISS) cardio (Elliptical, brisk walk) for 20-30 mins to flush lactic pooling.\n" +
                                     "• Growth Protocol: Rest target musculature. Drink optimal fluids and maintain caloric intake variables.",
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                             lineHeight = 18.sp,
                             color = Color.LightGray
                         )
@@ -959,7 +944,7 @@ fun DashboardContent(
                         // Exercises listing
                         Text(
                             "EXERCISES (${selectedDay.exercises.size})",
-                            fontSize = 11.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = com.example.ui.theme.GrayMedium,
                             letterSpacing = 1.sp
@@ -981,7 +966,7 @@ fun DashboardContent(
                                         Text(ex.name, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 13.sp)
                                         Text(
                                             "Target sets: ${ex.workingSets ?: "3"} • reps: ${ex.reps ?: ex.repRange ?: "10"}",
-                                            fontSize = 11.sp,
+                                            fontSize = 13.sp,
                                             color = com.example.ui.theme.GrayMedium
                                         )
                                     }
@@ -989,7 +974,7 @@ fun DashboardContent(
                                         Icon(
                                             Icons.Outlined.PlayArrow,
                                             contentDescription = "Demo available",
-                                            tint = Color.Red,
+                                            tint = Color.White,
                                             modifier = Modifier
                                                 .size(20.dp)
                                                 .bouncyClick { uriHandler.openUri(ex.videoUrl!!) }
@@ -1012,27 +997,25 @@ fun DashboardContent(
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.AccentGreen.copy(alpha = 0.12f)),
-                border = BorderStroke(1.dp, com.example.ui.theme.AccentGreen.copy(alpha = 0.5f))
+                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.12f)),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "🎉 WEEK COMPLETED SUMMARY!",
-                        fontSize = 16.sp,
+                        "WEEK COMPLETED SUMMARY",
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Black,
-                        color = com.example.ui.theme.AccentGreen
+                        color = Color.White
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         "Outstanding commitment! You successfully checked off all active training days scheduled for Week ${activeProgramState.currentWeekIndex + 1} with absolute precision.\n\n" +
-                                "📊 WEEK STATS:\n" +
-                                "• Total Completed: $totalWorkoutsThisWeek / $totalWorkoutsThisWeek \n" +
-                                "• Focus blocks: Foundation Block\n" +
-                                "• Intensity parameters: Maximum intensity threshold",
-                        fontSize = 12.sp,
+                                "WEEK STATS:\n" +
+                                "• Total Completed: $totalWorkoutsThisWeek / $totalWorkoutsThisWeek \n",
+                        fontSize = 13.sp,
                         lineHeight = 18.sp,
                         color = Color.LightGray,
                         textAlign = TextAlign.Center
@@ -1043,17 +1026,17 @@ fun DashboardContent(
                         Button(
                             onClick = onUnlockNextWeek,
                             shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = com.example.ui.theme.AccentGreen, contentColor = Color.White),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                             modifier = Modifier.fillMaxWidth().height(44.dp)
                         ) {
-                            Text("UNLOCK WEEK ${activeProgramState.currentWeekIndex + 2} / NEXT BLOCK 🚀", fontWeight = FontWeight.Black)
+                            Text("UNLOCK WEEK ${activeProgramState.currentWeekIndex + 2}", fontWeight = FontWeight.Black)
                         }
                     } else {
                         Text(
-                            "🎓 ALL BLOCKS FINISHED SUCCESSFULLY!",
-                            fontSize = 14.sp,
+                            "PROGRAM FINISHED SUCCESSFULLY!",
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Black,
-                            color = com.example.ui.theme.AccentGreen,
+                            color = Color.White,
                             modifier = Modifier.padding(8.dp)
                         )
                     }
@@ -1066,7 +1049,7 @@ fun DashboardContent(
             text = "DASHBOARD PERFORMANCE METRICS",
             color = com.example.ui.theme.GrayMedium,
             fontWeight = FontWeight.Bold,
-            fontSize = 11.sp,
+            fontSize = 13.sp,
             letterSpacing = 1.sp,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -1081,7 +1064,7 @@ fun DashboardContent(
                     .weight(1f)
                     .height(90.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF121212)),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
             ) {
                 Column(
                     modifier = Modifier
@@ -1091,8 +1074,8 @@ fun DashboardContent(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(Icons.Outlined.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(20.dp))
-                    Text(text = "$currentStreak DAYS", fontWeight = FontWeight.Black, fontSize = 18.sp, color = Color.White)
-                    Text(text = "CURRENT STREAK", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium)
+                    Text(text = "$currentStreak DAYS", fontWeight = FontWeight.Black, fontSize = 17.sp, color = Color.White)
+                    Text(text = "CURRENT STREAK", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium)
                 }
             }
 
@@ -1102,7 +1085,7 @@ fun DashboardContent(
                     .weight(1f)
                     .height(90.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF121212)),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
             ) {
                 Column(
                     modifier = Modifier
@@ -1111,9 +1094,9 @@ fun DashboardContent(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(Icons.Outlined.Timeline, contentDescription = null, tint = com.example.ui.theme.AccentGreen, modifier = Modifier.size(20.dp))
-                    Text(text = if (weeklyVolume > 0) "${weeklyVolume.toInt()} KG" else "0 KG", fontWeight = FontWeight.Black, fontSize = 18.sp, color = Color.White)
-                    Text(text = "7-DAY VOLUME", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium)
+                    Icon(Icons.Outlined.Timeline, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                    Text(text = if (weeklyVolume > 0) "${weeklyVolume.toInt()} KG" else "0 KG", fontWeight = FontWeight.Black, fontSize = 17.sp, color = Color.White)
+                    Text(text = "7-DAY VOLUME", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium)
                 }
             }
         }
@@ -1130,7 +1113,7 @@ fun DashboardContent(
                     .weight(1f)
                     .height(90.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF121212)),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
             ) {
                 Column(
                     modifier = Modifier
@@ -1140,8 +1123,8 @@ fun DashboardContent(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(Icons.Outlined.ThumbUp, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
-                    Text(text = "$totalCompletedDays WORKOUTS", fontWeight = FontWeight.Black, fontSize = 16.sp, color = Color.White)
-                    Text(text = "COMPLETED TOTAL", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium)
+                    Text(text = "$totalCompletedDays WORKOUTS", fontWeight = FontWeight.Black, fontSize = 15.sp, color = Color.White)
+                    Text(text = "COMPLETED TOTAL", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium)
                 }
             }
 
@@ -1151,7 +1134,7 @@ fun DashboardContent(
                     .weight(1f)
                     .height(90.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF121212)),
-                border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+                border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark)
             ) {
                 Column(
                     modifier = Modifier
@@ -1160,18 +1143,15 @@ fun DashboardContent(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = com.example.ui.theme.AccentGreen, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
                     val valText = if (newestPR != null) "${newestPR.value.toInt()} KG" else "NONE SET"
-                    Text(text = valText, fontWeight = FontWeight.Black, fontSize = 16.sp, color = Color.White)
-                    Text(text = "MOST RECENT PR", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium)
+                    Text(text = valText, fontWeight = FontWeight.Black, fontSize = 15.sp, color = Color.White)
+                    Text(text = "MOST RECENT PR", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = com.example.ui.theme.GrayMedium)
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Engine Import Diagnostics Panel
-        ImportDiagnosticsPanel(program = program)
+        // Engine Import Diagnostics Panel removed
 
         // Collapsible 12-Week Roadmap Timeline (now at the bottom of the Column)
         var expandedWeekIndex by remember { mutableStateOf<Int?>(null) }
@@ -1180,7 +1160,7 @@ fun DashboardContent(
             text = "12-WEEK TRAINING ROADMAP",
             color = com.example.ui.theme.GrayMedium,
             fontWeight = FontWeight.Bold,
-            fontSize = 11.sp,
+            fontSize = 13.sp,
             letterSpacing = 1.sp,
             modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
         )
@@ -1188,10 +1168,10 @@ fun DashboardContent(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 16.dp)
+                .glassCard(RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-            border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark)
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent)
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 for (wIdx in 0 until 12) {
@@ -1235,32 +1215,25 @@ fun DashboardContent(
                                     Text(
                                         text = "Week ${wIdx + 1} of 12",
                                         fontWeight = FontWeight.Bold,
-                                        color = if (wIdx == activeProgramState.currentWeekIndex) com.example.ui.theme.AccentGreen else Color.White,
-                                        fontSize = 14.sp
+                                        color = if (wIdx == activeProgramState.currentWeekIndex) Color.White else Color.White,
+                                        fontSize = 13.sp
                                     )
                                     Text(
                                         text = "$weekProgressPercent%",
-                                        color = if (weekProgressPercent == 100) com.example.ui.theme.AccentGreen else Color.White,
+                                        color = if (weekProgressPercent == 100) Color.White else Color.White,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp,
+                                        fontSize = 13.sp,
                                         modifier = Modifier.padding(end = 8.dp)
                                     )
                                 }
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    horizontalArrangement = Arrangement.End,
                                     modifier = Modifier.fillMaxWidth().padding(top = 2.dp)
                                 ) {
                                     Text(
-                                        text = weekData.block.uppercase(),
-                                        fontSize = 9.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = com.example.ui.theme.GrayMedium,
-                                        letterSpacing = 1.sp
-                                    )
-                                    Text(
                                         text = "$weekCompletedWorkouts of $weekTotalWorkouts completed",
-                                        fontSize = 9.sp,
+                                        fontSize = 13.sp,
                                         fontWeight = FontWeight.SemiBold,
                                         color = com.example.ui.theme.GrayMedium,
                                         modifier = Modifier.padding(end = 8.dp)
@@ -1269,7 +1242,7 @@ fun DashboardContent(
                                 Spacer(modifier = Modifier.height(6.dp))
                                 LinearProgressIndicator(
                                     progress = weekProgressPercent / 100f,
-                                    color = if (weekProgressPercent == 100) com.example.ui.theme.AccentGreen else com.example.ui.theme.AccentGreen.copy(alpha = 0.6f),
+                                    color = if (weekProgressPercent == 100) Color.White else Color.White.copy(alpha = 0.6f),
                                     trackColor = Color.White.copy(alpha = 0.1f),
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -1302,7 +1275,7 @@ fun DashboardContent(
                                             .background(Color.White.copy(alpha = 0.03f), RoundedCornerShape(8.dp))
                                             .border(
                                                 1.dp,
-                                                if (isDayCompleted) com.example.ui.theme.AccentGreen.copy(alpha = 0.2f) else Color.Transparent,
+                                                if (isDayCompleted) Color.White.copy(alpha = 0.2f) else Color.Transparent,
                                                 RoundedCornerShape(8.dp)
                                             )
                                             .bouncyClick {
@@ -1330,8 +1303,8 @@ fun DashboardContent(
                                                 Text(
                                                     text = dayLabel,
                                                     fontWeight = FontWeight.Bold,
-                                                    color = com.example.ui.theme.AccentGreen,
-                                                    fontSize = 11.sp
+                                                    color = Color.White,
+                                                    fontSize = 13.sp
                                                 )
                                                 if (dayObj.isRestDay) {
                                                     Box(
@@ -1340,7 +1313,7 @@ fun DashboardContent(
                                                             .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(4.dp))
                                                             .padding(horizontal = 4.dp, vertical = 2.dp)
                                                     ) {
-                                                        Text("REST", color = Color.LightGray, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+                                                        Text("REST", color = Color.LightGray, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                                     }
                                                 }
                                             }
@@ -1349,14 +1322,14 @@ fun DashboardContent(
                                                 text = if (dayObj.isRestDay) "Recovery & stretches" else dayObj.dayName,
                                                 fontWeight = FontWeight.Medium,
                                                 color = Color.White,
-                                                fontSize = 12.sp
+                                                fontSize = 13.sp
                                             )
                                         }
                                         if (isDayCompleted) {
                                             Icon(
                                                 imageVector = Icons.Outlined.CheckCircle,
                                                 contentDescription = "Completed",
-                                                tint = com.example.ui.theme.AccentGreen,
+                                                tint = Color.White,
                                                 modifier = Modifier.size(16.dp)
                                             )
                                         } else if (!dayObj.isRestDay) {
@@ -1396,64 +1369,4 @@ fun isDayUnlocked(dayIdx: Int, weekIndex: Int, daysList: List<ProgramDay>, compl
     return true
 }
 
-@Composable
-fun ImportDiagnosticsPanel(program: Program?) {
-    if (program == null) return
-    
-    val weeksFound = program.weeks.size
-    val daysFound = program.weeks.values.sumOf { it.days.size }
-    val workoutsFound = program.weeks.values.sumOf { wk -> wk.days.count { !it.isRestDay } }
-    val exercisesFound = program.weeks.values.flatMap { wk -> wk.days.flatMap { it.exercises } }.size
-    val subsFound = program.weeks.values.flatMap { wk -> wk.days.flatMap { it.exercises } }.count { it.substitution1 != null || it.substitution2 != null }
-    val videoLinksFound = program.weeks.values.flatMap { wk -> wk.days.flatMap { it.exercises } }.count { !it.demoLink.isNullOrBlank() || !it.link.isNullOrBlank() }
-    
-    // Safety abort Check
-    if (weeksFound <= 1) {
-        Card(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-            colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.ErrorColor.copy(alpha = 0.2f)),
-            border = BorderStroke(1.dp, com.example.ui.theme.ErrorColor)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("⚠️ CRITICAL PROGRAM IMPORT FAILURE", color = com.example.ui.theme.ErrorColor, fontWeight = FontWeight.Bold)
-                Text("Only 1 week found. Parser failed. Stop execution.", color = Color.White)
-            }
-        }
-        return
-    }
 
-    Card(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-        colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
-        border = BorderStroke(1.dp, com.example.ui.theme.AccentGreen.copy(alpha = 0.3f)),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Outlined.Build, contentDescription = null, tint = com.example.ui.theme.AccentGreen, modifier = Modifier.size(16.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("ENGINE IMPORT DIAGNOSTICS", color = com.example.ui.theme.AccentGreen, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.sp)
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                DiagnosticItem("Weeks", weeksFound.toString())
-                DiagnosticItem("Days", daysFound.toString())
-                DiagnosticItem("Workouts", workoutsFound.toString())
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                DiagnosticItem("Exercises", exercisesFound.toString())
-                DiagnosticItem("Substitutions", subsFound.toString())
-                DiagnosticItem("Demo Videos", videoLinksFound.toString())
-            }
-        }
-    }
-}
-
-@Composable
-fun DiagnosticItem(label: String, valStr: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(horizontal = 4.dp)) {
-        Text(text = label.uppercase(), fontSize = 8.sp, color = com.example.ui.theme.GrayMedium, fontWeight = FontWeight.Bold)
-        Text(text = valStr, fontSize = 14.sp, color = Color.White, fontWeight = FontWeight.Black)
-    }
-}

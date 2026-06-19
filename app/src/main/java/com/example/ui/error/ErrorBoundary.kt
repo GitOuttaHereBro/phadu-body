@@ -59,7 +59,7 @@ fun ErrorBoundary(
                     Text(
                         text = "⚠️ CRITICAL SECTOR ERROR TRIGGERED",
                         color = Color(0xFFFF453A),
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
                     )
@@ -67,12 +67,12 @@ fun ErrorBoundary(
                     Text(
                         text = "State or Render Exception Gracefully Intercepted",
                         color = Color.LightGray,
-                        fontSize = 12.sp
+                        fontSize = 13.sp
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0x33FF3B30)),
+                        colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -80,27 +80,27 @@ fun ErrorBoundary(
                                 text = "Exception Type: ${caughtError?.javaClass?.simpleName ?: "Exception"}",
                                 color = Color(0xFFFF453A),
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp
+                                fontSize = 13.sp
                             )
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
                                 text = caughtError?.message ?: "Unknown/Unresolved State Exception",
                                 color = Color.White,
-                                fontSize = 11.sp,
+                                fontSize = 13.sp,
                                 fontFamily = FontFamily.Monospace
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
                                 text = "Stack Trace Snippet:",
                                 color = Color.Gray,
-                                fontSize = 10.sp,
+                                fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = caughtError?.stackTrace?.take(10)?.joinToString("\n") { it.toString() } ?: "",
                                 color = Color.White.copy(alpha = 0.6f),
-                                fontSize = 9.sp,
+                                fontSize = 13.sp,
                                 fontFamily = FontFamily.Monospace,
                                 modifier = Modifier.verticalScroll(rememberScrollState())
                             )

@@ -103,7 +103,7 @@ fun PRsScreen(repository: IronLogRepository) {
                         text = "TROPHY CASE",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
+                        fontSize = 22.sp,
                         letterSpacing = 2.sp
                     )
                 },
@@ -145,7 +145,7 @@ fun PRsScreen(repository: IronLogRepository) {
                             text = group,
                             color = if (isSelected) Color.Black else Color.White.copy(alpha = 0.7f),
                             fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp,
+                            fontSize = 13.sp,
                             letterSpacing = 1.sp
                         )
                     }
@@ -164,7 +164,7 @@ fun PRsScreen(repository: IronLogRepository) {
                     text = "${recordItems.size} PERSONAL RECORDS",
                     color = com.example.ui.theme.GrayMedium,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 11.sp,
+                    fontSize = 13.sp,
                     letterSpacing = 1.5.sp
                 )
 
@@ -179,14 +179,14 @@ fun PRsScreen(repository: IronLogRepository) {
                     Icon(
                         imageVector = if (sortByDate) Icons.Outlined.ArrowDownward else Icons.Outlined.FilterList,
                         contentDescription = "Sort Icon",
-                        tint = com.example.ui.theme.AccentGreen,
+                        tint = Color.White,
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = if (sortByDate) "MOST RECENT" else "ALPHABETICAL",
                         color = Color.White,
-                        fontSize = 10.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
                     )
@@ -274,7 +274,7 @@ fun PRTrophyCard(item: PRItem) {
                     Text(
                         text = item.muscleGroup,
                         color = Color.White.copy(alpha = 0.7f),
-                        fontSize = 9.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
                     )
@@ -284,14 +284,14 @@ fun PRTrophyCard(item: PRItem) {
                     // Elevated brighter glowing glass treatment tag with full white text
                     Box(
                         modifier = Modifier
-                            .background(com.example.ui.theme.AccentGreen.copy(alpha = 0.3f), RoundedCornerShape(6.dp))
-                            .border(1.dp, com.example.ui.theme.AccentGreen, RoundedCornerShape(6.dp))
+                            .background(Color.White.copy(alpha = 0.3f), RoundedCornerShape(6.dp))
+                            .border(1.dp, Color.White, RoundedCornerShape(6.dp))
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = "NEW",
                             color = Color.White,
-                            fontSize = 8.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Black,
                             letterSpacing = 0.5.sp
                         )
@@ -327,12 +327,12 @@ fun PRTrophyCard(item: PRItem) {
                         text = "${item.pr.bestWeight?.value ?: 0.0} ${item.exercise.unit}",
                         color = Color.White,
                         fontWeight = FontWeight.Black,
-                        fontSize = 18.sp
+                        fontSize = 17.sp
                     )
                     Text(
                         text = "BEST WEIGHT (${item.pr.bestWeight?.reps ?: 0} REPS)",
                         color = com.example.ui.theme.GrayMedium,
-                        fontSize = 8.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
                     )
@@ -354,12 +354,12 @@ fun PRTrophyCard(item: PRItem) {
                         text = "$est1RM ${item.exercise.unit}",
                         color = Color.White,
                         fontWeight = FontWeight.Black,
-                        fontSize = 18.sp
+                        fontSize = 17.sp
                     )
                     Text(
                         text = "ESTIMATED 1RM",
                         color = com.example.ui.theme.GrayMedium,
-                        fontSize = 8.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
                     )
@@ -373,7 +373,7 @@ fun PRTrophyCard(item: PRItem) {
                 text = "SET ON $formattedDate",
                 color = com.example.ui.theme.GrayMedium,
                 fontWeight = FontWeight.Bold,
-                fontSize = 8.sp,
+                fontSize = 13.sp,
                 letterSpacing = 0.5.sp
             )
         }

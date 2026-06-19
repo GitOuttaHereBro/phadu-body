@@ -51,7 +51,7 @@ fun RestTimerBar(
     ) {
         Surface(
             color = com.example.ui.theme.GlassDark,
-            border = BorderStroke(1.dp, com.example.ui.theme.GlassBorderDark),
+            border = BorderStroke(0.5.dp, com.example.ui.theme.GlassBorderDark),
             modifier = Modifier.fillMaxWidth().height(56.dp)
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
@@ -60,7 +60,7 @@ fun RestTimerBar(
                     modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(progress)
-                        .background(com.example.ui.theme.AccentGreen.copy(alpha = 0.2f))
+                        .background(Color.White.copy(alpha = 0.2f))
                 )
                 
                 Row(
@@ -72,9 +72,9 @@ fun RestTimerBar(
                 ) {
                     Text(
                         "REST TIMER",
-                        color = com.example.ui.theme.AccentGreen,
+                        color = Color.White,
                         fontWeight = FontWeight.Black,
-                        fontSize = 12.sp,
+                        fontSize = 13.sp,
                         letterSpacing = 1.sp
                     )
                     
@@ -85,7 +85,7 @@ fun RestTimerBar(
                             String.format("%d:%02d", mins, secs),
                             color = Color.White,
                             fontWeight = FontWeight.Black,
-                            fontSize = 20.sp
+                            fontSize = 22.sp
                         )
                         Spacer(modifier = Modifier.width(24.dp))
                         Icon(

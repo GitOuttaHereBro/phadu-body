@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -96,17 +97,26 @@ fun BarbellVisualizer(
                         text = "TACTILE BARBELL BAR",
                         color = Color.White.copy(alpha = 0.4f),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 11.sp,
+                        fontSize = 13.sp,
                         letterSpacing = 1.sp
                     )
                     
-                    Text(
-                        text = "👉 TAP A LOADED PLATE TO UNLOAD IT",
-                        color = AccentGreen,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp,
-                        letterSpacing = 0.5.sp
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
+                            contentDescription = null,
+                            tint = AccentGreen,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "TAP A LOADED PLATE TO UNLOAD IT",
+                            color = AccentGreen,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp,
+                            letterSpacing = 0.5.sp
+                        )
+                    }
                 }
 
                 // Interactive Barbell Draw Area
@@ -326,7 +336,7 @@ fun BarbellVisualizer(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
-                .border(1.dp, GlassBorderDark, RoundedCornerShape(16.dp))
+                .border(0.5.dp, GlassBorderDark, RoundedCornerShape(16.dp))
                 .padding(14.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -336,7 +346,7 @@ fun BarbellVisualizer(
                     text = "TOTAL COMPLETED LOAD",
                     color = GrayMedium,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 10.sp,
+                    fontSize = 13.sp,
                     letterSpacing = 1.sp
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -345,14 +355,14 @@ fun BarbellVisualizer(
                         text = "${if (weight % 1.0 == 0.0) weight.toInt() else weight}",
                         color = Color.White,
                         fontWeight = FontWeight.Black,
-                        fontSize = 32.sp
+                        fontSize = 34.sp
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = if (isKg) "KG" else "LBS",
                         color = AccentGreen,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
                 }
@@ -390,7 +400,7 @@ fun BarbellVisualizer(
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                         modifier = Modifier.height(36.dp)
                     ) {
-                        Text("-$unitStep", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Black)
+                        Text("-$unitStep", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Black)
                     }
                     TextButton(
                         onClick = {
@@ -400,7 +410,7 @@ fun BarbellVisualizer(
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                         modifier = Modifier.height(36.dp)
                     ) {
-                        Text("+$unitStep", color = AccentGreen, fontSize = 11.sp, fontWeight = FontWeight.Black)
+                        Text("+$unitStep", color = AccentGreen, fontSize = 13.sp, fontWeight = FontWeight.Black)
                     }
                 }
             }
@@ -413,7 +423,7 @@ fun BarbellVisualizer(
             text = "SELECT PATTERNS FROM THE PLATE RACK",
             color = Color.White,
             fontWeight = FontWeight.Black,
-            fontSize = 12.sp,
+            fontSize = 13.sp,
             letterSpacing = 1.2.sp,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 6.dp),
             textAlign = TextAlign.Start
@@ -421,7 +431,7 @@ fun BarbellVisualizer(
         Text(
             text = "Tap any plate below to load one symmetrical pair (+2 plates) onto the barbell.",
             color = GrayMedium,
-            fontSize = 11.sp,
+            fontSize = 13.sp,
             modifier = Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, bottom = 12.dp),
             textAlign = TextAlign.Start
         )
@@ -484,7 +494,7 @@ fun BarbellVisualizer(
                             text = if (isKg) "KG" else "LBS",
                             color = if (color == Color.White) Color.Black.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.6f),
                             fontWeight = FontWeight.Bold,
-                            fontSize = 8.sp,
+                            fontSize = 13.sp,
                             modifier = Modifier.align(Alignment.Center)
                                 .offset(y = 16.dp)
                         )
@@ -499,14 +509,14 @@ fun BarbellVisualizer(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = GlassDark),
-            border = BorderStroke(1.dp, GlassBorderDark)
+            border = BorderStroke(0.5.dp, GlassBorderDark)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = "PLATE CONFIGURATION DETAILED LIST",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 11.sp,
+                    fontSize = 13.sp,
                     letterSpacing = 1.sp
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -516,7 +526,7 @@ fun BarbellVisualizer(
                         text = "EMPTY BARBELL (${if (barbellWeight % 1.0 == 0.0) barbellWeight.toInt() else barbellWeight} ${if (isKg) "kg" else "lbs"} only)",
                         color = AccentGreen,
                         fontWeight = FontWeight.ExtraBold,
-                        fontSize = 12.sp,
+                        fontSize = 13.sp,
                         fontFamily = FontFamily.Monospace
                     )
                 } else {
@@ -545,7 +555,7 @@ fun BarbellVisualizer(
                             Text(
                                 text = "Qty: $count Pair (${count * 2} Total Plates)",
                                 color = AccentGreen,
-                                fontSize = 12.sp,
+                                fontSize = 13.sp,
                                 fontFamily = FontFamily.Monospace,
                                 fontWeight = FontWeight.Bold
                             )

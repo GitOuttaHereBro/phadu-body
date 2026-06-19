@@ -12,7 +12,7 @@ object ProgramValidator {
         return when {
             n.contains("bench") || n.contains("press") && (n.contains("incline") || n.contains("decline") || n.contains("chest") || n.contains("barbell") || n.contains("dumbbell") || n.contains("pec") || n.contains("fly") || n.contains("crossover")) || n.contains("pushup") || n.contains("dips") -> "Chest"
             n.contains("squat") || n.contains("leg") || n.contains("ham") || n.contains("quad") || n.contains("calf") || n.contains("calves") || n.contains("thigh") || n.contains("lunge") || n.contains("nordic") || n.contains("hack") || n.contains("extension") && n.contains("leg") || n.contains("rdl") || n.contains("romanian") -> "Legs"
-            n.contains("pull") || n.contains("row") || n.contains("lat") || n.contains("chin") || n.contains("deadlift") || n.contains("shrug") || n.contains("rear delt") -> "Back"
+            n.contains("pull") || n.contains("row") || (n.contains("lat") && !n.contains("lateral") && !n.contains("plate")) || n.contains("chin") || n.contains("deadlift") || n.contains("shrug") || n.contains("rear delt") -> "Back"
             n.contains("shoulder") || n.contains("overhead") || n.contains("military") || n.contains("lateral") || n.contains("raise") || n.contains("delt") || n.contains("arnold") -> "Shoulders"
             n.contains("curl") || n.contains("bicep") || n.contains("tricep") || n.contains("skull") || n.contains("extension") && (n.contains("triceps") || n.contains("overhead")) || n.contains("pushdown") -> "Arms"
             n.contains("crunch") || n.contains("situp") || n.contains("plank") || n.contains("abs") || n.contains("core") || n.contains("hanging") -> "Core"
@@ -154,11 +154,7 @@ object ProgramValidator {
                     dayObj.copy(exercises = modifiedExercises)
                 }
                 existingWeeks[key] = ProgramWeek(
-                    block = when (i) {
-                        in 6..10 -> "Ramping Block"
-                        11 -> "Max Strength/Peaking"
-                        else -> "Active Recovery/Deload"
-                    },
+                    block = "Ramping Block",
                     days = rampingDays
                 )
             }

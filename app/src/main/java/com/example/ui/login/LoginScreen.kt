@@ -118,13 +118,13 @@ fun LoginScreen(
                 Box(
                     modifier = Modifier
                         .size(width = 8.dp, height = 28.dp)
-                        .background(AccentGreen, RoundedCornerShape(2.dp))
+                        .background(Color.White, RoundedCornerShape(2.dp))
                 )
                 Spacer(modifier = Modifier.width(3.dp))
                 Box(
                     modifier = Modifier
                         .size(width = 5.dp, height = 20.dp)
-                        .background(AccentGreen, RoundedCornerShape(1.dp))
+                        .background(Color.White, RoundedCornerShape(1.dp))
                 )
                 Box(
                     modifier = Modifier
@@ -134,20 +134,20 @@ fun LoginScreen(
                 Box(
                     modifier = Modifier
                         .size(width = 5.dp, height = 20.dp)
-                        .background(AccentGreen, RoundedCornerShape(1.dp))
+                        .background(Color.White, RoundedCornerShape(1.dp))
                 )
                 Spacer(modifier = Modifier.width(3.dp))
                 Box(
                     modifier = Modifier
                         .size(width = 8.dp, height = 28.dp)
-                        .background(AccentGreen, RoundedCornerShape(2.dp))
+                        .background(Color.White, RoundedCornerShape(2.dp))
                 )
             }
 
             Text(
                 text = "GYM KRTA H JI",
                 color = Color.White,
-                fontSize = 32.sp,
+                fontSize = 34.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 2.sp,
                 textAlign = TextAlign.Center
@@ -155,8 +155,8 @@ fun LoginScreen(
             
             Text(
                 text = "PRECISION STRENGTH INTELLIGENCE",
-                color = AccentGreen,
-                fontSize = 11.sp,
+                color = Color.White,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp,
                 modifier = Modifier.padding(top = 4.dp, bottom = 40.dp),
@@ -476,7 +476,7 @@ fun LoginScreen(
                 ) {
                     Text(
                         text = infoMessage!!,
-                        color = AccentGreen,
+                        color = Color.White,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(16.dp),
@@ -492,7 +492,7 @@ fun LoginScreen(
             Text(
                 text = "By continuing, you agree to our Terms of Service & Privacy Policy.",
                 color = Color.Gray,
-                fontSize = 11.sp,
+                fontSize = 13.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -536,11 +536,11 @@ fun LandingContent(
                     text = "G ",
                     color = Color.Black,
                     fontWeight = FontWeight.Black,
-                    fontSize = 18.sp
+                    fontSize = 17.sp
                 )
                 Text(
                     text = "Continue with Google",
-                    fontSize = 16.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.5.sp
                 )
@@ -561,7 +561,7 @@ fun LandingContent(
         ) {
             Text(
                 text = "Continue with Email",
-                fontSize = 16.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 0.5.sp
             )
@@ -575,14 +575,14 @@ fun LandingContent(
                 containerColor = GlassDark,
                 contentColor = Color.White
             ),
-            border = BorderStroke(1.dp, GlassBorderDark),
+            border = BorderStroke(0.5.dp, GlassBorderDark),
             contentPadding = PaddingValues(vertical = 16.dp),
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
         ) {
             Text(
                 text = "Create Account",
-                fontSize = 16.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 0.5.sp
             )
@@ -593,8 +593,8 @@ fun LandingContent(
         // Guest Entry Accessor
         Text(
             text = "Continue as Guest",
-            color = AccentGreen,
-            fontSize = 14.sp,
+            color = Color.White,
+            fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 0.5.sp,
             modifier = Modifier
@@ -652,7 +652,7 @@ fun EmailLoginContent(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
-                focusedBorderColor = AccentGreen,
+                focusedBorderColor = Color.White,
                 unfocusedBorderColor = GlassBorderDark,
                 cursorColor = Color.White
             ),
@@ -676,7 +676,7 @@ fun EmailLoginContent(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
-                focusedBorderColor = AccentGreen,
+                focusedBorderColor = Color.White,
                 unfocusedBorderColor = GlassBorderDark,
                 cursorColor = Color.White
             ),
@@ -722,7 +722,7 @@ fun EmailLoginContent(
             onClick = onSignInClick,
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = AccentGreen,
+                containerColor = Color.White,
                 contentColor = Color.Black
             ),
             modifier = Modifier.fillMaxWidth(),
@@ -734,7 +734,7 @@ fun EmailLoginContent(
             } else {
                 Text(
                     text = "SIGN IN",
-                    fontSize = 16.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Black,
                     letterSpacing = 1.sp
                 )
@@ -794,7 +794,7 @@ fun CreateAccountContent(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
-                focusedBorderColor = AccentGreen,
+                focusedBorderColor = Color.White,
                 unfocusedBorderColor = GlassBorderDark,
                 cursorColor = Color.White
             ),
@@ -818,7 +818,7 @@ fun CreateAccountContent(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
-                focusedBorderColor = AccentGreen,
+                focusedBorderColor = Color.White,
                 unfocusedBorderColor = GlassBorderDark,
                 cursorColor = Color.White
             ),
@@ -842,7 +842,7 @@ fun CreateAccountContent(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
-                focusedBorderColor = AccentGreen,
+                focusedBorderColor = Color.White,
                 unfocusedBorderColor = GlassBorderDark,
                 cursorColor = Color.White
             ),
@@ -873,7 +873,7 @@ fun CreateAccountContent(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
-                focusedBorderColor = AccentGreen,
+                focusedBorderColor = Color.White,
                 unfocusedBorderColor = GlassBorderDark,
                 cursorColor = Color.White
             ),
@@ -910,7 +910,7 @@ fun CreateAccountContent(
             } else {
                 Text(
                     text = "REGISTER ACCOUNT",
-                    fontSize = 16.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Black,
                     letterSpacing = 1.sp
                 )
@@ -970,7 +970,7 @@ fun ForgotPasswordContent(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
-                focusedBorderColor = AccentGreen,
+                focusedBorderColor = Color.White,
                 unfocusedBorderColor = GlassBorderDark,
                 cursorColor = Color.White
             ),
@@ -994,7 +994,7 @@ fun ForgotPasswordContent(
             onClick = onSendResetClick,
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = AccentGreen,
+                containerColor = Color.White,
                 contentColor = Color.Black
             ),
             modifier = Modifier.fillMaxWidth(),

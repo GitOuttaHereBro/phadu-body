@@ -111,7 +111,7 @@ data class ActiveProgramState(
     val currentWeekIndex: Int = 0,
     val currentDayIndex: Int = 0,
     val completedWorkoutsMap: Map<String, Boolean> = emptyMap(), // Key: "weekX_dayY" -> true if completed
-    val freeNavigationEnabled: Boolean = false,
+    val freeNavigationEnabled: Boolean = true,
     val workoutsCompletedThisWeek: Int = 0,
     val totalWorkoutsThisWeek: Int = 0,
     val isWeekCompletedMessageShown: Boolean = false,

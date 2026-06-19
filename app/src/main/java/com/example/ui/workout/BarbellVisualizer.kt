@@ -108,7 +108,7 @@ fun BarbellVisualizer(
                                 .bouncyClick { isReverseMode = false }
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
-                            Text("TARGET", color = if (!isReverseMode) Color.Black else Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("TARGET", color = if (!isReverseMode) Color.Black else Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                         Box(
                             modifier = Modifier
@@ -116,7 +116,7 @@ fun BarbellVisualizer(
                                 .bouncyClick { isReverseMode = true }
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
-                            Text("MANUAL", color = if (isReverseMode) Color.Black else Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("MANUAL", color = if (isReverseMode) Color.Black else Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                     
@@ -136,7 +136,7 @@ fun BarbellVisualizer(
                                 }
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
-                            Text("KG", color = if (isKg) Color.Black else Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("KG", color = if (isKg) Color.Black else Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                         Box(
                             modifier = Modifier
@@ -148,7 +148,7 @@ fun BarbellVisualizer(
                                 }
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
-                            Text("LB", color = if (!isKg) Color.Black else Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("LB", color = if (!isKg) Color.Black else Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -185,7 +185,7 @@ fun BarbellVisualizer(
                     Text(
                         text = convertedText,
                         color = Color.Gray,
-                        fontSize = 18.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.Bold
                     )
                     
@@ -194,7 +194,7 @@ fun BarbellVisualizer(
                         Text(
                             text = "APPROXIMATION (Target: $targetWeightInput)",
                             color = com.example.ui.theme.AccentGreen,
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -218,7 +218,7 @@ fun BarbellVisualizer(
                         Text(
                             text = "ADJUST",
                             color = Color.Gray,
-                            fontSize = 12.sp,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(horizontal = 8.dp)
                         )
@@ -233,7 +233,7 @@ fun BarbellVisualizer(
                 Text(
                     text = if (isReverseMode) "MANUAL PLATE LOADING (PER SIDE)" else "AVAILABLE PLATES",
                     color = Color.White,
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
                     modifier = Modifier.padding(bottom = 16.dp).align(Alignment.Start)
@@ -270,10 +270,10 @@ fun BarbellVisualizer(
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 if (count > 0) {
-                                                    Text("${count}x", color = if (color == Color.White) Color.Black else Color.White, fontWeight = FontWeight.Black, fontSize = 16.sp)
+                                                    Text("${count}x", color = if (color == Color.White) Color.Black else Color.White, fontWeight = FontWeight.Black, fontSize = 15.sp)
                                                 } else {
                                                     val ptText = if (plateWt % 1.0 == 0.0) plateWt.toInt().toString() else plateWt.toString()
-                                                    Text(ptText, color = if (color == Color.White) Color.Black else Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                                    Text(ptText, color = if (color == Color.White) Color.Black else Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                                 }
                                             }
                                             Spacer(modifier = Modifier.height(8.dp))
@@ -321,7 +321,7 @@ fun BarbellVisualizer(
                                                     "${reqCount}x",
                                                     color = if (color == Color.White) Color.Black else Color.White,
                                                     fontWeight = FontWeight.Black,
-                                                    fontSize = 20.sp
+                                                    fontSize = 22.sp
                                                 )
                                             } else {
                                                 val ptText = if (plateWt % 1.0 == 0.0) plateWt.toInt().toString() else plateWt.toString()
@@ -329,7 +329,7 @@ fun BarbellVisualizer(
                                                     ptText,
                                                     color = if (color == Color.White) Color.Black.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.5f),
                                                     fontWeight = FontWeight.Bold,
-                                                    fontSize = 14.sp
+                                                    fontSize = 13.sp
                                                 )
                                             }
                                         }
@@ -358,7 +358,7 @@ fun AdjustmentButton(text: String, onClick: () -> Unit) {
             .padding(horizontal = 16.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(text, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Text(text, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
     }
 }
 

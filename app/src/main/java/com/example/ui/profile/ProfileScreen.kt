@@ -45,7 +45,6 @@ import com.example.model.ProgressPhoto
 import com.example.model.UserProfile
 import com.example.model.Workout
 import com.example.data.IronLogRepository
-import com.example.ui.theme.AccentGreen
 import com.example.ui.theme.GlassBorderDark
 import com.example.ui.theme.GlassDark
 import com.example.ui.theme.GrayDark
@@ -234,16 +233,13 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("MY PROFILE", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp, letterSpacing = 1.sp) },
+                title = { Text("MY PROFILE", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp, letterSpacing = 1.sp) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 actions = {
                     if (!isEditing) {
                         IconButton(onClick = {  isEditing = true  }, modifier = Modifier.bouncy()) {
-                            Icon(Icons.Outlined.Edit, contentDescription = "Edit Profile Info", tint = AccentGreen)
+                            Icon(Icons.Outlined.Edit, contentDescription = "Edit Profile Info", tint = Color.White)
                         }
-                    }
-                    IconButton(onClick = {  showDiagnostics = true  }, modifier = Modifier.bouncy()) {
-                        Icon(Icons.Outlined.BugReport, contentDescription = "Developer Diagnostics", tint = Color.LightGray)
                     }
                 }
             )
@@ -280,7 +276,7 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = GlassDark),
-                    border = BorderStroke(1.dp, GlassBorderDark)
+                    border = BorderStroke(0.5.dp, GlassBorderDark)
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Row(
@@ -295,7 +291,7 @@ fun ProfileScreen(
                                     .clip(CircleShape)
                                     .background(
                                         Brush.linearGradient(
-                                            colors = listOf(AccentGreen, Color(0xFF1E824C))
+                                            colors = listOf(Color.White, Color(0xFF1E824C))
                                         )
                                     )
                                     .bouncyClick {
@@ -329,25 +325,25 @@ fun ProfileScreen(
                                     text = displayName.uppercase(),
                                     color = Color.White,
                                     fontWeight = FontWeight.Black,
-                                    fontSize = 20.sp,
+                                    fontSize = 22.sp,
                                     letterSpacing = 1.sp
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = currentUser?.email ?: "Guest Training Session",
                                     color = Color.LightGray,
-                                    fontSize = 14.sp
+                                    fontSize = 13.sp
                                 )
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Badge(
-                                    containerColor = AccentGreen.copy(alpha = 0.2f),
-                                    contentColor = AccentGreen,
+                                    containerColor = Color.White.copy(alpha = 0.2f),
+                                    contentColor = Color.White,
                                     modifier = Modifier.align(Alignment.Start)
                                 ) {
                                     Text(
                                         text = accountType.uppercase(),
                                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                        fontSize = 9.sp,
+                                        fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
@@ -363,14 +359,14 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = GlassDark),
-                        border = BorderStroke(1.dp, GlassBorderDark)
+                        border = BorderStroke(0.5.dp, GlassBorderDark)
                     ) {
                         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                             Text(
                                 text = "EDIT USER DETAILS",
                                 color = Color.Gray,
                                 fontWeight = FontWeight.Black,
-                                fontSize = 12.sp,
+                                fontSize = 13.sp,
                                 letterSpacing = 2.sp
                             )
                             
@@ -379,7 +375,7 @@ fun ProfileScreen(
                                 onValueChange = { nameInput = it },
                                 label = { Text("Display Name", color = Color.Gray) },
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = AccentGreen,
+                                    focusedBorderColor = Color.White,
                                     unfocusedBorderColor = GrayMedium,
                                     focusedTextColor = Color.White,
                                     unfocusedTextColor = Color.White
@@ -398,7 +394,7 @@ fun ProfileScreen(
                                     label = { Text("Age", color = Color.Gray) },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = AccentGreen,
+                                        focusedBorderColor = Color.White,
                                         unfocusedBorderColor = GrayMedium,
                                         focusedTextColor = Color.White,
                                         unfocusedTextColor = Color.White
@@ -420,7 +416,7 @@ fun ProfileScreen(
                                             }
                                         },
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = AccentGreen,
+                                            focusedBorderColor = Color.White,
                                             unfocusedBorderColor = GrayMedium,
                                             focusedTextColor = Color.White,
                                             unfocusedTextColor = Color.White
@@ -460,7 +456,7 @@ fun ProfileScreen(
                                     label = { Text("Weight (kg)", color = Color.Gray) },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = AccentGreen,
+                                        focusedBorderColor = Color.White,
                                         unfocusedBorderColor = GrayMedium,
                                         focusedTextColor = Color.White,
                                         unfocusedTextColor = Color.White
@@ -475,7 +471,7 @@ fun ProfileScreen(
                                     label = { Text("Height (cm)", color = Color.Gray) },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = AccentGreen,
+                                        focusedBorderColor = Color.White,
                                         unfocusedBorderColor = GrayMedium,
                                         focusedTextColor = Color.White,
                                         unfocusedTextColor = Color.White
@@ -506,7 +502,7 @@ fun ProfileScreen(
                                             Toast.makeText(context, "Telemetry stats saved!", Toast.LENGTH_SHORT).show()
                                         }
                                     },
-                                    colors = ButtonDefaults.buttonColors(containerColor = AccentGreen, contentColor = Color.Black),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                                     shape = RoundedCornerShape(12.dp),
                                     modifier = Modifier.weight(1f)
                                 ) {
@@ -542,16 +538,16 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = GlassDark),
-                        border = BorderStroke(1.dp, GlassBorderDark)
+                        border = BorderStroke(0.5.dp, GlassBorderDark)
                     ) {
                         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                Text("BODY STATMETRICS", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                                Text("BODY METRICS", color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                                 if (currentUser == null) {
                                     Text(
                                         text = "EDIT",
-                                        color = AccentGreen,
-                                        fontSize = 11.sp,
+                                        color = Color.White,
+                                        fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.bouncyClick { isEditing = true }
                                     )
@@ -582,7 +578,7 @@ fun ProfileScreen(
                                 val bmiFormatted = String.format("%.1f", bmi)
                                 val (bmiCategory, bmiColor) = when {
                                     bmi < 18.5 -> "Underweight" to Color(0xFF3498db)
-                                    bmi < 25.0 -> "Ideal / Athletic" to AccentGreen
+                                    bmi < 25.0 -> "Ideal / Athletic" to Color.White
                                     bmi < 30.0 -> "Overweight" to Color(0xFFf39c12)
                                     else -> "Obesity Status" to ErrorColor
                                 }
@@ -594,12 +590,12 @@ fun ProfileScreen(
                                 ) {
                                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                                         Column {
-                                            Text("BMI INDEX SCORE", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                            Text(bmiFormatted, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                                            Text("BMI INDEX SCORE", color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                            Text(bmiFormatted, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black)
                                         }
                                         Column(horizontalAlignment = Alignment.End) {
-                                            Text("CLASSIFICATION", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                            Text(bmiCategory, color = bmiColor, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                            Text("CLASSIFICATION", color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                            Text(bmiCategory, color = bmiColor, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                                         }
                                     }
                                 }
@@ -609,37 +605,37 @@ fun ProfileScreen(
                 }
                 
                 // CRITICAL CURRENT PROGRAM TRACKING (Current Program, Current Week, Current Day)
-                Text("CURRENT TRAINING STATE", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                Text("CURRENT TRAINING STATE", color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = GlassDark),
-                    border = BorderStroke(1.dp, GlassBorderDark)
+                    border = BorderStroke(0.5.dp, GlassBorderDark)
                 ) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.Star, contentDescription = "Active Program", tint = AccentGreen, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Outlined.Star, contentDescription = "Active Program", tint = Color.White, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(currentProgram, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Text(currentProgram, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                         }
                         
                         Divider(color = Color.White.copy(alpha = 0.08f))
                         
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text("CURRENT WEEK", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                Text(currentWeek, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Black)
+                                Text("CURRENT WEEK", color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                Text(currentWeek, color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Black)
                             }
                             Column(modifier = Modifier.weight(1f)) {
-                                Text("CURRENT DAY", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                Text(currentDay, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Black)
+                                Text("CURRENT DAY", color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                Text(currentDay, color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Black)
                             }
                         }
                     }
                 }
                 
                 // ATHLETIC STATS OVERVIW (Total Workouts, Current Streak, Longest Streak, Total Volume, PR Count)
-                Text("ATHLETIC ANALYTICS", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                Text("ATHLETIC ANALYTICS", color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                         statLargeBox(
@@ -653,7 +649,7 @@ fun ProfileScreen(
                             metric = "$prCount",
                             label = "PR RECORD COUNT",
                             icon = Icons.Outlined.EmojiEvents,
-                            tint = AccentGreen,
+                            tint = Color.White,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -681,7 +677,7 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = GlassDark),
-                        border = BorderStroke(1.dp, GlassBorderDark)
+                        border = BorderStroke(0.5.dp, GlassBorderDark)
                     ) {
                         Row(
                             modifier = Modifier.padding(16.dp),
@@ -689,21 +685,21 @@ fun ProfileScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Text("TOTAL ACCUMULATED VOLUME", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                Text(formattedVolume, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                                Text("TOTAL ACCUMULATED VOLUME", color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                Text(formattedVolume, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black)
                             }
-                            Icon(Icons.Outlined.TrendingUp, contentDescription = "Volume", tint = AccentGreen, modifier = Modifier.size(36.dp))
+                            Icon(Icons.Outlined.TrendingUp, contentDescription = "Volume", tint = Color.White, modifier = Modifier.size(36.dp))
                         }
                     }
                 }
                 
                 // SETTINGS OPTIONAL CONTROLS
-                Text("SETTINGS & OPTIONS", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                Text("SETTINGS & OPTIONS", color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = GlassDark),
-                    border = BorderStroke(1.dp, GlassBorderDark)
+                    border = BorderStroke(0.5.dp, GlassBorderDark)
                 ) {
                     Column(modifier = Modifier.padding(8.dp)) {
                         settingSwitchRow(
@@ -748,11 +744,11 @@ fun ProfileScreen(
                         text = "PROGRESS PICTURES ROLL",
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         letterSpacing = 1.sp
                     )
                     IconButton(onClick = {  photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))  }, modifier = Modifier.bouncy()) {
-                        Icon(Icons.Outlined.AddAPhoto, contentDescription = "Add Track Photo", tint = AccentGreen)
+                        Icon(Icons.Outlined.AddAPhoto, contentDescription = "Add Track Photo", tint = Color.White)
                     }
                 }
                 
@@ -761,7 +757,7 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = GlassDark),
-                        border = BorderStroke(1.dp, GlassBorderDark)
+                        border = BorderStroke(0.5.dp, GlassBorderDark)
                     ) {
                         Box(
                             modifier = Modifier.fillMaxWidth().padding(32.dp),
@@ -803,7 +799,7 @@ fun ProfileScreen(
                                         text = "${photo.weightKg}kg • $formattedDate",
                                         color = Color.White,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 9.sp
+                                        fontSize = 13.sp
                                     )
                                 }
                             }
@@ -829,7 +825,7 @@ fun ProfileScreen(
                 } else {
                     Button(
                         onClick = onLoginClick,
-                        colors = ButtonDefaults.buttonColors(containerColor = AccentGreen, contentColor = Color.Black),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth().height(48.dp)
                     ) {
@@ -861,12 +857,12 @@ fun keyValStat(label: String, value: String, modifier: Modifier = Modifier) {
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = GrayDark),
-        border = BorderStroke(1.dp, GlassBorderDark)
+        border = BorderStroke(0.5.dp, GlassBorderDark)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(label, color = Color.Gray, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(label, color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(2.dp))
-            Text(value, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Black)
+            Text(value, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Black)
         }
     }
 }
@@ -877,15 +873,15 @@ fun statLargeBox(metric: String, label: String, icon: androidx.compose.ui.graphi
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = GlassDark),
-        border = BorderStroke(1.dp, GlassBorderDark)
+        border = BorderStroke(0.5.dp, GlassBorderDark)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(label, color = Color.Gray, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Text(label, color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                 Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(18.dp))
             }
             Spacer(modifier = Modifier.height(4.dp))
-            Text(metric, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
+            Text(metric, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Black)
         }
     }
 }
@@ -900,16 +896,16 @@ fun settingSwitchRow(label: String, subtitle: String, checked: Boolean, onChecke
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
-            Text(label, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(label, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(2.dp))
-            Text(subtitle, color = Color.Gray, fontSize = 11.sp)
+            Text(subtitle, color = Color.Gray, fontSize = 13.sp)
         }
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.Black,
-                checkedTrackColor = AccentGreen,
+                checkedTrackColor = Color.White,
                 uncheckedThumbColor = Color.Gray,
                 uncheckedTrackColor = Color.Black
             )
@@ -967,7 +963,7 @@ fun DeveloperDiagnosticsDialog(
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Outlined.LogoDev, contentDescription = "Diag", tint = AccentGreen, modifier = Modifier.size(32.dp))
+                Icon(Icons.Outlined.LogoDev, contentDescription = "Diag", tint = Color.White, modifier = Modifier.size(32.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("DEVELOPER DIAGNOSTICS", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
             }
@@ -981,7 +977,7 @@ fun DeveloperDiagnosticsDialog(
             ) {
                 Text(
                     text = "Real-time auditing dashboard enabling on-device diagnostics without rebuilding.",
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
                     color = Color.Gray
                 )
                 
@@ -1076,12 +1072,12 @@ fun DeveloperDiagnosticsDialog(
                     clipboard.setText(AnnotatedString(shareStr.toString()))
                     Toast.makeText(context, "Diagnostics logs copied to clipboard! 📋", Toast.LENGTH_SHORT).show()
                 }) {
-                    Text("COPY REPORT", color = AccentGreen, fontWeight = FontWeight.Bold)
+                    Text("COPY REPORT", color = Color.White, fontWeight = FontWeight.Bold)
                 }
                 
                 Button(
                     onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(containerColor = AccentGreen, contentColor = Color.Black)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)
                 ) {
                     Text("CLOSE", fontWeight = FontWeight.Bold)
                 }
@@ -1106,10 +1102,10 @@ fun DiagnosticItem(title: String, value: String, isOk: Boolean, isWarning: Boole
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(title, color = Color.Gray, fontSize = 9.sp, fontWeight = FontWeight.Black, letterSpacing = 1.sp)
+            Text(title, color = Color.Gray, fontSize = 13.sp, fontWeight = FontWeight.Black, letterSpacing = 1.sp)
             val indicatorColor = when {
                 isWarning -> Color(0xFFf39c12)
-                isOk -> AccentGreen
+                isOk -> Color.White
                 else -> ErrorColor
             }
             Box(modifier = Modifier.size(6.dp).background(indicatorColor, CircleShape))
@@ -1118,7 +1114,7 @@ fun DiagnosticItem(title: String, value: String, isOk: Boolean, isWarning: Boole
         Text(
             text = value,
             color = Color.White,
-            fontSize = 11.sp,
+            fontSize = 13.sp,
             fontWeight = FontWeight.Normal,
             fontFamily = if (monospace) FontFamily.Monospace else FontFamily.Default
         )

@@ -20,6 +20,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
@@ -31,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AllInbox
 
 // ==================== SPACING SYSTEM ====================
 object IronSpacing {
@@ -132,19 +135,20 @@ fun Modifier.bouncyClick(
 }
 
 // ==================== ELEVATION / GLASS SYSTEM ====================
-fun Modifier.glassCard(): Modifier = this
-    .background(GlassDark, RoundedCornerShape(IronSpacing.CardCornerRadius))
-    .border(1.dp, GlassBorderDark, RoundedCornerShape(IronSpacing.CardCornerRadius))
+// Consistent glass recipe
+fun Modifier.glassCard(shape: Shape = RoundedCornerShape(IronSpacing.CardCornerRadius)): Modifier = this
+    .background(GlassDark, shape)
+    .border(0.5.dp, GlassBorderDark, shape)
 
-fun Modifier.glassFloating(): Modifier = this
-    .shadow(8.dp, RoundedCornerShape(IronSpacing.CardCornerRadius), spotColor = Color.Black.copy(alpha = 0.5f))
-    .background(GlassDark.copy(alpha = 0.15f), RoundedCornerShape(IronSpacing.CardCornerRadius))
-    .border(1.dp, GlassBorderDark.copy(alpha = 0.2f), RoundedCornerShape(IronSpacing.CardCornerRadius))
+fun Modifier.glassFloating(shape: Shape = RoundedCornerShape(IronSpacing.CardCornerRadius)): Modifier = this
+    .shadow(8.dp, shape, spotColor = Color.Black.copy(alpha = 0.5f))
+    .background(GlassDark, shape)
+    .border(0.5.dp, GlassBorderDark, shape)
 
-fun Modifier.glassModal(): Modifier = this
-    .shadow(24.dp, RoundedCornerShape(IronSpacing.XXLarge), spotColor = Color.Black)
-    .background(Color(0xFF1E1E1E).copy(alpha = 0.95f), RoundedCornerShape(IronSpacing.XXLarge))
-    .border(1.dp, GlassBorderDark.copy(alpha = 0.3f), RoundedCornerShape(IronSpacing.XXLarge))
+fun Modifier.glassModal(shape: Shape = RoundedCornerShape(IronSpacing.XXLarge)): Modifier = this
+    .shadow(24.dp, shape, spotColor = Color.Black)
+    .background(GlassDark, shape)
+    .border(0.5.dp, GlassBorderDark, shape)
 
 // ==================== LOADING (SKELETONS) ====================
 fun Modifier.skeleton(): Modifier = composed {
@@ -194,7 +198,12 @@ fun EmptyState(
                 .background(GlassDark, RoundedCornerShape(IronSpacing.ElementCornerRadius)),
             contentAlignment = Alignment.Center
         ) {
-            Text("📭", fontSize = 24.sp)
+            Icon(
+                imageVector = Icons.Outlined.AllInbox,
+                contentDescription = null,
+                tint = Color.White.copy(alpha = 0.5f),
+                modifier = Modifier.size(32.dp)
+            )
         }
         
         Spacer(modifier = Modifier.height(IronSpacing.Large))

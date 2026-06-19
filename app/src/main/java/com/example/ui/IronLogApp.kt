@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.Assignment
 import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Person
@@ -176,7 +176,7 @@ fun IronLogApp(repository: IronLogRepository) {
                 Text(
                     text = "GYM KRTA H JI",
                     color = Color.White,
-                    fontSize = 28.sp,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Black,
                     letterSpacing = 2.sp
                 )
@@ -184,7 +184,7 @@ fun IronLogApp(repository: IronLogRepository) {
                 Text(
                     text = "PRECISION STRENGTH INTELLIGENCE",
                     color = Color(0xFF39FF14),
-                    fontSize = 10.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 )
@@ -198,7 +198,7 @@ fun IronLogApp(repository: IronLogRepository) {
                 Text(
                     text = currentPhase.uppercase(),
                     color = Color.LightGray,
-                    fontSize = 11.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.5.sp
                 )
@@ -206,14 +206,14 @@ fun IronLogApp(repository: IronLogRepository) {
                 initErrorLog?.let { err ->
                     Spacer(modifier = Modifier.height(24.dp))
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0x33FF3B30)),
+                        colors = CardDefaults.cardColors(containerColor = com.example.ui.theme.GlassDark),
                         shape = RoundedCornerShape(12.dp),
                         border = BorderStroke(1.dp, Color(0xFFFF3B30).copy(alpha = 0.5f))
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text("INIT DEGRADATION ENCOUNTERED", color = Color(0xFFFF453A), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Text("INIT DEGRADATION ENCOUNTERED", color = Color(0xFFFF453A), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text(err, color = Color.White, fontSize = 11.sp, textAlign = TextAlign.Center)
+                            Text(err, color = Color.White, fontSize = 13.sp, textAlign = TextAlign.Center)
                         }
                     }
 
@@ -290,7 +290,7 @@ fun ProtectedRoute(
                 Text(
                     text = "RESOLVING IDENTITY STATE...",
                     color = Color.Gray,
-                    fontSize = 11.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 )
@@ -324,7 +324,7 @@ fun MainScreenWrapper(
     
     val items = listOf(
         Triple("home", Icons.Outlined.Home, "HOME"),
-        Triple("programs", Icons.Outlined.Star, "PROGRAM"),
+        Triple("programs", Icons.Outlined.Assignment, "PROGRAM"),
         Triple("progress", Icons.Outlined.Timeline, "PROGRESS"),
         Triple("prs", Icons.Outlined.Star, "PRS"),
         Triple("history", Icons.Outlined.History, "HISTORY"),
@@ -347,12 +347,12 @@ fun MainScreenWrapper(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            color = Color(0xBF000000), // backlit translucent carbon
+                            color = com.example.ui.theme.GlassDark,
                             shape = RoundedCornerShape(24.dp)
                         )
                         .border(
-                            width = 1.dp,
-                            color = Color.White.copy(alpha = 0.16f), // faint edge highlight catching light
+                            width = 0.5.dp,
+                            color = com.example.ui.theme.GlassBorderDark,
                             shape = RoundedCornerShape(24.dp)
                         )
                         .padding(horizontal = 12.dp, vertical = 10.dp),
@@ -389,7 +389,7 @@ fun MainScreenWrapper(
                             Text(
                                 text = label,
                                 color = if (isSelected) Color.White else Color.White.copy(alpha = 0.4f),
-                                fontSize = 9.sp,
+                                fontSize = 13.sp,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                 letterSpacing = 0.5.sp
                             )
