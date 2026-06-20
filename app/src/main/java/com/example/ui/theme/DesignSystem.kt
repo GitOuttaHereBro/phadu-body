@@ -14,9 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.BlurredEdgeTreatment
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
@@ -52,62 +50,142 @@ object IronCorner {
 object IronTypography {
     private val defaultFamily = FontFamily.Default
     
-    val Caption = androidx.compose.ui.text.TextStyle(
-        fontFamily = defaultFamily,
-        fontSize = 11.sp,
-        fontWeight = FontWeight.W500,
-        letterSpacing = 0.66.sp, // ~6% of 11px
-        color = TextPrimaryColor
-    )
-    val Footnote = androidx.compose.ui.text.TextStyle(
-        fontFamily = defaultFamily,
-        fontSize = 13.sp,
-        fontWeight = FontWeight.W400,
-        color = TextPrimaryColor
-    )
-    val Body = androidx.compose.ui.text.TextStyle(
-        fontFamily = defaultFamily,
-        fontSize = 15.sp,
-        fontWeight = FontWeight.W400,
-        color = TextPrimaryColor
-    )
-    val Callout = androidx.compose.ui.text.TextStyle(
-        fontFamily = defaultFamily,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.W500,
-        color = TextPrimaryColor
-    )
-    val Headline = androidx.compose.ui.text.TextStyle(
-        fontFamily = defaultFamily,
-        fontSize = 17.sp,
-        fontWeight = FontWeight.W600,
-        color = TextPrimaryColor
-    )
-    val Title3 = androidx.compose.ui.text.TextStyle(
-        fontFamily = defaultFamily,
-        fontSize = 20.sp,
-        fontWeight = FontWeight.W700,
-        color = TextPrimaryColor
-    )
-    val Title2 = androidx.compose.ui.text.TextStyle(
-        fontFamily = defaultFamily,
-        fontSize = 24.sp,
-        fontWeight = FontWeight.W700,
-        color = TextPrimaryColor
-    )
-    val Title1 = androidx.compose.ui.text.TextStyle(
-        fontFamily = defaultFamily,
-        fontSize = 34.sp,
-        fontWeight = FontWeight.W800,
-        letterSpacing = (-0.68).sp,
-        color = TextPrimaryColor
-    )
-    val LargeTitle = androidx.compose.ui.text.TextStyle(
+    val Display = androidx.compose.ui.text.TextStyle(
         fontFamily = defaultFamily,
         fontSize = 48.sp,
         fontWeight = FontWeight.W800,
         letterSpacing = (-1.44).sp,
+        lineHeight = 52.sp,
         color = TextPrimaryColor
+    )
+    
+    val Heading = androidx.compose.ui.text.TextStyle(
+        fontFamily = defaultFamily,
+        fontSize = 34.sp,
+        fontWeight = FontWeight.W800,
+        letterSpacing = (-0.68).sp,
+        lineHeight = 40.sp,
+        color = TextPrimaryColor
+    )
+
+    val Subheading = androidx.compose.ui.text.TextStyle(
+        fontFamily = defaultFamily,
+        fontSize = 24.sp,
+        fontWeight = FontWeight.W700,
+        lineHeight = 32.sp,
+        color = TextPrimaryColor
+    )
+
+    val Title = androidx.compose.ui.text.TextStyle(
+        fontFamily = defaultFamily,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.W700,
+        lineHeight = 28.sp,
+        color = TextPrimaryColor
+    )
+
+    val Headline = androidx.compose.ui.text.TextStyle(
+        fontFamily = defaultFamily,
+        fontSize = 17.sp,
+        fontWeight = FontWeight.W600,
+        lineHeight = 22.sp,
+        color = TextPrimaryColor
+    )
+
+    val Body = androidx.compose.ui.text.TextStyle(
+        fontFamily = defaultFamily,
+        fontSize = 15.sp,
+        fontWeight = FontWeight.W400,
+        lineHeight = 22.sp,
+        color = TextPrimaryColor
+    )
+
+    val Callout = androidx.compose.ui.text.TextStyle(
+        fontFamily = defaultFamily,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.W500,
+        lineHeight = 20.sp,
+        color = TextPrimaryColor
+    )
+
+    val Footnote = androidx.compose.ui.text.TextStyle(
+        fontFamily = defaultFamily,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.W400,
+        lineHeight = 18.sp,
+        color = TextPrimaryColor
+    )
+
+    val Caption = androidx.compose.ui.text.TextStyle(
+        fontFamily = defaultFamily,
+        fontSize = 11.sp,
+        fontWeight = FontWeight.W600,
+        letterSpacing = 0.5.sp,
+        lineHeight = 14.sp,
+        color = TextPrimaryColor
+    )
+
+    val Micro = androidx.compose.ui.text.TextStyle(
+        fontFamily = defaultFamily,
+        fontSize = 10.sp,
+        fontWeight = FontWeight.W700,
+        letterSpacing = 1.sp,
+        lineHeight = 12.sp,
+        color = TextPrimaryColor
+    )
+}
+
+/**
+ * A specialized text component that scales its internal typography to fit
+ * within a required line count, preventing layout destruction.
+ */
+@Composable
+fun AutoResizingText(
+    text: String,
+    style: androidx.compose.ui.text.TextStyle,
+    modifier: Modifier = Modifier,
+    maxLines: Int = 1,
+    textAlign: TextAlign = TextAlign.Start,
+    color: Color = Color.Unspecified,
+    overflow: androidx.compose.ui.text.style.TextOverflow = androidx.compose.ui.text.style.TextOverflow.Clip,
+    softWrap: Boolean = true
+) {
+    var resizedTextStyle by remember(text, style) { mutableStateOf(style) }
+    var readyToDraw by remember(text, style) { mutableStateOf(false) }
+
+    val defaultColor = if (color == Color.Unspecified) style.color else color
+
+    Text(
+        text = text,
+        color = defaultColor,
+        modifier = modifier.drawWithContent {
+            if (readyToDraw) drawContent()
+        },
+        style = resizedTextStyle,
+        softWrap = softWrap,
+        maxLines = maxLines,
+        textAlign = textAlign,
+        overflow = overflow,
+        onTextLayout = { textLayoutResult ->
+            if (textLayoutResult.didOverflowHeight || textLayoutResult.didOverflowWidth || textLayoutResult.lineCount > maxLines) {
+                val currentSize = resizedTextStyle.fontSize.value
+                val currentSpacing = resizedTextStyle.letterSpacing.value
+                val currentLineHeight = resizedTextStyle.lineHeight.value
+                
+                if (currentSize > 10f) {
+                    // 1. Scale font size
+                    resizedTextStyle = resizedTextStyle.copy(
+                        fontSize = (currentSize * 0.92f).sp,
+                        lineHeight = (currentLineHeight * 0.92f).sp,
+                        letterSpacing = (currentSpacing * 0.95f).sp
+                    )
+                } else {
+                    readyToDraw = true
+                }
+            } else {
+                readyToDraw = true
+            }
+        }
     )
 }
 
@@ -150,12 +228,61 @@ fun Modifier.bouncyClick(
 }
 
 fun Modifier.glassRecipe(shape: Shape = RoundedCornerShape(IronCorner.RadiusMd)): Modifier = this
-    .background(Color(0xFFFFFFFF).copy(alpha = 0.07f), shape)
-    .border(1.dp, Color(0xFFFFFFFF).copy(alpha = 0.12f), shape)
+    .background(Color(0xFFFFFFFF).copy(alpha = 0.05f), shape)
+    .border(0.5.dp, Color(0xFFFFFFFF).copy(alpha = 0.1f), shape)
     
 fun Modifier.glassRecipeRaised(shape: Shape = RoundedCornerShape(IronCorner.RadiusMd)): Modifier = this
-    .background(Color(0xFFFFFFFF).copy(alpha = 0.10f), shape)
-    .border(1.dp, Color(0xFFFFFFFF).copy(alpha = 0.12f), shape)
+    .background(Color(0xFFFFFFFF).copy(alpha = 0.08f), shape)
+    .border(0.5.dp, Color(0xFFFFFFFF).copy(alpha = 0.15f), shape)
+
+fun Modifier.hairlineBorder(shape: Shape = RoundedCornerShape(IronCorner.RadiusMd)): Modifier = this
+    .border(0.5.dp, Color.White.copy(alpha = 0.1f), shape)
+
+@Composable
+fun PremiumCard(
+    modifier: Modifier = Modifier,
+    shape: Shape = RoundedCornerShape(IronCorner.RadiusLg),
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .glassRecipe(shape)
+            .padding(IronSpacing.x20),
+        content = content
+    )
+}
+
+@Composable
+fun StatCard(
+    label: String,
+    value: String,
+    subValue: String? = null,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .glassRecipe(RoundedCornerShape(IronCorner.RadiusMd))
+            .padding(IronSpacing.x16)
+    ) {
+        Text(
+            text = label.uppercase(),
+            style = IronTypography.Micro.copy(color = TextTertiaryColor, letterSpacing = 1.5.sp)
+        )
+        Spacer(modifier = Modifier.height(IronSpacing.x4))
+        AutoResizingText(
+            text = value,
+            style = IronTypography.Subheading.copy(fontWeight = FontWeight.Black),
+            maxLines = 1
+        )
+        if (subValue != null) {
+            Text(
+                text = subValue,
+                style = IronTypography.Caption.copy(color = TextSecondaryColor)
+            )
+        }
+    }
+}
 
 fun Modifier.skeleton(): Modifier = composed {
     val transition = rememberInfiniteTransition(label = "skeleton")

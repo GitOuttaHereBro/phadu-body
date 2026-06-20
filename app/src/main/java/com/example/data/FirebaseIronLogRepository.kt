@@ -7,10 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
@@ -18,6 +15,9 @@ import java.util.UUID
 import android.util.Log
 
 import android.content.Context
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.flow.flow
 
 class FirebaseIronLogRepository(private val context: Context) : IronLogRepository {
     private val auth by lazy { FirebaseAuth.getInstance() }
@@ -39,12 +39,23 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
     }
     
     private val uid: String
-        get() = auth.currentUser?.uid ?: "local_test_user"
+        get() {
+            val currentUid = auth.currentUser?.uid
+            if (currentUid == null) {
+                Log.w("FirebaseRepo", "Warning: UID property accessed while auth.currentUser is NULL. Falling back to local_test_user.")
+            }
+            return currentUid ?: "local_test_user"
+        }
         
     private fun exercisesCollection() = firestore.collection("users").document(uid).collection("exercises")
     private fun templatesCollection() = firestore.collection("users").document(uid).collection("templates")
     private fun workoutsCollection() = firestore.collection("users").document(uid).collection("workouts")
     private fun prsCollection() = firestore.collection("users").document(uid).collection("personalRecords")
+    private fun sessionDoc() = firestore.collection("users").document(uid).collection("settings").document("activeSession")
+    private fun programMetaDoc() = firestore.collection("users").document(uid).collection("programState").document("active")
+    private fun programWeekDoc(weekNumber: Int) = firestore.collection("users").document(uid).collection("program").document("week$weekNumber").also {
+        Log.v("FirebaseRepo", "Target Week Path: ${it.path}")
+    }
 
     override fun getExercises(): Flow<List<Exercise>> {
         if (auth.currentUser == null) return localFallback.getExercises()
@@ -258,7 +269,56 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
                             try {
                                 val workouts = snapshot.documents.mapNotNull { doc ->
                                     try {
-                                        doc.toObject(Workout::class.java)
+                                        val workout = doc.toObject(Workout::class.java)
+                                        if (workout != null && workout.loggedExercises.isNotEmpty()) {
+                                            workout
+                                        } else {
+                                            Log.d("FirebaseRepo", "getWorkouts: toObject yielded empty exercises, using manual mapping for ${doc.id}")
+                                            val id = doc.getString("id") ?: doc.id
+                                            val date = doc.getLong("date") ?: 0L
+                                            val templateId = doc.getString("templateId")
+                                            val templateName = doc.getString("templateName")
+                                            val status = doc.getString("status") ?: "in_progress"
+                                            val durationMinutes = doc.getLong("durationMinutes")?.toInt() ?: 0
+                                            val totalVolume = doc.getDouble("totalVolume") ?: 0.0
+                                            
+                                            val loggedRaw = doc.get("loggedExercises") as? List<*> ?: emptyList<Any>()
+                                            val loggedExercises = loggedRaw.map { item ->
+                                                val exMap = item as? Map<*, *>
+                                                val exerciseId = exMap?.get("exerciseId") as? String ?: ""
+                                                val exerciseName = exMap?.get("exerciseName") as? String ?: ""
+                                                val videoUrl = exMap?.get("videoUrl") as? String
+                                                
+                                                val setsRaw = exMap?.get("sets") as? List<*> ?: emptyList<Any>()
+                                                val sets = setsRaw.map { setItem ->
+                                                    val setMap = setItem as? Map<*, *>
+                                                    WorkoutSet(
+                                                        setNumber = (setMap?.get("setNumber") as? Number)?.toInt() ?: 1,
+                                                        weight = (setMap?.get("weight") as? Number)?.toDouble() ?: 0.0,
+                                                        reps = (setMap?.get("reps") as? Number)?.toInt() ?: 0,
+                                                        isWarmup = (setMap?.get("warmup") as? Boolean ?: setMap?.get("isWarmup") as? Boolean ?: false),
+                                                        completedAt = (setMap?.get("completedAt") as? Number)?.toLong(),
+                                                        rpe = (setMap?.get("rpe") as? Number)?.toFloat()
+                                                    )
+                                                }
+                                                LoggedExercise(
+                                                    exerciseId = exerciseId,
+                                                    exerciseName = exerciseName,
+                                                    videoUrl = videoUrl,
+                                                    sets = sets
+                                                )
+                                            }
+                                            Workout(
+                                                id = id,
+                                                date = date,
+                                                templateId = templateId,
+                                                templateName = templateName,
+                                                status = status,
+                                                durationMinutes = durationMinutes,
+                                                loggedExercises = loggedExercises,
+                                                totalVolume = totalVolume
+                                            )
+                                        }
                                     } catch (ex: Exception) {
                                         Log.e("FirebaseRepo", "toObject(Workout) failed, manual fallback", ex)
                                         try {
@@ -339,28 +399,129 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
                 trySend(it)
             }
         }
-        var registration: ListenerRegistration? = null
-        val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
-            registration?.remove()
+        
+        var authRegistration: FirebaseAuth.AuthStateListener? = null
+        var sessionRegistration: ListenerRegistration? = null
+        var workoutRegistration: ListenerRegistration? = null
+        var fallbackRegistration: ListenerRegistration? = null
+
+        fun cleanupListeners() {
+            sessionRegistration?.remove()
+            workoutRegistration?.remove()
+            fallbackRegistration?.remove()
+            sessionRegistration = null
+            workoutRegistration = null
+            fallbackRegistration = null
+        }
+
+        authRegistration = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            cleanupListeners()
             val user = firebaseAuth.currentUser
             if (user != null) {
-                val col = workoutsCollection()
-                registration = col.whereEqualTo("status", "in_progress")
-                    .limit(1)
-                    .addSnapshotListener { snapshot, e ->
-                        if (e != null) {
-                            Log.e("FirebaseRepo", "Firestore active listen error", e)
-                            return@addSnapshotListener
-                        }
-                        if (snapshot != null) {
-                            try {
-                                val workout = if (!snapshot.isEmpty) {
+                // Primary: Listen to explicit session document
+                sessionRegistration = sessionDoc().addSnapshotListener { sessionSnapshot, sessionError ->
+                    workoutRegistration?.remove()
+                    workoutRegistration = null
+                    
+                    if (sessionError != null) {
+                        Log.e("FirebaseRepo", "Session listen error", sessionError)
+                        return@addSnapshotListener
+                    }
+                    
+                    val activeSession = sessionSnapshot?.toObject(ActiveWorkoutSession::class.java)
+                    if (activeSession != null && activeSession.workoutId.isNotEmpty()) {
+                        // Nested: Listen to the EXACT workout document
+                        fallbackRegistration?.remove()
+                        fallbackRegistration = null
+                        
+                        workoutRegistration = workoutsCollection().document(activeSession.workoutId)
+                            .addSnapshotListener { workoutDoc, workoutError ->
+                                if (workoutError != null) {
+                                    Log.e("FirebaseRepo", "Workout listen error", workoutError)
+                                    return@addSnapshotListener
+                                }
+                                
+                                if (workoutDoc != null && workoutDoc.exists()) {
+                                    try {
+                                        val workout = workoutDoc.toObject(Workout::class.java)
+                                        // Use manual mapping if fields are missing or if toObject failed partially
+                                        val finalWorkout = if (workout != null && workout.loggedExercises.isNotEmpty()) {
+                                            workout
+                                        } else {
+                                            Log.d("FirebaseRepo", "toObject yielded empty exercises, using manual mapping")
+                                            val id = workoutDoc.getString("id") ?: workoutDoc.id
+                                            val date = workoutDoc.getLong("date") ?: 0L
+                                            val templateId = workoutDoc.getString("templateId")
+                                            val templateName = workoutDoc.getString("templateName")
+                                            val status = workoutDoc.getString("status") ?: "in_progress"
+                                            val durationMinutes = workoutDoc.getLong("durationMinutes")?.toInt() ?: 0
+                                            val totalVolume = workoutDoc.getDouble("totalVolume") ?: 0.0
+                                            
+                                            val loggedRaw = workoutDoc.get("loggedExercises") as? List<*> ?: emptyList<Any>()
+                                            val loggedExercises = loggedRaw.map { item ->
+                                                val exMap = item as? Map<*, *>
+                                                val exerciseId = exMap?.get("exerciseId") as? String ?: ""
+                                                val exerciseName = exMap?.get("exerciseName") as? String ?: ""
+                                                val videoUrl = exMap?.get("videoUrl") as? String
+                                                
+                                                val setsRaw = exMap?.get("sets") as? List<*> ?: emptyList<Any>()
+                                                val sets = setsRaw.map { setItem ->
+                                                    val setMap = setItem as? Map<*, *>
+                                                    WorkoutSet(
+                                                        setNumber = (setMap?.get("setNumber") as? Number)?.toInt() ?: 1,
+                                                        weight = (setMap?.get("weight") as? Number)?.toDouble() ?: 0.0,
+                                                        reps = (setMap?.get("reps") as? Number)?.toInt() ?: 0,
+                                                        isWarmup = (setMap?.get("warmup") as? Boolean ?: setMap?.get("isWarmup") as? Boolean ?: false),
+                                                        completedAt = (setMap?.get("completedAt") as? Number)?.toLong(),
+                                                        rpe = (setMap?.get("rpe") as? Number)?.toFloat(),
+                                                        targetWeight = (setMap?.get("targetWeight") as? Number)?.toDouble(),
+                                                        targetReps = (setMap?.get("targetReps") as? Number)?.toInt()
+                                                    )
+                                                }
+                                                LoggedExercise(
+                                                    exerciseId = exerciseId, 
+                                                    exerciseName = exerciseName, 
+                                                    sets = sets, 
+                                                    videoUrl = videoUrl,
+                                                    muscleGroup = exMap?.get("muscleGroup") as? String ?: "GENERAL"
+                                                )
+                                            }
+                                            Workout(id = id, date = date, templateId = templateId, templateName = templateName, status = status, durationMinutes = durationMinutes, loggedExercises = loggedExercises, totalVolume = totalVolume)
+                                        }
+                                        
+                                        if (finalWorkout.status == "in_progress") {
+                                            launch { localFallback.saveWorkout(finalWorkout) }
+                                            trySend(finalWorkout)
+                                        } else {
+                                             trySend(null)
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("FirebaseRepo", "Error parsing workout from doc", e)
+                                        trySend(null)
+                                    }
+                                } else {
+                                    trySend(null)
+                                }
+                            }
+                    } else {
+                        // Secondary Fallback: Use status-based query if no session context exists
+                        fallbackRegistration = workoutsCollection()
+                            .whereEqualTo("status", "in_progress")
+                            .orderBy("date", Query.Direction.DESCENDING)
+                            .limit(1)
+                            .addSnapshotListener { snapshot, fallbackError ->
+                                if (fallbackError != null) {
+                                    Log.e("FirebaseRepo", "Fallback listen error", fallbackError)
+                                    return@addSnapshotListener
+                                }
+                                
+                                if (snapshot != null && !snapshot.isEmpty) {
                                     val doc = snapshot.documents.first()
                                     try {
-                                        doc.toObject(Workout::class.java)
-                                    } catch (ex: Exception) {
-                                        Log.e("FirebaseRepo", "toObject(Workout) failed for active, trying manual fallback", ex)
-                                        try {
+                                        val workout = doc.toObject(Workout::class.java)
+                                        val finalWorkout = if (workout != null && workout.loggedExercises.isNotEmpty()) {
+                                            workout
+                                        } else {
                                             val id = doc.getString("id") ?: doc.id
                                             val date = doc.getLong("date") ?: 0L
                                             val templateId = doc.getString("templateId")
@@ -385,58 +546,62 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
                                                         reps = (setMap?.get("reps") as? Number)?.toInt() ?: 0,
                                                         isWarmup = (setMap?.get("warmup") as? Boolean ?: setMap?.get("isWarmup") as? Boolean ?: false),
                                                         completedAt = (setMap?.get("completedAt") as? Number)?.toLong(),
-                                                        rpe = (setMap?.get("rpe") as? Number)?.toFloat()
+                                                        rpe = (setMap?.get("rpe") as? Number)?.toFloat(),
+                                                        targetWeight = (setMap?.get("targetWeight") as? Number)?.toDouble(),
+                                                        targetReps = (setMap?.get("targetReps") as? Number)?.toInt()
                                                     )
                                                 }
                                                 LoggedExercise(
-                                                    exerciseId = exerciseId,
-                                                    exerciseName = exerciseName,
+                                                    exerciseId = exerciseId, 
+                                                    exerciseName = exerciseName, 
+                                                    sets = sets, 
                                                     videoUrl = videoUrl,
-                                                    sets = sets
+                                                    muscleGroup = exMap?.get("muscleGroup") as? String ?: "GENERAL"
                                                 )
                                             }
-                                            Workout(
-                                                id = id,
-                                                date = date,
-                                                templateId = templateId,
-                                                templateName = templateName,
-                                                status = status,
-                                                durationMinutes = durationMinutes,
-                                                loggedExercises = loggedExercises,
-                                                totalVolume = totalVolume
-                                            )
-                                        } catch (fallbackEx: Exception) {
-                                            Log.e("FirebaseRepo", "Fallback manual mapping failed for active Workout", fallbackEx)
-                                            null
+                                            Workout(id = id, date = date, templateId = templateId, templateName = templateName, status = status, durationMinutes = durationMinutes, loggedExercises = loggedExercises, totalVolume = totalVolume)
                                         }
+                                        launch { localFallback.saveWorkout(finalWorkout) }
+                                        trySend(finalWorkout)
+                                    } catch (e: Exception) {
+                                        Log.e("FirebaseRepo", "Fallback mapping failed", e)
+                                        trySend(null)
                                     }
                                 } else {
-                                    null
+                                    trySend(null)
                                 }
-                                launch {
-                                    if (workout != null) {
-                                        localFallback.saveWorkout(workout)
-                                    } else {
-                                        val active = localFallback.getActiveWorkout().firstOrNull()
-                                        if (active != null) {
-                                            localFallback.deleteWorkout(active.id)
-                                        }
-                                    }
-                                }
-                                trySend(workout)
-                            } catch (exAll: Exception) {
-                                Log.e("FirebaseRepo", "Error mapping active workout", exAll)
                             }
-                        }
                     }
+                }
             }
         }
-        auth.addAuthStateListener(listener)
+        
+        auth.addAuthStateListener(authRegistration)
         awaitClose {
-            auth.removeAuthStateListener(listener)
-            registration?.remove()
+            auth.removeAuthStateListener(authRegistration)
+            cleanupListeners()
             localJob.cancel()
         }
+    }
+
+    private fun validateWorkoutIntegrity(workout: Workout): Boolean {
+        // A workout is considered "potentially corrupt" if it's in progress but has 0 exercises or 0 sets 
+        // when it definitely should have some.
+        if (workout.status == "in_progress" && workout.loggedExercises.isEmpty()) {
+            Log.w("FirebaseRepo", "Validation: Active workout has 0 exercises. Status: Suspicious")
+            return false
+        }
+        
+        // Check if any exercise has 0 sets (which shouldn't happen in a healthy save)
+        workout.loggedExercises.forEach { ex ->
+            if (ex.sets.isEmpty()) {
+                Log.w("FirebaseRepo", "Validation: Exercise ${ex.exerciseName} has 0 sets. Status: Suspicious")
+                return false
+            }
+        }
+        
+        Log.d("FirebaseRepo", "Validation: Workout integrity check passed (${workout.loggedExercises.size} exercises)")
+        return true
     }
 
     override suspend fun saveWorkout(workout: Workout) {
@@ -446,6 +611,12 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
         } else {
             workout.copy(id = id)
         }
+        
+        // Sanity check BEFORE saving
+        if (workoutCopy.status == "in_progress" && workoutCopy.loggedExercises.isEmpty()) {
+             Log.e("FirebaseRepo", "CRITICAL: Attempting to save an empty active workout. This might overwrite healthy data.")
+        }
+
         localFallback.saveWorkout(workoutCopy)
         if (auth.currentUser == null) {
             return
@@ -453,6 +624,34 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
         try {
             val col = workoutsCollection()
             col.document(id).set(workoutCopy).await()
+            
+            if (workoutCopy.status == "in_progress") {
+                // Update sessionDoc with latest activity time to ensure listeners trigger
+                sessionDoc().set(ActiveWorkoutSession(workoutId = id, timestamp = System.currentTimeMillis())).await()
+            }
+            
+            // Post-save verification: Cross-check set counts and integrity
+            val verificationDoc = col.document(id).get().await()
+            if (verificationDoc.exists()) {
+                val remoteExercises = verificationDoc.get("loggedExercises") as? List<*>
+                if (remoteExercises?.size != workoutCopy.loggedExercises.size) {
+                    Log.e("FirebaseRepo", "PERSISTENCE VALIDATION FAILED (EXERCISE COUNT): Local ${workoutCopy.loggedExercises.size} vs Remote ${remoteExercises?.size}")
+                } else {
+                    // Deep check first exercise set count if it exists
+                    if (workoutCopy.loggedExercises.isNotEmpty()) {
+                        val localFirstSetCount = workoutCopy.loggedExercises.first().sets.size
+                        val remoteFirstEx = (remoteExercises?.first() as? Map<*, *>)
+                        val remoteSets = remoteFirstEx?.get("sets") as? List<*>
+                        if (remoteSets?.size != localFirstSetCount) {
+                             Log.e("FirebaseRepo", "PERSISTENCE VALIDATION FAILED (SET COUNT): Local $localFirstSetCount vs Remote ${remoteSets?.size}")
+                        } else {
+                             Log.d("FirebaseRepo", "PERSISTENCE VALIDATION SUCCESS: Data verified in Firestore")
+                        }
+                    } else {
+                        Log.d("FirebaseRepo", "PERSISTENCE VALIDATION SUCCESS: Verified (empty exercise list but intentional)")
+                    }
+                }
+            }
         } catch (e: Exception) {
             Log.e("FirebaseRepo", "Error saving workout", e)
         }
@@ -464,6 +663,13 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
             return
         }
         try {
+            val snapshot = sessionDoc().get().await()
+            if (snapshot.exists()) {
+                val session = snapshot.toObject(ActiveWorkoutSession::class.java)
+                if (session?.workoutId == workoutId) {
+                    sessionDoc().delete().await()
+                }
+            }
             workoutsCollection().document(workoutId).delete().await()
         } catch (e: Exception) {
             Log.e("FirebaseRepo", "Error deleting workout", e)
@@ -489,6 +695,7 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
             val prsCol = prsCollection()
             
             col.document(id).set(finishedWorkout).await()
+            sessionDoc().delete().await()
             
             // Update PRs & Active Program State in background safely
             for (ex in finishedWorkout.loggedExercises) {
@@ -530,37 +737,28 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
             }
             
             if (finishedWorkout.templateId != null) {
-                val stateDoc = firestore.collection("users").document(uid).collection("settings").document("activeProgramState")
-                val stateSnapshot = stateDoc.get().await()
+                val stateSnapshot = programMetaDoc().get().await()
                 if (stateSnapshot.exists()) {
                     val state = stateSnapshot.toObject(ActiveProgramState::class.java)
                     if (state != null) {
                         val newCompletedMap = state.completedWorkoutsMap.toMutableMap()
-                        newCompletedMap[finishedWorkout.templateId] = true
-
-                        val parts = finishedWorkout.templateId.split("_")
-                        val dayIndex = if (parts.size == 2) parts[1].toIntOrNull() else null
+                        newCompletedMap[finishedWorkout.templateId!!] = true
                         
-                        val nextDayIndex = if (dayIndex != null) {
-                            if (dayIndex == state.currentDayIndex) {
-                                (dayIndex + 1).coerceAtMost(6)
-                            } else {
-                                state.currentDayIndex
-                            }
-                        } else {
-                            state.currentDayIndex
+                        var nextDaySlot = state.currentDaySlot + 1
+                        var nextWeek = state.currentWeek
+                        
+                        if (nextDaySlot >= 7) {
+                            nextDaySlot = 0
+                            nextWeek += 1
                         }
 
                         val newState = state.copy(
                             completedWorkoutsMap = newCompletedMap,
-                            currentDayIndex = nextDayIndex,
-                            workoutsCompletedThisWeek = state.workoutsCompletedThisWeek + 1
+                            currentDaySlot = nextDaySlot,
+                            currentWeek = nextWeek,
+                            lastCompletedDate = finishedWorkout.date
                         )
-                        if (newState.workoutsCompletedThisWeek >= newState.totalWorkoutsThisWeek) {
-                            stateDoc.set(newState.copy(isWeekCompletedMessageShown = false)).await()
-                        } else {
-                            stateDoc.set(newState).await()
-                        }
+                        saveActiveProgramState(newState)
                     }
                 }
             }
@@ -618,65 +816,123 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
         }
     }
     
-    override fun getActiveProgramState(): Flow<ActiveProgramState?> = callbackFlow {
-        val localJob = launch {
-            localFallback.getActiveProgramState().collect {
-                trySend(it)
-            }
-        }
-        var registration: ListenerRegistration? = null
-        val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
-            registration?.remove()
-            val user = firebaseAuth.currentUser
-            if (user != null) {
-                val doc = firestore.collection("users").document(uid).collection("settings").document("activeProgramState")
-                registration = doc.addSnapshotListener { snapshot, e ->
-                    if (e != null) {
-                        Log.e("FirebaseRepo", "Listen error", e)
-                        return@addSnapshotListener
-                    }
-                    if (snapshot != null && snapshot.exists()) {
-                        try {
-                            val state = snapshot.toObject(ActiveProgramState::class.java)
-                            launch {
-                                localFallback.saveActiveProgramState(state)
-                            }
-                            trySend(state)
-                        } catch (ex: Exception) {
-                            Log.e("FirebaseRepo", "Error deserializing active program state", ex)
-                        }
-                    } else {
-                        launch {
-                            localFallback.saveActiveProgramState(null)
-                        }
-                        trySend(null)
+    override fun getActiveProgramState(): Flow<ActiveProgramState?> {
+        val local = localFallback.getActiveProgramState()
+        val uid = auth.currentUser?.uid ?: return local
+        
+        val remote = callbackFlow {
+            Log.d("FirebaseRepo", "Starting remote getActiveProgramState for $uid")
+            val listener = programMetaDoc().addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.e("FirebaseRepo", "Error fetching meta: ${e.message}", e)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null && snapshot.exists()) {
+                    try {
+                        trySend(snapshot.toObject(ActiveProgramState::class.java))
+                    } catch (ex: Exception) {
+                        Log.e("FirebaseRepo", "Failed to deserialize program state", ex)
                     }
                 }
             }
+            awaitClose { listener.remove() }
         }
-        auth.addAuthStateListener(listener)
-        awaitClose {
-            auth.removeAuthStateListener(listener)
-            registration?.remove()
-            localJob.cancel()
-        }
+        
+        return merge(local, remote).distinctUntilChanged()
     }
 
     override suspend fun saveActiveProgramState(state: ActiveProgramState?) {
+        Log.d("FirebaseRepo", "saveActiveProgramState called with state: $state")
+        // Always save locally first for immediate responsiveness and offline support
         localFallback.saveActiveProgramState(state)
-        if (auth.currentUser == null) {
+        Log.d("FirebaseRepo", "Local state saved")
+        
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            Log.d("FirebaseRepo", "No user logged in, skipping Firestore save")
             return
         }
+        
         try {
-            val doc = firestore.collection("users").document(uid).collection("settings").document("activeProgramState")
+            Log.d("FirebaseRepo", "Saving to Firestore for user: $uid")
             if (state == null) {
-                doc.delete().await()
+                programMetaDoc().delete().await()
+                Log.d("FirebaseRepo", "Firestore document deleted")
             } else {
-                doc.set(state).await()
+                programMetaDoc().set(state, SetOptions.merge()).await()
+                Log.d("FirebaseRepo", "Firestore document set/merged")
             }
         } catch (e: Exception) {
-            Log.e("FirebaseRepo", "Error saving active program state", e)
+            Log.e("FirebaseRepo", "Error saving program state to Firestore", e)
+            throw e // Re-throw to be caught by UI if desired
         }
+    }
+
+    private val moshi by lazy {
+        Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+    }
+
+    private var cachedProgram: Program? = null
+
+    private fun loadProgramFromAssets(): Program? {
+        if (cachedProgram != null) return cachedProgram
+        return try {
+            val json = context.assets.open("program_data_v4.json").bufferedReader().use { it.readText() }
+            Log.d("DiagnosticLog", "[JSON INIT] Raw String Length: ${json.length} characters")
+            
+            val adapter = moshi.adapter(Program::class.java)
+            val parsedResult = adapter.fromJson(json)
+            
+            if (parsedResult != null) {
+                logProgramDiagnostic(parsedResult)
+            } else {
+                Log.e("DiagnosticLog", "[FATAL] Moshi returned NULL during parsing of program_data_v4.json")
+            }
+            
+            cachedProgram = parsedResult
+            cachedProgram
+        } catch (e: Exception) {
+            Log.e("FirebaseRepo", "Failed to load local program data", e)
+            null
+        }
+    }
+
+    private fun logProgramDiagnostic(p: Program) {
+        val schema = p._meta?.schema
+        Log.i("DiagnosticLog", "====================================================")
+        Log.i("DiagnosticLog", "IRONLOG DIAGNOSTIC: PROGRAM INITIALIZATION")
+        Log.i("DiagnosticLog", "----------------------------------------------------")
+        Log.i("DiagnosticLog", "Name: ${p.programName}")
+        Log.i("DiagnosticLog", "Author: ${p.program?.author}")
+        Log.i("DiagnosticLog", "Weeks Count: ${p.weeks.size}")
+        Log.i("DiagnosticLog", "Schema Detected: ${schema != null}")
+        
+        schema?.let {
+            Log.i("DiagnosticLog", "Schema - Total Weeks: ${it.totalWeeks}")
+            Log.i("DiagnosticLog", "Schema - Training Days: ${it.trainingDaysPerWeek}")
+            Log.i("DiagnosticLog", "Schema - Techniques: ${it.techniques.joinToString()}")
+            Log.i("DiagnosticLog", "Schema - Experience: ${it.experienceLevel}")
+        }
+        
+        val samples = p.weeks.keys.take(2)
+        Log.i("DiagnosticLog", "Week Keys Sample: $samples")
+        
+        val firstWeek = p.weeks["week1"]
+        Log.i("DiagnosticLog", "Week 1 - Day Count: ${firstWeek?.days?.size ?: 0}")
+        
+        Log.i("DiagnosticLog", "====================================================")
+    }
+
+    override fun getActiveProgram(): Flow<Program?> = flow {
+        emit(loadProgramFromAssets())
+    }
+
+    override fun getProgramWeek(weekNumber: Int): Flow<ProgramWeek?> = flow {
+        val program = loadProgramFromAssets()
+        val weekKey = "week$weekNumber"
+        emit(program?.weeks?.get(weekKey))
     }
 
     override fun getUserProfile(): Flow<com.example.model.UserProfile?> = callbackFlow {

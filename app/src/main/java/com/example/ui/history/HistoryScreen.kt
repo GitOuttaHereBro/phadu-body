@@ -11,11 +11,13 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.List
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.data.IronLogRepository
@@ -30,6 +32,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(repository: IronLogRepository) {
+    val coroutineScope = rememberCoroutineScope()
     var history by remember { mutableStateOf<List<Workout>>(emptyList()) }
     var selectedDateStr by remember { mutableStateOf(SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())) }
     var currentMonth by remember { mutableStateOf(Calendar.getInstance()) }
@@ -47,9 +50,10 @@ fun HistoryScreen(repository: IronLogRepository) {
 
     Scaffold(
         containerColor = BgColor,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             TopAppBar(
-                title = { Text("History", style = IronTypography.Title2) },
+                title = { Text("History", style = IronTypography.Subheading) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = BgColor),
                 actions = {
                     Row(
@@ -121,7 +125,14 @@ fun HistoryScreen(repository: IronLogRepository) {
                     }
                 } else {
                     items(matchedWorkouts) { wk ->
-                        WorkoutHistoryCard(workout = wk)
+                        WorkoutHistoryCard(
+                            workout = wk,
+                            onDelete = {
+                                coroutineScope.launch {
+                                    repository.deleteWorkout(wk.id)
+                                }
+                            }
+                        )
                     }
                 }
             } else {
@@ -131,7 +142,14 @@ fun HistoryScreen(repository: IronLogRepository) {
                     }
                 } else {
                     items(history.sortedByDescending { it.date }) { workout ->
-                        WorkoutHistoryCard(workout = workout)
+                        WorkoutHistoryCard(
+                            workout = workout,
+                            onDelete = {
+                                coroutineScope.launch {
+                                    repository.deleteWorkout(workout.id)
+                                }
+                            }
+                        )
                     }
                 }
             }
@@ -238,7 +256,7 @@ fun CalendarWidget(
 }
 
 @Composable
-fun WorkoutHistoryCard(workout: Workout) {
+fun WorkoutHistoryCard(workout: Workout, onDelete: () -> Unit) {
     val displayDf = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
     val timeDf = SimpleDateFormat("h:mm a", Locale.getDefault())
     val d = Date(workout.date)
@@ -256,11 +274,20 @@ fun WorkoutHistoryCard(workout: Workout) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Top
         ) {
-            Column {
-                Text(workout.templateName ?: "Workout", style = IronTypography.Title3)
+            Column(modifier = Modifier.weight(1f)) {
+                AutoResizingText(workout.templateName ?: "Workout", style = IronTypography.Headline, maxLines = 1)
                 Text("$displayDate at $displayTime", style = IronTypography.Caption.copy(color = TextSecondaryColor))
             }
-            Text("${workout.totalVolume.toInt()} kg", style = IronTypography.Headline)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AutoResizingText(
+                    text = "${workout.totalVolume.toInt()} kg", 
+                    style = IronTypography.Headline.copy(fontWeight = FontWeight.Black),
+                    maxLines = 1
+                )
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Outlined.Delete, contentDescription = "Delete", tint = DestructiveColor.copy(alpha = 0.5f), modifier = Modifier.size(20.dp))
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(IronSpacing.x16))

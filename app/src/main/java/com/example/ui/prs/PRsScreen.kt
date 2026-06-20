@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.IronLogRepository
 import com.example.model.Exercise
@@ -36,9 +37,10 @@ fun PRsScreen(repository: IronLogRepository) {
 
     Scaffold(
         containerColor = BgColor,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             TopAppBar(
-                title = { Text("Personal Records", style = IronTypography.Title2) },
+                title = { Text("Personal Records", style = IronTypography.Subheading) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = BgColor)
             )
         }
@@ -74,7 +76,7 @@ fun PrCard(pr: PersonalRecord, ex: Exercise) {
             .glassRecipe(RoundedCornerShape(IronCorner.RadiusMd))
             .padding(IronSpacing.x20)
     ) {
-        Text(ex.name, style = IronTypography.Headline)
+        AutoResizingText(ex.name, style = IronTypography.Headline, maxLines = 1)
         Spacer(modifier = Modifier.height(IronSpacing.x16))
 
         if (pr.bestWeight != null && pr.bestWeight.value > 0) {
@@ -84,7 +86,10 @@ fun PrCard(pr: PersonalRecord, ex: Exercise) {
                     Text("Max Weight", style = IronTypography.Caption.copy(color = TextSecondaryColor))
                     Text(dateStr, style = IronTypography.Footnote.copy(color = TextTertiaryColor))
                 }
-                Text("${pr.bestWeight.value} ${ex.unit}", style = IronTypography.Body)
+                Text(
+                    text = "${pr.bestWeight.value} ${ex.unit}", 
+                    style = IronTypography.Subheading.copy(fontWeight = FontWeight.Black)
+                )
             }
         }
         
@@ -95,7 +100,10 @@ fun PrCard(pr: PersonalRecord, ex: Exercise) {
                     Text("Est 1RM", style = IronTypography.Caption.copy(color = TextSecondaryColor))
                     Text(dateStr, style = IronTypography.Footnote.copy(color = TextTertiaryColor))
                 }
-                Text("${pr.bestEstimated1RM.value} ${ex.unit}", style = IronTypography.Body)
+                Text(
+                    text = "${pr.bestEstimated1RM.value} ${ex.unit}", 
+                    style = IronTypography.Subheading.copy(fontWeight = FontWeight.Black)
+                )
             }
         }
     }

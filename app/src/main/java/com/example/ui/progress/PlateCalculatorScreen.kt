@@ -46,9 +46,10 @@ fun PlateCalculatorScreen(
 
     Scaffold(
         containerColor = BgColor,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             TopAppBar(
-                title = { Text("PLATE CALCULATOR", style = IronTypography.Title3.copy(letterSpacing = 1.sp), fontWeight = FontWeight.Black) },
+                title = { Text("PLATE CALCULATOR", style = IronTypography.Title.copy(letterSpacing = 1.sp), fontWeight = FontWeight.Black) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Outlined.ArrowBack, contentDescription = "Back", tint = TextPrimaryColor)
@@ -82,7 +83,7 @@ fun PlateCalculatorScreen(
                     val displayWeight = if (totalWeight % 1.0 == 0.0) totalWeight.toInt().toString() else String.format("%.2f", totalWeight)
                     Text(
                         text = displayWeight,
-                        style = IronTypography.LargeTitle.copy(fontSize = 72.sp),
+                        style = IronTypography.Display.copy(fontSize = 72.sp),
                         color = TextPrimaryColor
                     )
                     Text(

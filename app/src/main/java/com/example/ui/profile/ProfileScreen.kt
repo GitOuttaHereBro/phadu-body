@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.data.IronLogRepository
 import com.example.model.UserProfile
 import com.example.model.Workout
@@ -45,7 +46,8 @@ fun ProfileScreen(
     }
 
     Scaffold(
-        containerColor = BgColor
+        containerColor = BgColor,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -66,7 +68,11 @@ fun ProfileScreen(
                 }
                 Spacer(modifier = Modifier.width(IronSpacing.x16))
                 Column {
-                    Text(if (profile.name.isNotBlank()) profile.name else "Athlete", style = IronTypography.Title2)
+                    AutoResizingText(
+                        text = if (profile.name.isNotBlank()) profile.name else "Athlete", 
+                        style = IronTypography.Subheading,
+                        maxLines = 1
+                    )
                     Text("${workoutsList.size} workouts completed", style = IronTypography.Footnote.copy(color = TextSecondaryColor))
                 }
             }
@@ -74,7 +80,7 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(IronSpacing.x48))
 
             // Actions list
-            Text("UTILITIES", style = IronTypography.Caption.copy(color = TextTertiaryColor))
+            Text("UTILITIES", style = IronTypography.Micro.copy(color = TextTertiaryColor, letterSpacing = 1.5.sp))
             Spacer(modifier = Modifier.height(IronSpacing.x12))
 
             Column(
@@ -82,21 +88,6 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .glassRecipe(RoundedCornerShape(IronCorner.RadiusLg))
             ) {
-                // Plate Calculator menu item
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .bouncyClick { onNavigateToPlateCalc() }
-                        .padding(IronSpacing.x20),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Plate Calculator", style = IronTypography.Body)
-                    Text("→", style = IronTypography.Body.copy(color = TextSecondaryColor))
-                }
-                
-                HorizontalDivider(color = BorderColor)
-
                 // Sign Out
                 Row(
                     modifier = Modifier
@@ -106,7 +97,26 @@ fun ProfileScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Sign Out", style = IronTypography.Body.copy(color = DestructiveColor))
+                    Text("Sign Out", style = IronTypography.Body.copy(color = Color.White))
+                }
+                
+                Divider(color = Color.White.copy(alpha = 0.05f))
+
+                // Reset Program
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .bouncyClick { 
+                            coroutineScope.launch {
+                                repository.saveActiveProgramState(null)
+                                Toast.makeText(context, "Program state reset", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        .padding(IronSpacing.x20),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Reset Program State", style = IronTypography.Body.copy(color = DestructiveColor))
                 }
             }
         }

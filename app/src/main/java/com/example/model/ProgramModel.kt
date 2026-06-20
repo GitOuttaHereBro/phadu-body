@@ -1,112 +1,213 @@
 package com.example.model
+
 import com.squareup.moshi.JsonClass
+import java.util.UUID
 
 @JsonClass(generateAdapter = true)
 data class Program(
-    val programName: String = "",
-    val author: String = "",
+    val _meta: ProgramMeta? = null,
+    val program: ProgramInfo? = null,
+    val warmupProtocol: WarmupProtocol? = null,
     val weeks: Map<String, ProgramWeek> = emptyMap()
+) {
+    val programName: String get() = program?.name ?: ""
+    val durationWeeks: Int get() = _meta?.schema?.totalWeeks ?: program?.durationWeeks ?: weeks.size
+}
+
+@JsonClass(generateAdapter = true)
+data class ProgramMeta(
+    val version: String = "",
+    val generatedAt: String = "",
+    val source: String = "",
+    val schema: ProgramSchema? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class ProgramSchema(
+    val totalWeeks: Int = 0,
+    val trainingDaysPerWeek: Int = 0,
+    val restDaysPerWeek: Int = 0,
+    val blocks: Map<String, String> = emptyMap(),
+    val weekdayMap: Map<String, String> = emptyMap(),
+    val techniques: List<String> = emptyList(),
+    val experienceLevel: String? = "Intermediate-Advanced",
+    val trainingStyle: String? = "Bodybuilding / Hypertrophy",
+    val primaryFocus: String? = "Systemic Transformation"
+)
+
+@JsonClass(generateAdapter = true)
+data class ProgramInfo(
+    val name: String = "",
+    val author: String = "",
+    val durationWeeks: Int = 0,
+    val notes: String? = null
 )
 
 @JsonClass(generateAdapter = true)
 data class ProgramWeek(
-    val block: String = "Block",
+    val weekNumber: Int = 0,
+    val block: String = "",
+    val isIntroWeek: Boolean = false,
     val days: List<ProgramDay> = emptyList()
 )
 
 @JsonClass(generateAdapter = true)
 data class ProgramDay(
-    val dayName: String = "",
+    val slot: Int = 0,
+    val weekday: String = "",
+    val trainingDay: String = "",
+    val displayName: String = "",
     val isRestDay: Boolean = false,
-    val exercises: List<ProgramExercise> = emptyList()
+    val exercises: List<ProgramExercise> = emptyList(),
+    val recovery: RecoveryInstructions? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class RecoveryInstructions(
+    val instructions: String? = null,
+    val suggestions: List<String> = emptyList()
 )
 
 @JsonClass(generateAdapter = true)
 data class ProgramExercise(
     val name: String = "",
     val demoLink: String? = null,
-    val link: String? = null,
-    val warmupSets: String? = null,
-    val workingSets: String? = null,
-    val repRange: String? = null,
-    val reps: String? = null,
-    val earlySetRPE: String? = null,
-    val lastSetRPE: Any? = null,
-    val rest: String? = null,
-    val lastSetTechnique: String? = "N/A",
     val muscleGroup: String? = null,
-    val notes: String? = null,
+    val prescription: ExercisePrescription? = null,
+    val technique: ExerciseTechnique? = null,
+    val notes: ExerciseNotes? = null,
+    val alternatives: ExerciseAlternatives? = null,
+    val logging: ExerciseLogging? = null,
+    val progression: ExerciseProgression? = null
+) {
+    val videoUrl: String? get() = demoLink
+}
+
+@JsonClass(generateAdapter = true)
+data class ExercisePrescription(
+    val warmup: WarmupRampInfo? = null,
+    val workingSets: Any? = null,
+    val repRange: String? = null,
+    val earlySetRPE: String? = null,
+    val lastSetRPE: String? = null,
+    val restTime: String? = null
+) {
+    val workingSetsInt: Int get() = when(workingSets) {
+        is Number -> workingSets.toInt()
+        is String -> workingSets.toIntOrNull() ?: 3
+        else -> 3
+    }
+}
+
+@JsonClass(generateAdapter = true)
+data class WarmupRampInfo(
+    val setsCount: String? = null,
+    val ramp: List<WarmupRampSet> = emptyList()
+)
+
+@JsonClass(generateAdapter = true)
+data class WarmupRampSet(
+    val setNumber: Int = 0,
+    val percentOfWorking: Int = 0,
+    val reps: String = "",
+    val instruction: String = ""
+)
+
+@JsonClass(generateAdapter = true)
+data class ExerciseTechnique(
+    val failure: Boolean = false,
+    val myoReps: Boolean = false,
+    val lengthenedPartials: Boolean = false,
+    val staticStretch: Boolean = false,
+    val staticStretchDuration: String? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class ExerciseNotes(
+    val exerciseNotes: String? = null,
+    val executionNotes: String? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class ExerciseAlternatives(
     val substitution1: ProgramExercise? = null,
     val substitution2: ProgramExercise? = null
-) {
-    val videoUrl: String? get() = demoLink ?: link
-    val lastSetRPEStr: String get() = lastSetRPE?.toString() ?: "N/A"
-}
+)
+
+@JsonClass(generateAdapter = true)
+data class ExerciseLogging(
+    val sets: List<LoggingSet> = emptyList()
+)
+
+@JsonClass(generateAdapter = true)
+data class LoggingSet(
+    val setNumber: Int = 0,
+    val isWarmup: Boolean = false,
+    val targetWeight: Double? = null,
+    val weightUsed: Double? = null,
+    val targetReps: String? = null,
+    val repsAchieved: Int? = null,
+    val targetRPE: String? = null,
+    val actualRPE: Float? = null,
+    val isCompleted: Boolean = false
+)
+
+@JsonClass(generateAdapter = true)
+data class ExerciseProgression(
+    val weekToWeekChanges: Map<String, Any>? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class WarmupProtocol(
+    val general: GeneralWarmup? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class GeneralWarmup(
+    val exercises: List<GeneralWarmupExercise> = emptyList()
+)
+
+@JsonClass(generateAdapter = true)
+data class GeneralWarmupExercise(
+    val name: String = "",
+    val amount: String = ""
+)
 
 fun ProgramDay.toWorkout(weekKey: String, dayIndex: Int): Workout {
     val logged = this.exercises.map { pex ->
         val subNames = mutableListOf<String>()
-        pex.substitution1?.name?.let { subNames.add(it) }
-        pex.substitution2?.name?.let { subNames.add(it) }
-
-        val totalWorking = run {
-            val cleaned = pex.workingSets?.replace("~", "")?.trim() ?: "3"
-            "\\d+".toRegex().find(cleaned)?.value?.toIntOrNull() ?: 3
-        }
-
-        val totalWarmups = run {
-            val cleaned = pex.warmupSets?.replace("~", "")?.trim() ?: "0"
-            if (cleaned.equals("n/a", ignoreCase = true) || cleaned.equals("none", ignoreCase = true)) 0
-            else "\\d+".toRegex().find(cleaned)?.value?.toIntOrNull() ?: 0
-        }
-
-        val targetRepsParsed = run {
-            val cleaned = (pex.reps ?: pex.repRange)?.trim() ?: "10"
-            "\\d+".toRegex().findAll(cleaned).map { it.value.toIntOrNull() ?: 10 }.lastOrNull() ?: 10
-        }
+        pex.alternatives?.substitution1?.name?.let { subNames.add(it) }
+        pex.alternatives?.substitution2?.name?.let { subNames.add(it) }
 
         val setsList = mutableListOf<WorkoutSet>()
-        var setNum = 1
-
-        for (i in 0 until totalWarmups) {
-            val approxPercent = when (totalWarmups) {
-                1 -> "60% of target"
-                2 -> if (i == 0) "50% of target" else "75% of target"
-                else -> if (i == 0) "45% of target" else if (i == 1) "65% of target" else "85% of target"
-            }
-            setsList.add(
-                WorkoutSet(
-                    setNumber = setNum++,
-                    isWarmup = true,
-                    targetReps = targetRepsParsed,
-                    targetRpe = "Warm-up",
-                    notes = "Warm-up set ($approxPercent load)",
-                    restTimeSeconds = 60
-                )
-            )
+        
+        // Add Warmups if they exist in prescription or logging
+        pex.prescription?.warmup?.ramp?.forEach { rampSet ->
+            val targetRepsVal = rampSet.reps.takeWhile { it.isDigit() || it == ' ' }.trim().toIntOrNull() ?: 10
+            setsList.add(WorkoutSet(
+                setNumber = rampSet.setNumber,
+                isWarmup = true,
+                targetReps = targetRepsVal,
+                reps = targetRepsVal,
+                targetRpe = "Warmup",
+                notes = "Load: ${rampSet.percentOfWorking}% - ${rampSet.instruction}"
+            ))
         }
-
-        for (i in 0 until totalWorking) {
-            val setRpe = if (i == totalWorking - 1) pex.lastSetRPEStr else (pex.earlySetRPE ?: "7")
-            val setNotes = if (i == totalWorking - 1 && pex.lastSetTechnique != "N/A" && pex.lastSetTechnique != null) {
-                "Final set technique: ${pex.lastSetTechnique}. ${pex.notes ?: ""}"
-            } else {
-                pex.notes
-            }
-            setsList.add(
-                WorkoutSet(
-                    setNumber = setNum++,
-                    isWarmup = false,
-                    targetReps = targetRepsParsed,
-                    targetRpe = setRpe,
-                    notes = setNotes,
-                    restTimeSeconds = run {
-                        val cleaned = pex.rest?.replace("min", "")?.replace(" ", "")?.trim() ?: "2"
-                        val mins = "\\d+".toRegex().find(cleaned)?.value?.toDoubleOrNull() ?: 2.0
-                        (mins * 60).toInt()
-                    }
-                )
-            )
+        
+        // Add Working Sets
+        val workingSetsCount = pex.prescription?.workingSetsInt ?: 3
+        val startSetNum = setsList.size + 1
+        val targetRepsVal = pex.prescription?.repRange?.takeWhile { it.isDigit() || it == ' ' }?.trim()?.toIntOrNull() ?: 10
+        for (i in 0 until workingSetsCount) {
+            val isLast = i == workingSetsCount - 1
+            setsList.add(WorkoutSet(
+                setNumber = startSetNum + i,
+                isWarmup = false,
+                targetRpe = if (isLast) pex.prescription?.lastSetRPE ?: "10" else pex.prescription?.earlySetRPE ?: "8",
+                targetReps = targetRepsVal,
+                reps = targetRepsVal,
+                notes = pex.notes?.exerciseNotes
+            ))
         }
 
         LoggedExercise(
@@ -115,18 +216,19 @@ fun ProgramDay.toWorkout(weekKey: String, dayIndex: Int): Workout {
             muscleGroup = pex.muscleGroup ?: "General",
             videoUrl = pex.videoUrl,
             sets = setsList,
-            targetRestStr = pex.rest,
-            techniqueRequirements = pex.lastSetTechnique,
-            note = pex.notes,
+            targetRestStr = pex.prescription?.restTime,
+            techniqueRequirements = if (pex.technique?.failure == true) "Failure" else null,
+            note = pex.notes?.executionNotes,
+            technique = pex.technique,
             substitutionOpts = subNames
         )
     }
 
     return Workout(
-        id = java.util.UUID.randomUUID().toString(),
+        id = UUID.randomUUID().toString(),
         date = System.currentTimeMillis(),
         templateId = "${weekKey}_${dayIndex}",
-        templateName = this.dayName,
+        templateName = this.displayName.takeIf { it.isNotEmpty() } ?: this.trainingDay,
         loggedExercises = logged,
         status = "in_progress"
     )

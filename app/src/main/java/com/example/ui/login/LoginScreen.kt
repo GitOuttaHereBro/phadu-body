@@ -40,7 +40,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             modifier = Modifier.padding(IronSpacing.x24).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("GYM KRTA H JI", style = IronTypography.LargeTitle)
+            Text("GYM KRTA H JI", style = IronTypography.Display)
             Spacer(modifier = Modifier.height(IronSpacing.x8))
             Text("Precision Strength Intelligence", style = IronTypography.Caption.copy(color = TextSecondaryColor))
             

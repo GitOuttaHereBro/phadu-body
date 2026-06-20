@@ -52,6 +52,7 @@ data class LoggedExercise(
     val targetRestStr: String? = null,
     val techniqueRequirements: String? = null,
     val note: String? = null,
+    val technique: ExerciseTechnique? = null,
     val isSubstitution: Boolean = false,
     val substitutionOpts: List<String> = emptyList()
 )
@@ -107,14 +108,19 @@ data class ProgressPhoto(
 
 @JsonClass(generateAdapter = true)
 data class ActiveProgramState(
-    val programKey: String = "", // e.g. the json filename or programName
     val programName: String = "",
-    val currentWeekIndex: Int = 0,
-    val currentDayIndex: Int = 0,
-    val completedWorkoutsMap: Map<String, Boolean> = emptyMap(), // Key: "weekX_dayY" -> true if completed
-    val freeNavigationEnabled: Boolean = true,
-    val workoutsCompletedThisWeek: Int = 0,
-    val totalWorkoutsThisWeek: Int = 0,
-    val isWeekCompletedMessageShown: Boolean = false,
-    val streakCount: Int = 0
+    val author: String = "",
+    val startDate: Long = 0L,
+    val currentWeek: Int = 1,     // 1-12
+    val currentDaySlot: Int = 0,   // 0-Slot index
+    val lastCompletedDate: Long = 0L,
+    val totalWeeks: Int = 0,
+    val warmupProtocol: WarmupProtocol? = null,
+    val completedWorkoutsMap: Map<String, Boolean> = emptyMap() // "week1_0" -> true
+)
+
+@JsonClass(generateAdapter = true)
+data class ActiveWorkoutSession(
+    val workoutId: String = "",
+    val timestamp: Long = 0L
 )

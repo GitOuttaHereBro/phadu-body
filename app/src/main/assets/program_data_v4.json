@@ -1,0 +1,1034 @@
+{
+  "_meta": {
+    "version": "4.0",
+    "generatedAt": "2026-06-20T06:34:26.953953",
+    "source": "Jeff Nippard — Bodybuilding Transformation System Intermediate-Advanced",
+    "usageNote": "Personal copy — private use only, not for redistribution",
+    "schema": {
+      "totalWeeks": 12,
+      "trainingDaysPerWeek": 5,
+      "restDaysPerWeek": 2,
+      "blocks": {
+        "Foundation Block": "Weeks 1-5",
+        "Ramping Block": "Weeks 6-12"
+      },
+      "weekdayMap": {
+        "Monday": "Upper",
+        "Tuesday": "Lower",
+        "Wednesday": "Rest",
+        "Thursday": "Pull",
+        "Friday": "Push",
+        "Saturday": "Legs",
+        "Sunday": "Rest"
+      },
+      "techniques": [
+        "Failure",
+        "Myo-reps",
+        "Lengthened Partials (LLPs)",
+        "Static Stretch"
+      ],
+      "logFields": [
+        "weightUsed",
+        "repsAchieved",
+        "actualRPE",
+        "notes",
+        "completedAt"
+      ]
+    }
+  },
+  "program": {
+    "name": "The Bodybuilding Transformation System — Intermediate-Advanced",
+    "author": "Jeff Nippard",
+    "durationWeeks": 12,
+    "notes": "IMPORTANT PROGRAM NOTES (READ BEFORE STARTING) ● Perform a full general warm-up and exercise-specific warm-up every workout as outlined below (should only take 5-10 mins max) ● Note that for the first week of the program, most sets are taken to an RPE of ~7-9. This means you will be leaving 1-3 reps in the tank on most exercises. This only lasts for the first week (to serve as a deload/intro week). After the first week, the intensity will increase and you’ll start taking the last set of every exercise to failure. ● All working sets are broken up into Early Sets and Last Sets. The Early Sets are all the sets that come before your Last Set. Usually the Early Sets should be a little bit easier than the later sets (slightly lower RPE) whereas the Last Set is pushed to failure on all exercises (besides intro/deload weeks). See the Bodybuilding Transformation System Guidebook for a full explanation of RPE. ● Each exercise has a clickable link which demonstrates how to perform the exercise. I suggest watching each exercise demo before starting the workout. ● All other aspects of the program, including when to make an exercise substitution and how to progress through the rep ranges given is explained in the Bodybuilding Transformation System Guidebook. Give it a full read before starting your first workout! Let's crush it!!"
+  },
+  "warmupProtocol": {
+    "general": {
+      "durationMinutes": "5-10",
+      "note": "Perform the following general warm-up before every workout (should take 5-10 mins max). You can save time by doing some of the dynamic stretches as you do warm-up sets for the first exercise.",
+      "exercises": [
+        {
+          "amount": "5-10 minutes",
+          "name": "Light cardio on machine on your choice of machine (treadmill, stairmaster, elliptical, bike, etc.)",
+          "demoLink": null
+        },
+        {
+          "amount": "10 reps per side",
+          "name": "Arm Swings",
+          "demoLink": "https://youtu.be/tFpwBr_7KPg?si=-dwT-qM4TzVqRWGx"
+        },
+        {
+          "amount": "10 reps per side",
+          "name": "Arm Circles",
+          "demoLink": "https://youtu.be/tFpwBr_7KPg?si=ZBn0o9wo6P78IwIg&t=10"
+        },
+        {
+          "amount": "10 reps per side",
+          "name": "Front-to-Back Leg Swings",
+          "demoLink": "https://youtu.be/tFpwBr_7KPg?si=xiy3TjoRiQUvn7qX&t=19"
+        },
+        {
+          "amount": "10 reps per side",
+          "name": "Side-to-Side Leg Swings",
+          "demoLink": "https://youtu.be/m5M3W6evtbwi9amN&t=28"
+        },
+        {
+          "amount": "15 reps per side",
+          "name": "Cable External Rotation (optional)",
+          "demoLink": "https://youtu.be/ui18pgNWTE2IrKcu&t=39"
+        }
+      ]
+    },
+    "exerciseSpecific": {
+      "note": "Perform the following exercise-specific warm-up according to the number of warm-up sets listed in the program",
+      "rules": {
+        "1": {
+          "setsLabel": "1 Warm-Up Set",
+          "instruction": "Use ~60% of your planned working weight for ~6-10 reps (or until you feel warm and loose)",
+          "ramp": [
+            {
+              "setNumber": 1,
+              "percentOfWorking": 60,
+              "reps": "6-10",
+              "instruction": "~60% of working weight for 6-10 reps"
+            }
+          ]
+        },
+        "2": {
+          "setsLabel": "2 Warm-Up Sets",
+          "instruction": "Perform a mini warm-up pyramid: \nWarm-Up Set #1 = ~50% of planned working weight for ~6-10 reps \nWarm-Up Set #2 = ~70% of planned working weight for 4-6 reps",
+          "ramp": [
+            {
+              "setNumber": 1,
+              "percentOfWorking": 50,
+              "reps": "6-10",
+              "instruction": "~50% of working weight for 6-10 reps"
+            },
+            {
+              "setNumber": 2,
+              "percentOfWorking": 70,
+              "reps": "4-6",
+              "instruction": "~70% of working weight for 4-6 reps"
+            }
+          ]
+        },
+        "3": {
+          "setsLabel": "3 Warm-Up Sets",
+          "instruction": "Perform a full warm-up pyramid: \nWarm-Up Set #1 = ~45% of planned working weight for ~6-10 reps \nWarm-Up Set #2 = ~65% of planned working weight for 4-6 reps\nWarm-Up Set #3 = ~85% of planned working weight for 3-4 reps",
+          "ramp": [
+            {
+              "setNumber": 1,
+              "percentOfWorking": 45,
+              "reps": "6-10",
+              "instruction": "~45% of working weight for 6-10 reps"
+            },
+            {
+              "setNumber": 2,
+              "percentOfWorking": 65,
+              "reps": "4-6",
+              "instruction": "~65% of working weight for 4-6 reps"
+            },
+            {
+              "setNumber": 3,
+              "percentOfWorking": 85,
+              "reps": "3-4",
+              "instruction": "~85% of working weight for 3-4 reps"
+            }
+          ]
+        },
+        "4": {
+          "setsLabel": "4 Warm-Up Sets",
+          "instruction": "Perform a full warm-up pyramid:\nWarm-Up Set #1 = ~45% of planned working weight for ~6-10 reps\nWarm-Up Set #2 = ~60% of planned working weight for 4-6 reps\nWarm-Up Set #3 = ~75% of planned working weight for 3-5 reps\nWarm-Up Set #4 = ~85% of planned working weight for 2-4 reps",
+          "ramp": [
+            {
+              "setNumber": 1,
+              "percentOfWorking": 45,
+              "reps": "6-10",
+              "instruction": "~45% of working weight for 6-10 reps"
+            },
+            {
+              "setNumber": 2,
+              "percentOfWorking": 60,
+              "reps": "4-6",
+              "instruction": "~60% of working weight for 4-6 reps"
+            },
+            {
+              "setNumber": 3,
+              "percentOfWorking": 75,
+              "reps": "3-5",
+              "instruction": "~75% of working weight for 3-5 reps"
+            },
+            {
+              "setNumber": 4,
+              "percentOfWorking": 85,
+              "reps": "2-4",
+              "instruction": "~85% of working weight for 2-4 reps"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "weeks": {
+    "week1": {
+      "weekNumber": 1,
+      "block": "Foundation Block",
+      "isIntroWeek": true,
+      "totalExercises": 29,
+      "days": [
+        {
+          "slot": 0,
+          "weekday": "Monday",
+          "trainingDay": "Upper",
+          "displayName": "Upper",
+          "rawName": "Upper (Strength Focus)",
+          "isRestDay": false,
+          "estimatedDurationMinutes": 32,
+          "estimatedRestMinutes": 14,
+          "exercises": [
+            {
+              "name": "Cable Crossover Ladder",
+              "demoLink": "https://youtu.be/0TP9kVcWGic?si=5lWdSFfUA27mop9-",
+              "muscleGroup": "Chest",
+              "prescription": {
+                "warmup": {
+                  "setsCount": "1-2",
+                  "ramp": [
+                    {
+                      "setNumber": 1,
+                      "percentOfWorking": 60,
+                      "reps": "6-10",
+                      "instruction": "~60% of working weight for 6-10 reps"
+                    }
+                  ]
+                },
+                "workingSets": 2,
+                "workingSetsDisplay": "2",
+                "repRange": "8-10",
+                "earlySetRPE": "~7-8",
+                "lastSetRPE": "~8-9",
+                "restTime": "1-2 min"
+              },
+              "technique": {
+                "raw": null,
+                "failure": false,
+                "myoReps": false,
+                "lengthenedPartials": false,
+                "staticStretch": false,
+                "staticStretchDuration": null
+              },
+              "notes": {
+                "exerciseNotes": "Do one set with low cable position, one set with medium-height cable position, and one height with a high cable position. If you only have one or two sets, choose the one or two cable positions you prefer.",
+                "executionNotes": null
+              },
+              "alternatives": {
+                "substitution1": {
+                  "name": "Pec Deck",
+                  "demoLink": "https://youtu.be/CI88L1VNvEs?si=UjPZ3Ep5QaYBM5rC",
+                  "muscleGroup": "Chest",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1-2",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "8-10",
+                    "earlySetRPE": "~7-8",
+                    "lastSetRPE": "~8-9",
+                    "restTime": "1-2 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                },
+                "substitution2": {
+                  "name": "Bottom-Half DB Flye",
+                  "demoLink": "https://youtu.be/qJzc-iHKGdg?si=GGd61Dr4uoDUI9b6",
+                  "muscleGroup": "Chest",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1-2",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "8-10",
+                    "earlySetRPE": "~7-8",
+                    "lastSetRPE": "~8-9",
+                    "restTime": "1-2 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                }
+              },
+              "logging": {
+                "sets": [
+                  {
+                    "setNumber": 1,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "8-10",
+                    "repsAchieved": null,
+                    "targetRPE": "~7-8",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  },
+                  {
+                    "setNumber": 2,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "8-10",
+                    "repsAchieved": null,
+                    "targetRPE": "~8-9",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  }
+                ],
+                "completionStatus": "pending",
+                "workoutDate": null,
+                "workoutNotes": null
+              },
+              "progression": {
+                "weekToWeekChanges": null,
+                "isIntroWeek": true,
+                "introWeekNote": "Week 1 is an intro/deload week. Most sets taken to RPE 7-9 (1-3 reps in reserve). Intensity increases from Week 2 onwards."
+              }
+            },
+            {
+              "name": "Wide-Grip Pull-Up",
+              "demoLink": "https://youtu.be/yGnp0HU8BnA?si=g9lS7YfxwnBQ5gbR",
+              "muscleGroup": "Lats",
+              "prescription": {
+                "warmup": {
+                  "setsCount": "1-2",
+                  "ramp": [
+                    {
+                      "setNumber": 1,
+                      "percentOfWorking": 60,
+                      "reps": "6-10",
+                      "instruction": "~60% of working weight for 6-10 reps"
+                    }
+                  ]
+                },
+                "workingSets": 2,
+                "workingSetsDisplay": "2",
+                "repRange": "8-10",
+                "earlySetRPE": "~6-7",
+                "lastSetRPE": "~7-8",
+                "restTime": "2-3 min"
+              },
+              "technique": {
+                "raw": null,
+                "failure": false,
+                "myoReps": false,
+                "lengthenedPartials": false,
+                "staticStretch": false,
+                "staticStretchDuration": null
+              },
+              "notes": {
+                "exerciseNotes": "1.5x shoulder width overhand grip. Slow 2-3 second negative. Feel your lats pulling apart on the way down.",
+                "executionNotes": null
+              },
+              "alternatives": {
+                "substitution1": {
+                  "name": "Wide-Grip Lat Pulldown",
+                  "demoLink": "https://youtu.be/IYXRrYXfVLc?si=8eUNzIQ9o7Y-XpSp",
+                  "muscleGroup": "Lats",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1-2",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "8-10",
+                    "earlySetRPE": "~6-7",
+                    "lastSetRPE": "~7-8",
+                    "restTime": "2-3 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                },
+                "substitution2": {
+                  "name": "Dual-Handle Lat Pulldown",
+                  "demoLink": "https://youtu.be/NwQ5Ch5t5Vk?si=JHztlva6LI2NPBDC",
+                  "muscleGroup": "Lats",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1-2",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "8-10",
+                    "earlySetRPE": "~6-7",
+                    "lastSetRPE": "~7-8",
+                    "restTime": "2-3 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                }
+              },
+              "logging": {
+                "sets": [
+                  {
+                    "setNumber": 1,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "8-10",
+                    "repsAchieved": null,
+                    "targetRPE": "~6-7",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  },
+                  {
+                    "setNumber": 2,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "8-10",
+                    "repsAchieved": null,
+                    "targetRPE": "~7-8",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  }
+                ],
+                "completionStatus": "pending",
+                "workoutDate": null,
+                "workoutNotes": null
+              },
+              "progression": {
+                "weekToWeekChanges": null,
+                "isIntroWeek": true,
+                "introWeekNote": "Week 1 is an intro/deload week. Most sets taken to RPE 7-9 (1-3 reps in reserve). Intensity increases from Week 2 onwards."
+              }
+            },
+            {
+              "name": "High-Cable Lateral Raise",
+              "demoLink": "https://youtu.be/MnMux3Wc0Ac?si=diOk1ZKwTwTa4Sx0",
+              "muscleGroup": "Side Delts",
+              "prescription": {
+                "warmup": {
+                  "setsCount": "1-2",
+                  "ramp": [
+                    {
+                      "setNumber": 1,
+                      "percentOfWorking": 60,
+                      "reps": "6-10",
+                      "instruction": "~60% of working weight for 6-10 reps"
+                    }
+                  ]
+                },
+                "workingSets": 2,
+                "workingSetsDisplay": "2",
+                "repRange": "8-10",
+                "earlySetRPE": "~7-8",
+                "lastSetRPE": "~8-9",
+                "restTime": "1-2 min"
+              },
+              "technique": {
+                "raw": null,
+                "failure": false,
+                "myoReps": false,
+                "lengthenedPartials": false,
+                "staticStretch": false,
+                "staticStretchDuration": null
+              },
+              "notes": {
+                "exerciseNotes": "Focus on squeezing your lateral delt to move the weight.",
+                "executionNotes": null
+              },
+              "alternatives": {
+                "substitution1": {
+                  "name": "High-Cable Cuffed Lateral Raise",
+                  "demoLink": "https://youtu.be/8m2jNHBP580?si=a4KGz2Dm0gRioyBG",
+                  "muscleGroup": "Side Delts",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1-2",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "8-10",
+                    "earlySetRPE": "~7-8",
+                    "lastSetRPE": "~8-9",
+                    "restTime": "1-2 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                },
+                "substitution2": {
+                  "name": "Lean-In DB Lateral Raise",
+                  "demoLink": "https://youtu.be/BmYuAG2j2co",
+                  "muscleGroup": "Side Delts",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1-2",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "8-10",
+                    "earlySetRPE": "~7-8",
+                    "lastSetRPE": "~8-9",
+                    "restTime": "1-2 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                }
+              },
+              "logging": {
+                "sets": [
+                  {
+                    "setNumber": 1,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "8-10",
+                    "repsAchieved": null,
+                    "targetRPE": "~7-8",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  },
+                  {
+                    "setNumber": 2,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "8-10",
+                    "repsAchieved": null,
+                    "targetRPE": "~8-9",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  }
+                ],
+                "completionStatus": "pending",
+                "workoutDate": null,
+                "workoutNotes": null
+              },
+              "progression": {
+                "weekToWeekChanges": null,
+                "isIntroWeek": true,
+                "introWeekNote": "Week 1 is an intro/deload week. Most sets taken to RPE 7-9 (1-3 reps in reserve). Intensity increases from Week 2 onwards."
+              }
+            },
+            {
+              "name": "Pendlay Deficit Row",
+              "demoLink": "https://youtu.be/MmuyHKYCLps?si=JK1d5szj5PIIbYYm",
+              "muscleGroup": "Back",
+              "prescription": {
+                "warmup": {
+                  "setsCount": "1-2",
+                  "ramp": [
+                    {
+                      "setNumber": 1,
+                      "percentOfWorking": 60,
+                      "reps": "6-10",
+                      "instruction": "~60% of working weight for 6-10 reps"
+                    }
+                  ]
+                },
+                "workingSets": 2,
+                "workingSetsDisplay": "2",
+                "repRange": "6-8",
+                "earlySetRPE": "~7-8",
+                "lastSetRPE": "~8-9",
+                "restTime": "2-3 min"
+              },
+              "technique": {
+                "raw": null,
+                "failure": false,
+                "myoReps": false,
+                "lengthenedPartials": false,
+                "staticStretch": false,
+                "staticStretchDuration": null
+              },
+              "notes": {
+                "exerciseNotes": "Stand on a bumper plate. Focus on getting a big stretch and touch your stomach/chest on each rep!",
+                "executionNotes": null
+              },
+              "alternatives": {
+                "substitution1": {
+                  "name": "Smith Machine Row",
+                  "demoLink": "https://youtu.be/Wmivm40AV3Q?si=pAcxmzGxP16bt5I5",
+                  "muscleGroup": "Back",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1-2",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "6-8",
+                    "earlySetRPE": "~7-8",
+                    "lastSetRPE": "~8-9",
+                    "restTime": "2-3 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                },
+                "substitution2": {
+                  "name": "Single-Arm DB Row",
+                  "demoLink": "https://youtu.be/roKtfQZbxzg?si=x0BVOCTXzrksYhHL",
+                  "muscleGroup": "Back",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1-2",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "6-8",
+                    "earlySetRPE": "~7-8",
+                    "lastSetRPE": "~8-9",
+                    "restTime": "2-3 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                }
+              },
+              "logging": {
+                "sets": [
+                  {
+                    "setNumber": 1,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "6-8",
+                    "repsAchieved": null,
+                    "targetRPE": "~7-8",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  },
+                  {
+                    "setNumber": 2,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "6-8",
+                    "repsAchieved": null,
+                    "targetRPE": "~8-9",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  }
+                ],
+                "completionStatus": "pending",
+                "workoutDate": null,
+                "workoutNotes": null
+              },
+              "progression": {
+                "weekToWeekChanges": null,
+                "isIntroWeek": true,
+                "introWeekNote": "Week 1 is an intro/deload week. Most sets taken to RPE 7-9 (1-3 reps in reserve). Intensity increases from Week 2 onwards."
+              }
+            },
+            {
+              "name": "Overhead Cable Triceps Extension (Bar)",
+              "demoLink": "https://youtu.be/9_I1PqZAjdA?si=hLmz2aLH05YfsUTF",
+              "muscleGroup": "Triceps",
+              "prescription": {
+                "warmup": {
+                  "setsCount": "1",
+                  "ramp": [
+                    {
+                      "setNumber": 1,
+                      "percentOfWorking": 60,
+                      "reps": "6-10",
+                      "instruction": "~60% of working weight for 6-10 reps"
+                    }
+                  ]
+                },
+                "workingSets": 2,
+                "workingSetsDisplay": "2",
+                "repRange": "8-10",
+                "earlySetRPE": "~7-8",
+                "lastSetRPE": "~8-9",
+                "restTime": "1-2 min"
+              },
+              "technique": {
+                "raw": null,
+                "failure": false,
+                "myoReps": false,
+                "lengthenedPartials": false,
+                "staticStretch": false,
+                "staticStretchDuration": null
+              },
+              "notes": {
+                "exerciseNotes": "Optionally pause for 0.5-1 second in the stretched aspect of each rep",
+                "executionNotes": null
+              },
+              "alternatives": {
+                "substitution1": {
+                  "name": "Overhead Cable Triceps Extension (Rope)",
+                  "demoLink": "https://youtu.be/GYoUoVNlbGc?si=mKlJH3mz_e7-RCu0",
+                  "muscleGroup": "Triceps",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "8-10",
+                    "earlySetRPE": "~7-8",
+                    "lastSetRPE": "~8-9",
+                    "restTime": "1-2 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                },
+                "substitution2": {
+                  "name": "DB Skull Crusher",
+                  "demoLink": "https://youtu.be/fbLTzgTKOR8?si=z-O6SNR4HG4rd09j",
+                  "muscleGroup": "Triceps",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "8-10",
+                    "earlySetRPE": "~7-8",
+                    "lastSetRPE": "~8-9",
+                    "restTime": "1-2 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                }
+              },
+              "logging": {
+                "sets": [
+                  {
+                    "setNumber": 1,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "8-10",
+                    "repsAchieved": null,
+                    "targetRPE": "~7-8",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  },
+                  {
+                    "setNumber": 2,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "8-10",
+                    "repsAchieved": null,
+                    "targetRPE": "~8-9",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  }
+                ],
+                "completionStatus": "pending",
+                "workoutDate": null,
+                "workoutNotes": null
+              },
+              "progression": {
+                "weekToWeekChanges": null,
+                "isIntroWeek": true,
+                "introWeekNote": "Week 1 is an intro/deload week. Most sets taken to RPE 7-9 (1-3 reps in reserve). Intensity increases from Week 2 onwards."
+              }
+            },
+            {
+              "name": "Bayesian Cable Curl",
+              "demoLink": "https://youtu.be/CWH5J_7kzjM?si=FlPzreLDPHogRxve",
+              "muscleGroup": "Biceps",
+              "prescription": {
+                "warmup": {
+                  "setsCount": "1",
+                  "ramp": [
+                    {
+                      "setNumber": 1,
+                      "percentOfWorking": 60,
+                      "reps": "6-10",
+                      "instruction": "~60% of working weight for 6-10 reps"
+                    }
+                  ]
+                },
+                "workingSets": 2,
+                "workingSetsDisplay": "2",
+                "repRange": "8-10",
+                "earlySetRPE": "~7-8",
+                "lastSetRPE": "~8-9",
+                "restTime": "1-2 min"
+              },
+              "technique": {
+                "raw": null,
+                "failure": false,
+                "myoReps": false,
+                "lengthenedPartials": false,
+                "staticStretch": false,
+                "staticStretchDuration": null
+              },
+              "notes": {
+                "exerciseNotes": "If you have a left-right bicep size imbalance, do these 1 arm at a time, starting with the weaker arm. Take the weaker arm to the listed RPE. Then match the reps with the other arm (stop once you've matched the reps, even if the RPE is lower). If you don't have a size imbalance, do these both arms at the same time.",
+                "executionNotes": null
+              },
+              "alternatives": {
+                "substitution1": {
+                  "name": "Seated Super-Bayesian High Cable Curl",
+                  "demoLink": "https://youtu.be/jQ9rkfvAbIc?si=m1Q5OHGTNvhD6TZ9",
+                  "muscleGroup": "Biceps",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "8-10",
+                    "earlySetRPE": "~7-8",
+                    "lastSetRPE": "~8-9",
+                    "restTime": "1-2 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                },
+                "substitution2": {
+                  "name": "Incline DB Stretch Curl",
+                  "demoLink": "https://youtu.be/Z0NIYS9nyoQ?si=PgrGaJLln2uZLfnY",
+                  "muscleGroup": "Biceps",
+                  "prescription": {
+                    "warmup": {
+                      "setsCount": "1",
+                      "ramp": [
+                        {
+                          "setNumber": 1,
+                          "percentOfWorking": 60,
+                          "reps": "6-10",
+                          "instruction": "~60% of working weight for 6-10 reps"
+                        }
+                      ]
+                    },
+                    "workingSets": 2,
+                    "workingSetsDisplay": "2",
+                    "repRange": "8-10",
+                    "earlySetRPE": "~7-8",
+                    "lastSetRPE": "~8-9",
+                    "restTime": "1-2 min"
+                  },
+                  "technique": {
+                    "raw": null,
+                    "failure": false,
+                    "myoReps": false,
+                    "lengthenedPartials": false,
+                    "staticStretch": false,
+                    "staticStretchDuration": null
+                  }
+                }
+              },
+              "logging": {
+                "sets": [
+                  {
+                    "setNumber": 1,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "8-10",
+                    "repsAchieved": null,
+                    "targetRPE": "~7-8",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  },
+                  {
+                    "setNumber": 2,
+                    "isWarmup": false,
+                    "targetWeight": null,
+                    "weightUsed": null,
+                    "targetReps": "8-10",
+                    "repsAchieved": null,
+                    "targetRPE": "~8-9",
+                    "actualRPE": null,
+                    "notes": null,
+                    "completedAt": null,
+                    "isCompleted": false
+                  }
+                ],
+                "completionStatus": "pending",
+                "workoutDate": null,
+                "workoutNotes": null
+              },
+              "progression": {
+                "weekToWeekChanges": null,
+                "isIntroWeek": true,
+                "introWeekNote": "Week 1 is an intro/deload week. Most sets taken to RPE 7-9 (1-3 reps in reserve). Intensity increases from Week 2 onwards."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -53,7 +53,7 @@ fun ProgressScreen(repository: IronLogRepository) {
         containerColor = BgColor,
         topBar = {
             TopAppBar(
-                title = { Text("Progress", style = IronTypography.Title2) },
+                title = { Text("Progress", style = IronTypography.Subheading) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = BgColor)
             )
         }
@@ -133,8 +133,12 @@ fun ProgressSwipeableCard(ex: Exercise, history: List<Workout>) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(ex.name, style = IronTypography.Headline)
-            Text("${dataPoints.last().second.toInt()} ${ex.unit}", style = IronTypography.Callout)
+            AutoResizingText(ex.name, style = IronTypography.Headline, maxLines = 1, modifier = Modifier.weight(1f))
+            Text(
+                text = "${dataPoints.last().second.toInt()} ${ex.unit}", 
+                style = IronTypography.Subheading.copy(fontWeight = FontWeight.Black),
+                modifier = Modifier.padding(start = 8.dp)
+            )
         }
         Spacer(modifier = Modifier.height(IronSpacing.x16))
         
@@ -210,7 +214,7 @@ fun VolumeDashboardCustom(history: List<Workout>) {
             .padding(IronSpacing.x24)
     ) {
         Column {
-            Text("${currentWeeklyVol.toInt()} kg", style = IronTypography.LargeTitle)
+            AutoResizingText("${currentWeeklyVol.toInt()} kg", style = IronTypography.Display.copy(fontWeight = FontWeight.Black), maxLines = 1)
             Text("Past 7 Days", style = IronTypography.Footnote.copy(color = TextSecondaryColor))
             Spacer(modifier = Modifier.height(IronSpacing.x24))
             

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.Calculate
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.border
 import com.example.ui.theme.bouncyClick
@@ -62,179 +64,16 @@ fun IronLogApp(repository: IronLogRepository) {
     com.example.ui.error.ErrorBoundary {
         val navController = rememberNavController()
         val authContext = com.example.ui.auth.LocalAuthProvider.current
-        val auth = authContext.firebaseAuth
-        var isInitialized by remember { mutableStateOf(false) }
-        var startDestination by remember { mutableStateOf("login") }
-        var currentPhase by remember { mutableStateOf("Splash Screen") }
-        var initErrorLog by remember { mutableStateOf<String?>(null) }
 
-        LaunchedEffect(authContext.isAuthResolved) {
-            if (!authContext.isAuthResolved) return@LaunchedEffect
-            Log.d("GymKrtaHJi", "=== APP STARTUP SEQUENCE INITIATED ===")
-            try {
-                // Step 1: Splash Screen
-                currentPhase = "Splash Screen"
-                Log.d("IronLogApp", "[Startup Phase 1] Splash Screen starting")
-                kotlinx.coroutines.delay(600L) // Visual duration
-
-                // Step 2: Initialize Firebase
-                currentPhase = "Initialize Firebase"
-                Log.d("IronLogApp", "[Startup Phase 2] Initializing Firebase Core...")
-                val app = auth.app
-
-                // Step 3: Initialize Authentication
-                currentPhase = "Initialize Authentication"
-                Log.d("IronLogApp", "[Startup Phase 3] Initializing Firebase Authentication...")
-                if (auth.app != app) {
-                    throw IllegalStateException("Firebase Auth disassociated from active Firebase App!")
-                }
-
-                // Step 4: Verify Firebase Configuration
-                currentPhase = "Verify Firebase Configuration"
-                Log.d("IronLogApp", "[Startup Phase 4] Verifying Configuration...")
-                if (app.options.applicationId.isEmpty()) {
-                    throw IllegalStateException("Firebase Application ID is unconfigured or null!")
-                }
-
-                // Step 5: Load User
-                currentPhase = "Load User"
-                Log.d("IronLogApp", "[Startup Phase 5] Resolving Current Authenticated Session...")
-                val currentUser = authContext.currentUser
-                Log.d("IronLogApp", "Auth Session User: ${currentUser?.uid ?: "None (Guest/Logged out)"}")
-
-                if (currentUser != null) {
-                    // Step 6: Load Program State
-                    currentPhase = "Load Program State"
-                    Log.d("IronLogApp", "[Startup Phase 6] Retrieving user active program state with safety boundaries...")
-                    try {
-                        withTimeoutOrNull(1500L) {
-                            repository.getActiveProgramState().firstOrNull()
-                        }
-                    } catch (e: Exception) {
-                        Log.w("IronLogApp", "Active Program load timeout or warning: ${e.message}")
-                    }
-
-                    // Step 7: Load Local Cache
-                    currentPhase = "Load Local Cache"
-                    Log.d("IronLogApp", "[Startup Phase 7] Caching and seeding local exercise database...")
-                    try {
-                        withTimeoutOrNull(1500L) {
-                            repository.getUserProfile().firstOrNull()
-                        }
-                        repository.seedInitialExercises()
-                    } catch (e: Exception) {
-                        Log.w("IronLogApp", "Local cache loading encountered warnings: ${e.message}")
-                    }
-
-                    // Step 8: Navigate
-                    currentPhase = "Navigate"
-                    Log.d("IronLogApp", "[Startup Phase 8] Custom dashboard routing initiated for verified user")
-                    startDestination = "main"
-                } else {
-                    currentPhase = "Navigate"
-                    Log.d("IronLogApp", "[Startup Phase 8] Logging out or Guest mode. Routing to login screen")
-                    startDestination = "login"
-                }
-                
-                isInitialized = true
-            } catch (e: Exception) {
-                Log.e("IronLogApp", "CRITICAL Crash safety boundary caught startup error", e)
-                initErrorLog = e.localizedMessage ?: "Unknown initialization failure"
-                // Ensure no full crash: screen is not frozen, bypass available.
-            }
+        if (!authContext.isAuthResolved) {
+            Box(modifier = Modifier.fillMaxSize().background(BgColor))
+            return@ErrorBoundary
         }
 
-    if (!isInitialized) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color(0xFF0D0D11), Color.Black)
-                    )
-                )
-                .padding(24.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                // Large Barbell branding
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(bottom = 24.dp)
-                ) {
-                    Box(modifier = Modifier.width(8.dp).height(28.dp).background(Color(0xFF39FF14), RoundedCornerShape(2.dp)))
-                    Spacer(modifier = Modifier.width(3.dp))
-                    Box(modifier = Modifier.width(5.dp).height(20.dp).background(Color(0xFF39FF14), RoundedCornerShape(1.dp)))
-                    Box(modifier = Modifier.width(36.dp).height(4.dp).background(Color.White))
-                    Box(modifier = Modifier.width(5.dp).height(20.dp).background(Color(0xFF39FF14), RoundedCornerShape(1.dp)))
-                    Spacer(modifier = Modifier.width(3.dp))
-                    Box(modifier = Modifier.width(8.dp).height(28.dp).background(Color(0xFF39FF14), RoundedCornerShape(2.dp)))
-                }
-                Text(
-                    text = "GYM KRTA H JI",
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = 2.sp
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "PRECISION STRENGTH INTELLIGENCE",
-                    color = Color(0xFF39FF14),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
-                )
-
-                Spacer(modifier = Modifier.height(48.dp))
-
-                Box(modifier = Modifier.width(120.dp).height(8.dp).skeleton().clip(RoundedCornerShape(4.dp)))
-
-                Spacer(modifier = Modifier.height(18.dp))
-
-                Text(
-                    text = currentPhase.uppercase(),
-                    color = Color.LightGray,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.5.sp
-                )
-
-                initErrorLog?.let { err ->
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = BgColor),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, DestructiveColor)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text("INIT DEGRADATION ENCOUNTERED", color = Color(0xFFFF453A), fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(err, color = Color.White, fontSize = 13.sp, textAlign = TextAlign.Center)
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        onClick = {
-                            startDestination = "login"
-                            isInitialized = true
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF39FF14), contentColor = Color.Black),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("BYPASS & PROCEED OFFLINE", fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
+        val startDestination = remember(authContext.currentUser) {
+            if (authContext.currentUser != null) "main" else "login"
         }
-    } else {
+
         NavHost(
             navController = navController,
             startDestination = startDestination,
@@ -277,7 +116,6 @@ fun IronLogApp(repository: IronLogRepository) {
             }
         }
     }
-  }
 }
 
 @Composable
@@ -333,15 +171,17 @@ fun MainScreenWrapper(
     val bottomNavController = rememberNavController()
     
     val items = listOf(
-        Triple("home", Icons.Outlined.Home, "HOME"),
-        Triple("programs", Icons.Outlined.Assignment, "PROGRAM"),
-        Triple("progress", Icons.Outlined.Timeline, "PROGRESS"),
-        Triple("prs", Icons.Outlined.Star, "PRS"),
-        Triple("history", Icons.Outlined.History, "HISTORY")
+        Triple("home", Icons.Outlined.Home, "Home"),
+        Triple("programs", Icons.Outlined.Assignment, "Program"),
+        Triple("plate_calculator", Icons.Outlined.Calculate, "Plates"),
+        Triple("progress", Icons.Outlined.Timeline, "Progress"),
+        Triple("prs", Icons.Outlined.Star, "PRs"),
+        Triple("history", Icons.Outlined.History, "History")
     )
 
     Scaffold(
         containerColor = BgColor,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -392,7 +232,9 @@ fun MainScreenWrapper(
                             Spacer(modifier = Modifier.height(IronSpacing.x4))
                             Text(
                                 text = label,
-                                style = IronTypography.Caption.copy(color = contentColor)
+                                style = IronTypography.Micro.copy(color = contentColor),
+                                maxLines = 1,
+                                softWrap = false
                             )
                         }
                     }
@@ -437,11 +279,14 @@ fun MainScreenWrapper(
                 com.example.ui.programs.ProgramsScreen(
                     repository = repository,
                     onProgramStarted = {
+                        // Navigate home FIRST so it's the backstack under active_workout
                         bottomNavController.navigate("home") {
                             popUpTo(bottomNavController.graph.startDestinationId) { saveState = false }
                             launchSingleTop = true
                             restoreState = false
                         }
+                        // Then navigate to active workout on the root controller
+                        rootNavController.navigate("active_workout")
                     }
                 )
             }
@@ -453,6 +298,13 @@ fun MainScreenWrapper(
             }
             composable("history") {
                 HistoryScreen(repository)
+            }
+            composable("plate_calculator") {
+                PlateCalculatorScreen(onBack = { 
+                    bottomNavController.navigate("home") {
+                        popUpTo("home") { inclusive = false }
+                    }
+                })
             }
             composable("profile") {
                 com.example.ui.profile.ProfileScreen(

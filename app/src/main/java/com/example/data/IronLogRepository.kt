@@ -29,6 +29,8 @@ interface IronLogRepository {
     fun getActiveProgramState(): Flow<ActiveProgramState?>
     suspend fun saveActiveProgramState(state: ActiveProgramState?)
     
+    fun getActiveProgram(): Flow<com.example.model.Program?>
+    fun getProgramWeek(weekNumber: Int): Flow<com.example.model.ProgramWeek?>
     
     fun getUserProfile(): Flow<com.example.model.UserProfile?>
     suspend fun saveUserProfile(profile: com.example.model.UserProfile)

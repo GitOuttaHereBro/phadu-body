@@ -83,10 +83,14 @@ class SharedPrefsIronLogRepository(context: Context) : IronLogRepository {
     private fun savePrs() = prefs.edit().putString("prs", moshi.adapter<List<PersonalRecord>>(Types.newParameterizedType(List::class.java, PersonalRecord::class.java)).toJson(prsState.value)).apply()
     private fun saveActiveProgram() {
         val state = activeProgramStateFlow.value
+        Log.d("SharedPrefsRepo", "saveActiveProgram called with state: $state")
         if (state == null) {
             prefs.edit().remove("active_program").apply()
+            Log.d("SharedPrefsRepo", "Active program state removed from SharedPrefs")
         } else {
-            prefs.edit().putString("active_program", moshi.adapter(ActiveProgramState::class.java).toJson(state)).apply()
+            val json = moshi.adapter(ActiveProgramState::class.java).toJson(state)
+            prefs.edit().putString("active_program", json).apply()
+            Log.d("SharedPrefsRepo", "Active program state persisted to SharedPrefs. JSON length: ${json.length}")
         }
     }
 
@@ -221,28 +225,26 @@ class SharedPrefsIronLogRepository(context: Context) : IronLogRepository {
                 newCompletedMap[workout.templateId] = true
 
                 val parts = workout.templateId.split("_")
-                val dayIndex = if (parts.size == 2) parts[1].toIntOrNull() else null
+                val daySlot = if (parts.size == 2) parts[1].toIntOrNull() else null
                 
-                val nextDayIndex = if (dayIndex != null) {
-                    if (dayIndex == state.currentDayIndex) {
-                        (dayIndex + 1).coerceAtMost(6)
-                    } else {
-                        state.currentDayIndex
+                var nextSlot = state.currentDaySlot
+                var nextWeek = state.currentWeek
+                
+                if (daySlot != null && daySlot == state.currentDaySlot) {
+                    nextSlot = state.currentDaySlot + 1
+                    if (nextSlot >= 7) {
+                        nextSlot = 0
+                        nextWeek += 1
                     }
-                } else {
-                    state.currentDayIndex
                 }
 
                 val newState = state.copy(
                     completedWorkoutsMap = newCompletedMap,
-                    currentDayIndex = nextDayIndex,
-                    workoutsCompletedThisWeek = state.workoutsCompletedThisWeek + 1
+                    currentDaySlot = nextSlot,
+                    currentWeek = nextWeek,
+                    lastCompletedDate = System.currentTimeMillis()
                 )
-                if (newState.workoutsCompletedThisWeek >= newState.totalWorkoutsThisWeek) {
-                    saveActiveProgramState(newState.copy(isWeekCompletedMessageShown = false))
-                } else {
-                    saveActiveProgramState(newState)
-                }
+                saveActiveProgramState(newState)
             }
         }
     }
@@ -253,9 +255,13 @@ class SharedPrefsIronLogRepository(context: Context) : IronLogRepository {
     override fun getActiveProgramState(): Flow<ActiveProgramState?> = activeProgramStateFlow
     
     override suspend fun saveActiveProgramState(state: ActiveProgramState?) {
+        Log.d("SharedPrefsRepo", "saveActiveProgramState called with state: $state")
         activeProgramStateFlow.value = state
         saveActiveProgram()
     }
+
+    override fun getActiveProgram(): Flow<Program?> = MutableStateFlow<Program?>(null)
+    override fun getProgramWeek(weekNumber: Int): Flow<ProgramWeek?> = MutableStateFlow<ProgramWeek?>(null)
     
     private val userProfileState = MutableStateFlow<UserProfile?>(null)
     
