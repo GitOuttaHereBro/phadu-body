@@ -879,7 +879,7 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
     private fun loadProgramFromAssets(): Program? {
         if (cachedProgram != null) return cachedProgram
         return try {
-            val json = context.assets.open("program_data_v4.json").bufferedReader().use { it.readText() }
+            val json = context.assets.open("jeff_nippard.json").bufferedReader().use { it.readText() }
             Log.d("DiagnosticLog", "[JSON INIT] Raw String Length: ${json.length} characters")
             
             val adapter = moshi.adapter(Program::class.java)
@@ -894,7 +894,8 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
             cachedProgram = parsedResult
             cachedProgram
         } catch (e: Exception) {
-            Log.e("FirebaseRepo", "Failed to load local program data", e)
+            Log.e("DiagnosticLog", "[JSON INIT ERROR] Failed to load or parse JSON", e)
+            Log.e("FirebaseRepo", "Failed to load local program data: ${e.message}", e)
             null
         }
     }

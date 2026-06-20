@@ -98,11 +98,18 @@ object ProgramValidator {
                     val notes = exObj.notes ?: ExerciseNotes()
                     
                     val alts = exObj.alternatives ?: run {
-                        val (s1Name, s2Name) = getDefaultSubstitutions(resolvedName, resolvedGroup)
-                        ExerciseAlternatives(
-                            substitution1 = ProgramExercise(name = s1Name, muscleGroup = resolvedGroup),
-                            substitution2 = ProgramExercise(name = s2Name, muscleGroup = resolvedGroup)
-                        )
+                        if (exObj.flatSub1 != null || exObj.flatSub2 != null) {
+                            ExerciseAlternatives(
+                                substitution1 = exObj.flatSub1,
+                                substitution2 = exObj.flatSub2
+                            )
+                        } else {
+                            val (s1Name, s2Name) = getDefaultSubstitutions(resolvedName, resolvedGroup)
+                            ExerciseAlternatives(
+                                substitution1 = ProgramExercise(name = s1Name, muscleGroup = resolvedGroup),
+                                substitution2 = ProgramExercise(name = s2Name, muscleGroup = resolvedGroup)
+                            )
+                        }
                     }
 
                     exObj.copy(

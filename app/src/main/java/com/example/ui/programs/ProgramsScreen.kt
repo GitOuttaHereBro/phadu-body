@@ -376,7 +376,12 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Column(modifier = Modifier.weight(1f)) {
-                                            AutoResizingText(ex.name, style = IronTypography.Headline, maxLines = 1)
+                                            Text(
+                                                text = ex.name,
+                                                style = IronTypography.Headline,
+                                                maxLines = 1,
+                                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                            )
                                             Text(
                                                 "${ex.muscleGroup?.uppercase() ?: "GENERAL"} • ${ex.prescription?.workingSets ?: "2"} SETS",
                                                 style = IronTypography.Micro.copy(color = TextSecondaryColor)
@@ -420,10 +425,19 @@ fun ProgramsScreen(repository: IronLogRepository, onProgramStarted: () -> Unit) 
                                     Button(
                                         onClick = {
                                             coroutineScope.launch {
-                                                val nextSlot = (state.currentDaySlot) + 1
-                                                val nextWeek = if (nextSlot >= 7) (state.currentWeek) + 1 else state.currentWeek
+                                                var nextSlot = (state.currentDaySlot + 1) % 7
+                                                // Find next non-rest day
+                                                for (i in 1..7) {
+                                                    val checkSlot = (state.currentDaySlot + i) % 7
+                                                    val checkDay = daysList.getOrNull(checkSlot)
+                                                    if (checkDay != null && !checkDay.isRestDay) {
+                                                        nextSlot = checkSlot
+                                                        break
+                                                    }
+                                                }
+                                                val nextWeek = if (nextSlot <= state.currentDaySlot) state.currentWeek + 1 else state.currentWeek
                                                 repository.saveActiveProgramState(state.copy(
-                                                    currentDaySlot = if (nextSlot >= 7) 0 else nextSlot,
+                                                    currentDaySlot = nextSlot,
                                                     currentWeek = nextWeek
                                                 ))
                                             }

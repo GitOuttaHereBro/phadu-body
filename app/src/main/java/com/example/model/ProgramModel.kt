@@ -1,16 +1,21 @@
 package com.example.model
 
 import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Json
 import java.util.UUID
 
 @JsonClass(generateAdapter = true)
 data class Program(
     val _meta: ProgramMeta? = null,
     val program: ProgramInfo? = null,
+    @Json(name = "programName") val directProgramName: String? = null,
+    @Json(name = "author") val directAuthor: String? = null,
+    @Json(name = "programNotes") val directNotes: String? = null,
     val warmupProtocol: WarmupProtocol? = null,
     val weeks: Map<String, ProgramWeek> = emptyMap()
 ) {
-    val programName: String get() = program?.name ?: ""
+    val programName: String get() = directProgramName ?: program?.name ?: ""
+    val author: String get() = directAuthor ?: program?.author ?: ""
     val durationWeeks: Int get() = _meta?.schema?.totalWeeks ?: program?.durationWeeks ?: weeks.size
 }
 
@@ -55,12 +60,15 @@ data class ProgramWeek(
 data class ProgramDay(
     val slot: Int = 0,
     val weekday: String = "",
+    @Json(name = "dayName") val directDayName: String? = null,
     val trainingDay: String = "",
     val displayName: String = "",
     val isRestDay: Boolean = false,
     val exercises: List<ProgramExercise> = emptyList(),
     val recovery: RecoveryInstructions? = null
-)
+) {
+    val effectiveDisplayName: String get() = directDayName ?: displayName.takeIf { it.isNotEmpty() } ?: trainingDay
+}
 
 @JsonClass(generateAdapter = true)
 data class RecoveryInstructions(
@@ -73,6 +81,14 @@ data class ProgramExercise(
     val name: String = "",
     val demoLink: String? = null,
     val muscleGroup: String? = null,
+    @Json(name = "reps") val directReps: Any? = null,
+    @Json(name = "rest") val directRest: Any? = null,
+    @Json(name = "warmupSets") val directWarmupSets: Any? = null,
+    @Json(name = "workingSets") val directWorkingSets: Any? = null,
+    @Json(name = "earlySetRPE") val directEarlyRPE: Any? = null,
+    @Json(name = "lastSetRPE") val directLastRPE: Any? = null,
+    @Json(name = "substitution1") val flatSub1: ProgramExercise? = null,
+    @Json(name = "substitution2") val flatSub2: ProgramExercise? = null,
     val prescription: ExercisePrescription? = null,
     val technique: ExerciseTechnique? = null,
     val notes: ExerciseNotes? = null,
@@ -176,34 +192,66 @@ data class GeneralWarmupExercise(
 fun ProgramDay.toWorkout(weekKey: String, dayIndex: Int): Workout {
     val logged = this.exercises.map { pex ->
         val subNames = mutableListOf<String>()
+        // Use alternatives or direct flat substitutions
         pex.alternatives?.substitution1?.name?.let { subNames.add(it) }
         pex.alternatives?.substitution2?.name?.let { subNames.add(it) }
+        pex.flatSub1?.name?.let { if (!subNames.contains(it)) subNames.add(it) }
+        pex.flatSub2?.name?.let { if (!subNames.contains(it)) subNames.add(it) }
 
         val setsList = mutableListOf<WorkoutSet>()
         
-        // Add Warmups if they exist in prescription or logging
-        pex.prescription?.warmup?.ramp?.forEach { rampSet ->
-            val targetRepsVal = rampSet.reps.takeWhile { it.isDigit() || it == ' ' }.trim().toIntOrNull() ?: 10
-            setsList.add(WorkoutSet(
-                setNumber = rampSet.setNumber,
-                isWarmup = true,
-                targetReps = targetRepsVal,
-                reps = targetRepsVal,
-                targetRpe = "Warmup",
-                notes = "Load: ${rampSet.percentOfWorking}% - ${rampSet.instruction}"
-            ))
+        // Add Warmups if they exist in prescription or direct fields
+        val warmupSetsStr = (pex.prescription?.warmup?.setsCount ?: pex.directWarmupSets ?: "0").toString()
+        val warmupCount = warmupSetsStr.takeWhile { it.isDigit() }.toIntOrNull() ?: 0
+        
+        if (pex.prescription?.warmup?.ramp?.isNotEmpty() == true) {
+            pex.prescription.warmup.ramp.forEach { rampSet ->
+                val targetRepsVal = rampSet.reps.takeWhile { it.isDigit() || it == ' ' }.trim().toIntOrNull() ?: 10
+                setsList.add(WorkoutSet(
+                    setNumber = rampSet.setNumber,
+                    isWarmup = true,
+                    targetReps = targetRepsVal,
+                    reps = targetRepsVal,
+                    targetRpe = "Warmup",
+                    notes = "Load: ${rampSet.percentOfWorking}% - ${rampSet.instruction}"
+                ))
+            }
+        } else if (warmupCount > 0) {
+            for (i in 1..warmupCount) {
+                setsList.add(WorkoutSet(
+                    setNumber = i,
+                    isWarmup = true,
+                    targetRpe = "Warmup",
+                    targetReps = 10,
+                    reps = 10
+                ))
+            }
         }
         
         // Add Working Sets
-        val workingSetsCount = pex.prescription?.workingSetsInt ?: 3
+        val workingSetsCount = pex.prescription?.workingSetsInt 
+            ?: when(val ws = pex.directWorkingSets) {
+                is Number -> ws.toInt()
+                is String -> ws.toIntOrNull() ?: 2
+                else -> 2
+            }
+            
         val startSetNum = setsList.size + 1
-        val targetRepsVal = pex.prescription?.repRange?.takeWhile { it.isDigit() || it == ' ' }?.trim()?.toIntOrNull() ?: 10
+        val repRangeStr = (pex.prescription?.repRange ?: pex.directReps ?: "8-10").toString()
+        val targetRepsVal = repRangeStr.takeWhile { it.isDigit() || it == ' ' }.trim().toIntOrNull() ?: 10
+        
         for (i in 0 until workingSetsCount) {
             val isLast = i == workingSetsCount - 1
+            val targetRpe = if (isLast) {
+                (pex.prescription?.lastSetRPE ?: pex.directLastRPE ?: "10").toString()
+            } else {
+                (pex.prescription?.earlySetRPE ?: pex.directEarlyRPE ?: "8").toString()
+            }
+            
             setsList.add(WorkoutSet(
                 setNumber = startSetNum + i,
                 isWarmup = false,
-                targetRpe = if (isLast) pex.prescription?.lastSetRPE ?: "10" else pex.prescription?.earlySetRPE ?: "8",
+                targetRpe = targetRpe,
                 targetReps = targetRepsVal,
                 reps = targetRepsVal,
                 notes = pex.notes?.exerciseNotes
@@ -216,7 +264,7 @@ fun ProgramDay.toWorkout(weekKey: String, dayIndex: Int): Workout {
             muscleGroup = pex.muscleGroup ?: "General",
             videoUrl = pex.videoUrl,
             sets = setsList,
-            targetRestStr = pex.prescription?.restTime,
+            targetRestStr = (pex.prescription?.restTime ?: pex.directRest)?.toString(),
             techniqueRequirements = if (pex.technique?.failure == true) "Failure" else null,
             note = pex.notes?.executionNotes,
             technique = pex.technique,
@@ -228,7 +276,7 @@ fun ProgramDay.toWorkout(weekKey: String, dayIndex: Int): Workout {
         id = UUID.randomUUID().toString(),
         date = System.currentTimeMillis(),
         templateId = "${weekKey}_${dayIndex}",
-        templateName = this.displayName.takeIf { it.isNotEmpty() } ?: this.trainingDay,
+        templateName = this.effectiveDisplayName,
         loggedExercises = logged,
         status = "in_progress"
     )

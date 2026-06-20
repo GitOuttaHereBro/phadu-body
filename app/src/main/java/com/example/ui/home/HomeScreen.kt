@@ -45,7 +45,8 @@ fun HomeScreen(
     onStartWorkout: (Workout) -> Unit,
     onResumeWorkout: () -> Unit,
     onProfileClick: () -> Unit,
-    onNavigateToTab: (String) -> Unit = {}
+    onNavigateToTab: (String) -> Unit = {},
+    onNavigateToDiagnostics: () -> Unit = {}
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -175,7 +176,8 @@ fun HomeScreen(
                         workoutsList = workoutsList,
                         onResumeWorkout = onResumeWorkout,
                         onStartWorkout = onStartWorkout,
-                        onProfileClick = onProfileClick
+                        onProfileClick = onProfileClick,
+                        onNavigateToDiagnostics = onNavigateToDiagnostics
                     )
                 }
             } else {
@@ -540,14 +542,26 @@ fun DashboardClean(
     workoutsList: List<Workout>,
     onResumeWorkout: () -> Unit,
     onStartWorkout: (Workout) -> Unit,
-    onProfileClick: () -> Unit
+    onProfileClick: () -> Unit,
+    onNavigateToDiagnostics: () -> Unit = {}
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val todayWeekday = remember {
+        val cal = Calendar.getInstance()
+        // Convert to 0=Mon, ..., 6=Sun
+        (cal.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY + 7) % 7
+    }
+
     val completedMap = activeProgramState?.completedWorkoutsMap ?: emptyMap()
     val weekKey = "week${activeProgramState?.currentWeek ?: 1}"
     val daysList = currentWeekData?.days ?: emptyList()
-    val targetDayIndex = activeProgramState?.currentDaySlot ?: 0
-    val selectedDay = daysList.getOrNull(targetDayIndex)
+    
+    // Session selection logic
+    val progressionDayIndex = activeProgramState?.currentDaySlot ?: 0
+    val todayTargetDayIndex = if (daysList.size == 7) todayWeekday else progressionDayIndex
+    
+    // selectedDay represents what we show on the Home card
+    val selectedDay = daysList.getOrNull(todayTargetDayIndex) ?: daysList.getOrNull(progressionDayIndex)
     
     var showWarmupDialog by remember { mutableStateOf(false) }
 
@@ -588,7 +602,7 @@ fun DashboardClean(
     val totalWorkouts = workoutsList.count { it.status == "completed" }
 
     val dayNames = listOf("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
-    val currentSlotDayName = dayNames.getOrNull(targetDayIndex) ?: "REST DAY"
+    val currentSlotDayName = dayNames.getOrNull(todayTargetDayIndex) ?: "REST DAY"
 
     val todayInfo = remember {
         val sdf = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
@@ -632,10 +646,16 @@ fun DashboardClean(
         }
 
         // Action Recommendation
-        if (selectedDay != null) {
+        selectedDay?.let { day ->
+            val isActuallyToday = todayTargetDayIndex == todayWeekday
             Text(
-                if (selectedDay.isRestDay) "YOUR RECOVERY PLAN" else "YOUR WORKOUT FOR TODAY",
+                if (day.isRestDay) "TODAY IS FOR RECOVERY" else "RECOMMENDED ACTION",
                 style = IronTypography.Caption.copy(color = SuccessColor, fontWeight = FontWeight.Bold, letterSpacing = 1.sp),
+                modifier = Modifier.padding(bottom = IronSpacing.x12, start = 4.dp)
+            )
+            Text(
+                if (day.isRestDay) "Focus on mobility and restoration." else "Ready for ${day.trainingDay.uppercase()}?",
+                style = IronTypography.Body.copy(color = TextSecondaryColor, fontSize = 12.sp),
                 modifier = Modifier.padding(bottom = IronSpacing.x20, start = 4.dp)
             )
         }
@@ -656,7 +676,7 @@ fun DashboardClean(
         }
 
         // Hero card (Mission)
-        val missionKey = activeProgramState?.let { "${it.currentWeek}_${it.currentDaySlot}" } ?: "no_program"
+        val missionKey = activeProgramState?.let { "${it.currentWeek}_${todayTargetDayIndex}" } ?: "no_program"
         AnimatedContent(
             targetState = missionKey,
             transitionSpec = {
@@ -665,21 +685,20 @@ fun DashboardClean(
             label = "mission_card_transition"
         ) { _ ->
             val targetWeek = activeProgramState?.currentWeek ?: 1
-            val targetDayIndex = activeProgramState?.currentDaySlot ?: 0
             val daysListLocal = currentWeekData?.days ?: emptyList()
-            val selectedDayLocal = daysListLocal.getOrNull(targetDayIndex)
-            val currentSlotDayNameLocal = dayNames.getOrNull(targetDayIndex) ?: "REST DAY"
+            val selectedDayLocal = selectedDay 
+            val currentSlotDayNameLocal = dayNames.getOrNull(todayTargetDayIndex) ?: (if (selectedDayLocal?.isRestDay == true) "REST DAY" else "SESSION")
 
             if (selectedDayLocal != null) {
                 Column {
                     Text(
-                        if (selectedDayLocal.isRestDay) "RECOVERY" else "MISSION",
+                        if (selectedDayLocal.isRestDay) "RECOVERY MISSION" else "ACTIVE MISSION",
                         style = IronTypography.Caption.copy(color = TextTertiaryColor, letterSpacing = 2.sp),
                         modifier = Modifier.padding(bottom = 12.dp, start = 4.dp)
                     )
                     PremiumCard(modifier = Modifier.padding(bottom = IronSpacing.x24)) {
                         Text(
-                            text = if (selectedDayLocal.isRestDay) "RECOVER TODAY" else "TRAIN TODAY",
+                            text = if (selectedDayLocal.isRestDay) "FULLY RECHARGE" else "TIME TO WORK",
                             style = IronTypography.Micro.copy(color = SuccessColor, fontWeight = FontWeight.Black, letterSpacing = 1.sp),
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
@@ -690,25 +709,26 @@ fun DashboardClean(
                                     style = IronTypography.Micro.copy(color = TextPrimaryColor, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
-                                AutoResizingText(
-                                    text = if (selectedDayLocal.isRestDay) "REST & REFUEL" else selectedDayLocal.displayName.ifEmpty { selectedDayLocal.trainingDay },
-                                    style = IronTypography.Heading,
-                                    maxLines = 1
+                                Text(
+                                    text = if (selectedDayLocal.isRestDay) "R&R / RECOVERY" else selectedDayLocal.displayName.ifEmpty { selectedDayLocal.trainingDay }.uppercase(),
+                                    style = IronTypography.Title.copy(fontWeight = FontWeight.Black),
+                                    maxLines = 1,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    "WEEK $targetWeek • SESSION ${targetDayIndex + 1}",
+                                    "WEEK $targetWeek • TODAY'S PROTOCOL",
                                     style = IronTypography.Micro.copy(color = TextSecondaryColor, letterSpacing = 1.sp)
                                 )
                             }
                             Box(modifier = Modifier.background(SuccessColor.copy(alpha = 0.1f), RoundedCornerShape(IronCorner.RadiusFull)).padding(horizontal = 10.dp, vertical = 4.dp)) {
-                                Text("TARGET", style = IronTypography.Caption.copy(color = SuccessColor, fontSize = 9.sp))
+                                Text(if (selectedDayLocal.isRestDay) "RELAX" else "TARGET", style = IronTypography.Caption.copy(color = SuccessColor, fontSize = 9.sp))
                             }
                         }
                         
                         Spacer(modifier = Modifier.height(IronSpacing.x20))
                         
-                    if (selectedDayLocal.isRestDay) {
+                        if (selectedDayLocal.isRestDay) {
                             Spacer(modifier = Modifier.height(IronSpacing.x20))
                             Box(
                                 modifier = Modifier
@@ -722,14 +742,14 @@ fun DashboardClean(
                                     RestDayAnimation()
                                     Spacer(modifier = Modifier.height(IronSpacing.x16))
                                     Text(
-                                        "RECOVERY IN PROGRESS",
+                                        "RECHARGE YOUR BATTERY",
                                         style = IronTypography.Headline.copy(color = SuccessColor, letterSpacing = 1.sp)
                                     )
                                 }
                             }
                             Spacer(modifier = Modifier.height(IronSpacing.x20))
                             Text(
-                                selectedDayLocal.recovery?.instructions ?: "Focus on deep sleep, hydration, and light mobility to ensure maximum hypertrophy and CNS recovery.",
+                                selectedDayLocal.recovery?.instructions ?: "Rest is where the growth happens. Ensure high protein intake and 8+ hours of sleep today.",
                                 style = IronTypography.Body.copy(color = TextSecondaryColor, fontSize = 13.sp),
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = IronSpacing.x12)
@@ -754,9 +774,20 @@ fun DashboardClean(
                             Button(
                                 onClick = {
                                     coroutineScope.launch {
-                                        val nextSlot = (activeProgramState?.currentDaySlot ?: 0) + 1
-                                        val nextWeek = if (nextSlot >= 7) (activeProgramState?.currentWeek ?: 1) + 1 else activeProgramState?.currentWeek ?: 1
-                                        repository.saveActiveProgramState(activeProgramState?.copy(currentDaySlot = if (nextSlot >= 7) 0 else nextSlot, currentWeek = nextWeek))
+                                        var nextSlot = (todayTargetDayIndex + 1) % 7
+                                        var foundNext = false
+                                        // Look ahead for next 7 days for a non-rest day
+                                        for (i in 1..7) {
+                                            val checkSlot = (todayTargetDayIndex + i) % 7
+                                            val checkDay = daysList.getOrNull(checkSlot)
+                                            if (checkDay != null && !checkDay.isRestDay) {
+                                                nextSlot = checkSlot
+                                                foundNext = true
+                                                break
+                                            }
+                                        }
+                                        val nextWeek = if (nextSlot <= todayTargetDayIndex) targetWeek + 1 else targetWeek
+                                        repository.saveActiveProgramState(activeProgramState?.copy(currentDaySlot = nextSlot, currentWeek = nextWeek))
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -767,12 +798,12 @@ fun DashboardClean(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Outlined.FastForward, contentDescription = null, tint = TextPrimaryColor, modifier = Modifier.size(20.dp))
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("SKIP TO NEXT WORKOUT", style = IronTypography.Headline, color = TextPrimaryColor)
+                                    Text("SKIP TO TOMORROW'S WORKOUT", style = IronTypography.Headline, color = TextPrimaryColor)
                                 }
                             }
                         } else {
                             Button(onClick = {
-                                val newW = selectedDayLocal.toWorkout(weekKey, targetDayIndex)
+                                val newW = selectedDayLocal.toWorkout("week$targetWeek", todayTargetDayIndex)
                                 onStartWorkout(newW)
                             }, modifier = Modifier.fillMaxWidth().height(52.dp), colors = ButtonDefaults.buttonColors(containerColor = TextPrimaryColor, contentColor = BgColor), shape = RoundedCornerShape(IronCorner.RadiusMd)) {
                                 Text("BEGIN SESSION", style = IronTypography.Headline, color = BgColor)
@@ -780,10 +811,20 @@ fun DashboardClean(
                         }
                     }
                 }
+            } else {
+                // Empty State / Fallback
+                PremiumCard(modifier = Modifier.padding(bottom = IronSpacing.x24)) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp)) {
+                        Icon(Icons.Outlined.Assignment, contentDescription = null, tint = TextTertiaryColor, modifier = Modifier.size(48.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("NO SESSION SCHEDULED", style = IronTypography.Title, color = TextPrimaryColor)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Head to the Program tab to start a transformation.", style = IronTypography.Body, color = TextSecondaryColor, textAlign = TextAlign.Center)
+                    }
+                }
             }
         }
 
-        // Quick Actions
         Row(modifier = Modifier.fillMaxWidth().padding(bottom = IronSpacing.x32), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(modifier = Modifier.weight(1f).height(48.dp).glassRecipe(RoundedCornerShape(IronCorner.RadiusMd)).bouncyClick { showWarmupDialog = true }, contentAlignment = Alignment.Center) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -798,6 +839,9 @@ fun DashboardClean(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("NEW LOG", style = IronTypography.Caption, fontWeight = FontWeight.Bold)
                 }
+            }
+            Box(modifier = Modifier.weight(0.5f).height(48.dp).glassRecipe(RoundedCornerShape(IronCorner.RadiusMd)).bouncyClick { onNavigateToDiagnostics() }, contentAlignment = Alignment.Center) {
+                Icon(Icons.Outlined.BugReport, null, tint = Color.Yellow, modifier = Modifier.size(20.dp))
             }
         }
 

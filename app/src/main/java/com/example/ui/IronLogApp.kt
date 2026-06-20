@@ -47,6 +47,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.data.IronLogRepository
 import com.example.ui.home.HomeScreen
+import com.example.ui.debug.DiagnosticsScreen
 import com.example.ui.history.HistoryScreen
 import com.example.ui.login.LoginScreen
 import com.example.ui.progress.ProgressScreen
@@ -113,6 +114,12 @@ fun IronLogApp(repository: IronLogRepository) {
                         onBack = { navController.popBackStack() }
                     )
                 }
+            }
+            composable("diagnostics") {
+                DiagnosticsScreen(
+                    repository = repository,
+                    onBack = { navController.popBackStack() }
+                )
             }
         }
     }
@@ -272,6 +279,9 @@ fun MainScreenWrapper(
                             launchSingleTop = true
                             restoreState = true
                         }
+                    },
+                    onNavigateToDiagnostics = {
+                        rootNavController.navigate("diagnostics")
                     }
                 )
             }

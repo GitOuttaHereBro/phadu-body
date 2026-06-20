@@ -230,10 +230,11 @@ fun ActiveWorkoutScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    AutoResizingText(
+                                    Text(
                                         text = ex.exerciseName, 
                                         style = IronTypography.Title, 
                                         maxLines = 2,
+                                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                                         modifier = Modifier.weight(1f)
                                     )
                                     Row {
@@ -641,9 +642,13 @@ fun ActiveWorkoutScreen(
         }
     }
 
-    if (showSummaryDialog && activeWorkout != null) {
+    val workoutResult = remember(showSummaryDialog) { 
+        activeWorkout // Capture it when showSummaryDialog is triggered
+    }
+
+    if (showSummaryDialog && workoutResult != null) {
         WorkoutSummaryDialog(
-            workout = activeWorkout!!,
+            workout = workoutResult,
             completedExercises = completedExCount,
             onDismiss = {
                 showSummaryDialog = false
