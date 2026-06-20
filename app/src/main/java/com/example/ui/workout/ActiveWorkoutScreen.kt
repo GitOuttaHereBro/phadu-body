@@ -52,6 +52,7 @@ fun ActiveWorkoutScreen(
     var showSubstituteDialogIndex by remember { mutableStateOf<Int?>(null) } // Legacy - keeping for now to avoid errors if referenced elsewhere, but will use subSheet
     var substituteTargetIndex by remember { mutableStateOf<Int?>(null) }
     var showSubSheet by remember { mutableStateOf(false) }
+    var showSummaryDialog by remember { mutableStateOf(false) }
 
     // Bottom Sheet states
     val sheetState = rememberModalBottomSheetState()
@@ -117,7 +118,7 @@ fun ActiveWorkoutScreen(
                             onClick = {
                                 coroutineScope.launch {
                                     repository.finishWorkout(workout)
-                                    onFinish()
+                                    showSummaryDialog = true
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = TextPrimaryColor, contentColor = BgColor),
@@ -387,7 +388,7 @@ fun ActiveWorkoutScreen(
                                             } else {
                                                 coroutineScope.launch {
                                                     repository.finishWorkout(workout)
-                                                    onFinish()
+                                                    showSummaryDialog = true
                                                 }
                                             }
                                         },
@@ -639,6 +640,104 @@ fun ActiveWorkoutScreen(
             }
         }
     }
+
+    if (showSummaryDialog && activeWorkout != null) {
+        WorkoutSummaryDialog(
+            workout = activeWorkout!!,
+            completedExercises = completedExCount,
+            onDismiss = {
+                showSummaryDialog = false
+                onFinish()
+            }
+        )
+    }
+}
+
+@Composable
+fun WorkoutSummaryDialog(
+    workout: Workout,
+    completedExercises: Int,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1C1C1E),
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = TextPrimaryColor, contentColor = BgColor),
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(IronCorner.RadiusSm)
+            ) {
+                Text("DONE", style = IronTypography.Headline)
+            }
+        },
+        title = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Icon(
+                    Icons.Outlined.Celebration,
+                    contentDescription = null,
+                    tint = SuccessColor,
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    "SESSION COMPLETE",
+                    style = IronTypography.Title,
+                    color = TextPrimaryColor,
+                    textAlign = TextAlign.Center
+                )
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    workout.templateName ?: "Workout",
+                    style = IronTypography.Body.copy(color = TextSecondaryColor),
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .glassRecipe(RoundedCornerShape(IronCorner.RadiusMd))
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("VOLUME", style = IronTypography.Micro, color = TextTertiaryColor)
+                        Text(
+                            "${workout.totalVolume.toInt()}kg",
+                            style = IronTypography.Display.copy(fontSize = 24.sp),
+                            color = TextPrimaryColor
+                        )
+                    }
+                    
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .glassRecipe(RoundedCornerShape(IronCorner.RadiusMd))
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("EXERCISES", style = IronTypography.Micro, color = TextTertiaryColor)
+                        Text(
+                            "$completedExercises",
+                            style = IronTypography.Display.copy(fontSize = 24.sp),
+                            color = TextPrimaryColor
+                        )
+                    }
+                }
+            }
+        }
+    )
 }
 
 data class EditingSetInfo(

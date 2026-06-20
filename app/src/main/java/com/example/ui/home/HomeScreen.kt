@@ -590,6 +590,15 @@ fun DashboardClean(
     val dayNames = listOf("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
     val currentSlotDayName = dayNames.getOrNull(targetDayIndex) ?: "REST DAY"
 
+    val todayInfo = remember {
+        val sdf = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
+        sdf.format(Date())
+    }
+    val todayDayName = remember {
+        val sdf = SimpleDateFormat("EEEE", Locale.getDefault())
+        sdf.format(Date()).uppercase()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -597,19 +606,20 @@ fun DashboardClean(
             .padding(horizontal = IronSpacing.x16)
             .padding(top = IronSpacing.x20, bottom = IronSpacing.x20)
     ) {
-        // Top row
+        // Top row (Health Header)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .statusBarsPadding()
-                .padding(bottom = IronSpacing.x24)
+                .padding(bottom = IronSpacing.x16)
                 .glassRecipe(RoundedCornerShape(IronCorner.RadiusLg))
                 .padding(horizontal = IronSpacing.x16, vertical = IronSpacing.x12),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("GYM KRTA H JI", style = IronTypography.Title.copy(letterSpacing = 1.5.sp), fontWeight = FontWeight.Black)
+                Text(todayInfo.uppercase(), style = IronTypography.Micro.copy(color = TextSecondaryColor, letterSpacing = 2.sp))
+                Text("TODAY IS $todayDayName", style = IronTypography.Title.copy(letterSpacing = 1.5.sp), fontWeight = FontWeight.Black)
             }
             Box(
                 modifier = Modifier.size(40.dp).clip(RoundedCornerShape(IronCorner.RadiusFull)).background(Color.White.copy(alpha = 0.05f))
@@ -619,6 +629,15 @@ fun DashboardClean(
             ) {
                 Icon(Icons.Outlined.Person, contentDescription = "Profile", tint = Color.White, modifier = Modifier.size(20.dp))
             }
+        }
+
+        // Action Recommendation
+        if (selectedDay != null) {
+            Text(
+                if (selectedDay.isRestDay) "YOUR RECOVERY PLAN" else "YOUR WORKOUT FOR TODAY",
+                style = IronTypography.Caption.copy(color = SuccessColor, fontWeight = FontWeight.Bold, letterSpacing = 1.sp),
+                modifier = Modifier.padding(bottom = IronSpacing.x20, start = 4.dp)
+            )
         }
 
         // Stats row (Moved Up)
@@ -659,6 +678,11 @@ fun DashboardClean(
                         modifier = Modifier.padding(bottom = 12.dp, start = 4.dp)
                     )
                     PremiumCard(modifier = Modifier.padding(bottom = IronSpacing.x24)) {
+                        Text(
+                            text = if (selectedDayLocal.isRestDay) "RECOVER TODAY" else "TRAIN TODAY",
+                            style = IronTypography.Micro.copy(color = SuccessColor, fontWeight = FontWeight.Black, letterSpacing = 1.sp),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
@@ -836,7 +860,7 @@ fun RestDayAnimation() {
     )
 
     Box(
-        modifier = Modifier.fillMaxWidth().height(120.dp),
+        modifier = Modifier.fillMaxWidth().height(150.dp),
         contentAlignment = Alignment.Center
     ) {
         // Pulse circles
@@ -851,6 +875,45 @@ fun RestDayAnimation() {
                 .background(SuccessColor.copy(alpha = alpha * 1.5f), RoundedCornerShape(IronCorner.RadiusFull))
         )
         
+        // Floating Zzz symbols
+        repeat(3) { i ->
+            val floatAnim = rememberInfiniteTransition(label = "z_float_$i")
+            val yOffset by floatAnim.animateFloat(
+                initialValue = 0f,
+                targetValue = -60f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(3000, delayMillis = i * 1000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart
+                ),
+                label = "y_offset"
+            )
+            val xOffset by floatAnim.animateFloat(
+                initialValue = 0f,
+                targetValue = 20f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(3000, delayMillis = i * 1000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "x_offset"
+            )
+            val zAlpha by floatAnim.animateFloat(
+                initialValue = 0.8f,
+                targetValue = 0f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(3000, delayMillis = i * 1000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart
+                ),
+                label = "alpha"
+            )
+
+            Text(
+                "Z",
+                style = IronTypography.Title.copy(fontWeight = FontWeight.Black, fontSize = (14 + i * 4).sp),
+                color = SuccessColor.copy(alpha = zAlpha),
+                modifier = Modifier.offset(x = (20 + i * 10).dp + xOffset.dp, y = yOffset.dp)
+            )
+        }
+
         // Icon
         Surface(
             modifier = Modifier.size(64.dp),
