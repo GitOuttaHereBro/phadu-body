@@ -28,16 +28,16 @@ class ExampleUnitTest {
     fun testProgramValidator_sanitizesMissingFields() {
         // Create an incomplete/malformed program exercise structure
         val malformedExercise = ProgramExercise(
-            name = "", // blank -> should fall back to a numbered exercise
-            muscleGroup = null, // null -> should infer from name or default
-            warmupSets = "", // empty
-            workingSets = null,
-            substitution1 = null, // missing
-            substitution2 = null // missing
+            name = "",
+            muscleGroup = null,
+            directWarmupSets = "",
+            directWorkingSets = null,
+            flatSub1 = null,
+            flatSub2 = null
         )
 
         val malformedDay = ProgramDay(
-            dayName = "Sample Day",
+            directDayName = "Sample Day",
             exercises = listOf(malformedExercise)
         )
 
@@ -47,8 +47,8 @@ class ExampleUnitTest {
         )
 
         val malformedProgram = Program(
-            programName = "",
-            author = "",
+            directProgramName = "",
+            directAuthor = "",
             weeks = mapOf("week1" to malformedWeek)
         )
 
@@ -67,15 +67,17 @@ class ExampleUnitTest {
 
         assertEquals("Exercise 1", sanitExercise.name)
         assertEquals("General", sanitExercise.muscleGroup)
-        assertEquals("1", sanitExercise.warmupSets)
-        assertEquals("3", sanitExercise.workingSets)
-        assertEquals("8-10", sanitExercise.repRange)
+        assertEquals("1", sanitExercise.directWarmupSets?.toString() ?: sanitExercise.prescription?.warmup?.setsCount)
+        assertEquals("3", sanitExercise.directWorkingSets?.toString() ?: sanitExercise.prescription?.workingSetsInt?.toString())
+        assertEquals("8-10", sanitExercise.directReps?.toString() ?: sanitExercise.prescription?.repRange)
 
         // Verify substitution fallbacks are correctly generated and non-null
-        assertNotNull(sanitExercise.substitution1)
-        assertNotNull(sanitExercise.substitution2)
-        assertEquals("Bodyweight Push-Up", sanitExercise.substitution1?.name)
-        assertEquals("Bodyweight Squat", sanitExercise.substitution2?.name)
+        val hasAlt1 = sanitExercise.alternatives?.substitution1 != null || sanitExercise.flatSub1 != null
+        val hasAlt2 = sanitExercise.alternatives?.substitution2 != null || sanitExercise.flatSub2 != null
+        assertTrue(hasAlt1)
+        assertTrue(hasAlt2)
+        assertEquals("Bodyweight Push-Up", sanitExercise.alternatives?.substitution1?.name ?: sanitExercise.flatSub1?.name)
+        assertEquals("Bodyweight Squat", sanitExercise.alternatives?.substitution2?.name ?: sanitExercise.flatSub2?.name)
     }
 }
 

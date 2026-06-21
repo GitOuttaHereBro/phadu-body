@@ -100,7 +100,7 @@ fun IronLogApp(repository: IronLogRepository) {
                         repository = repository,
                         onNavigateToPlateCalc = { navController.navigate("plate_calculator") },
                         onFinish = {
-                            navController.popBackStack()
+                            navController.popBackStack("home", inclusive = false)
                         },
                         onBack = {
                             navController.popBackStack()

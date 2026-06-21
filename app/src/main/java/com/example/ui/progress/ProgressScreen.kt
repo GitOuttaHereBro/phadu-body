@@ -89,7 +89,7 @@ fun ProgressScreen(repository: IronLogRepository) {
             }
 
             item {
-                Text("EXERCISE PROGRESSION", style = IronTypography.Caption.copy(color = TextTertiaryColor))
+                Text("STRENGTH GAINS DASHBOARD", style = IronTypography.Caption.copy(color = TextTertiaryColor))
                 Spacer(modifier = Modifier.height(IronSpacing.x12))
             }
 
@@ -101,16 +101,7 @@ fun ProgressScreen(repository: IronLogRepository) {
                 }
             } else {
                 item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(IronSpacing.x12)
-                    ) {
-                        list.forEach { ex ->
-                            ProgressSwipeableCard(ex = ex, history = history)
-                        }
-                    }
+                    StrengthDashboard(exercises = list, history = history)
                 }
             }
         }
@@ -450,5 +441,109 @@ fun CanvasChartSmooth(points: List<Pair<Long, Float>>) {
             color = Color.White,
             style = Stroke(width = 3.dp.toPx())
         )
+    }
+}
+
+@Composable
+fun StrengthDashboard(exercises: List<Exercise>, history: List<Workout>) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedExercise by remember(exercises) { mutableStateOf(exercises.firstOrNull()) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .glassRecipe(RoundedCornerShape(IronCorner.RadiusLg))
+            .padding(IronSpacing.x24)
+    ) {
+        Column {
+            // Header / Selector
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box {
+                    Button(
+                        onClick = { expanded = true },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.1f), contentColor = Color.White),
+                        shape = RoundedCornerShape(IronCorner.RadiusSm)
+                    ) {
+                        Text(selectedExercise?.name ?: "Select Lift", style = IronTypography.Footnote)
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.background(Color(0xFF1C1C1E))
+                    ) {
+                        exercises.forEach { ex ->
+                            DropdownMenuItem(
+                                text = { Text(ex.name, style = IronTypography.Body.copy(color = TextPrimaryColor)) },
+                                onClick = {
+                                    selectedExercise = ex
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+                Text("Strength Gains", style = IronTypography.Footnote.copy(color = TextSecondaryColor))
+            }
+
+            Spacer(modifier = Modifier.height(IronSpacing.x24))
+
+            if (selectedExercise != null) {
+                val dataPoints = remember(selectedExercise, history) {
+                    history.sortedBy { it.date }.mapNotNull { w ->
+                        val log = w.loggedExercises.find { it.exerciseId == selectedExercise!!.id }
+                        if (log != null && log.sets.isNotEmpty()) {
+                            val best = log.sets.filter { it.completedAt != null }.maxOfOrNull { it.weight }
+                            if (best != null && best > 0) Pair(w.date, best.toFloat()) else null
+                        } else null
+                    }
+                }
+
+                if (dataPoints.size >= 2) {
+                    val startWeight = dataPoints.first().second
+                    val currentWeight = dataPoints.last().second
+                    val diff = currentWeight - startWeight
+                    val trendColor = if (diff >= 0) SuccessColor else DestructiveColor
+                    val trendSign = if (diff >= 0) "+" else ""
+
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            "${currentWeight.toInt()} ${selectedExercise?.unit ?: "kg"}",
+                            style = IronTypography.Display.copy(fontSize = 32.sp, fontWeight = FontWeight.Black)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "$trendSign${diff.toInt()} ${selectedExercise?.unit ?: "kg"} All Time",
+                            style = IronTypography.Footnote.copy(color = trendColor, fontWeight = FontWeight.SemiBold),
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(IronSpacing.x24))
+                    
+                    CanvasChartSmooth(points = dataPoints)
+                } else {
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            "Not Enough Data",
+                            style = IronTypography.Display.copy(fontSize = 24.sp, fontWeight = FontWeight.Black)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(IronSpacing.x24))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Log multiple sessions to plot gains.", style = IronTypography.Caption.copy(color = TextSecondaryColor))
+                    }
+                }
+            }
+        }
     }
 }

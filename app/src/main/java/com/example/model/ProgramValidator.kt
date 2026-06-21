@@ -95,7 +95,7 @@ object ProgramValidator {
 
                     val prescriptions = exObj.prescription ?: ExercisePrescription()
                     val tech = exObj.technique ?: ExerciseTechnique()
-                    val notes = exObj.notes ?: ExerciseNotes()
+                    val notes = exObj.effectiveNotes ?: ExerciseNotes()
                     
                     val alts = exObj.alternatives ?: run {
                         if (exObj.flatSub1 != null || exObj.flatSub2 != null) {
@@ -117,7 +117,7 @@ object ProgramValidator {
                         muscleGroup = resolvedGroup,
                         prescription = prescriptions,
                         technique = tech,
-                        notes = notes,
+                        directNotes = notes,
                         alternatives = alts
                     )
                 }

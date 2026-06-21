@@ -41,6 +41,7 @@ fun ActiveWorkoutScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     var activeWorkout by remember { mutableStateOf<Workout?>(null) }
+    var lastKnownWorkout by remember { mutableStateOf<Workout?>(null) }
     var availableExercises by remember { mutableStateOf<List<Exercise>>(emptyList()) }
     var expandedExerciseIndex by remember { mutableStateOf(0) }
     
@@ -49,7 +50,7 @@ fun ActiveWorkoutScreen(
 
     var showPlateCalcWeight by remember { mutableStateOf<Double?>(null) }
     var showAddExerciseDialog by remember { mutableStateOf(false) }
-    var showSubstituteDialogIndex by remember { mutableStateOf<Int?>(null) } // Legacy - keeping for now to avoid errors if referenced elsewhere, but will use subSheet
+    var showSubstituteDialogIndex by remember { mutableStateOf<Int?>(null) }
     var substituteTargetIndex by remember { mutableStateOf<Int?>(null) }
     var showSubSheet by remember { mutableStateOf(false) }
     var showSummaryDialog by remember { mutableStateOf(false) }
@@ -61,18 +62,26 @@ fun ActiveWorkoutScreen(
     var editingSetInfo by remember { mutableStateOf<EditingSetInfo?>(null) }
 
     LaunchedEffect(Unit) {
-        launch { repository.getActiveWorkout().collect { activeWorkout = it } }
+        launch { 
+            repository.getActiveWorkout().collect { 
+                if (it != null) {
+                    lastKnownWorkout = it
+                }
+                activeWorkout = it 
+            } 
+        }
         launch { repository.getExercises().collect { availableExercises = it } }
     }
 
-    if (activeWorkout == null) {
+    val workoutToRender = activeWorkout ?: lastKnownWorkout
+    if (workoutToRender == null) {
         Box(modifier = Modifier.fillMaxSize().background(BgColor), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = TextPrimaryColor)
         }
         return
     }
 
-    val workout = activeWorkout!!
+    val workout = workoutToRender
     val totalExCount = workout.loggedExercises.size
     val completedExCount = workout.loggedExercises.count { ex -> 
         ex.sets.isNotEmpty() && ex.sets.all { it.completedAt != null } 
@@ -81,6 +90,18 @@ fun ActiveWorkoutScreen(
     val totalSets = workout.loggedExercises.sumOf { it.sets.size }
     val completedSetsCount = workout.loggedExercises.sumOf { it.sets.count { s -> s.completedAt != null } }
     val setProgress = if (totalSets > 0) completedSetsCount.toFloat() / totalSets else 0f
+
+    if (showSummaryDialog) {
+        WorkoutSummaryFullScreen(
+            workout = workout,
+            completedExercises = completedExCount,
+            onDone = {
+                showSummaryDialog = false
+                onFinish()
+            }
+        )
+        return
+    }
 
     Scaffold(
         containerColor = BgColor,
@@ -643,106 +664,94 @@ fun ActiveWorkoutScreen(
     }
 
     val workoutResult = remember(showSummaryDialog) { 
-        activeWorkout // Capture it when showSummaryDialog is triggered
-    }
-
-    if (showSummaryDialog && workoutResult != null) {
-        WorkoutSummaryDialog(
-            workout = workoutResult,
-            completedExercises = completedExCount,
-            onDismiss = {
-                showSummaryDialog = false
-                onFinish()
-            }
-        )
+        workoutToRender // Capture the latest visible state
     }
 }
 
 @Composable
-fun WorkoutSummaryDialog(
+fun WorkoutSummaryFullScreen(
     workout: Workout,
     completedExercises: Int,
-    onDismiss: () -> Unit
+    onDone: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Color(0xFF1C1C1E),
-        confirmButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = TextPrimaryColor, contentColor = BgColor),
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = RoundedCornerShape(IronCorner.RadiusSm)
-            ) {
-                Text("DONE", style = IronTypography.Headline)
-            }
-        },
-        title = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                Icon(
-                    Icons.Outlined.Celebration,
-                    contentDescription = null,
-                    tint = SuccessColor,
-                    modifier = Modifier.size(48.dp)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    "SESSION COMPLETE",
-                    style = IronTypography.Title,
-                    color = TextPrimaryColor,
-                    textAlign = TextAlign.Center
-                )
-            }
-        },
-        text = {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BgColor)
+            .statusBarsPadding()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            Icons.Outlined.Celebration,
+            contentDescription = null,
+            tint = SuccessColor,
+            modifier = Modifier.size(80.dp)
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            "SESSION COMPLETE",
+            style = IronTypography.Display.copy(fontSize = 32.sp),
+            color = TextPrimaryColor,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            workout.templateName ?: "Workout",
+            style = IronTypography.Subheading.copy(color = TextSecondaryColor),
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(48.dp))
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .weight(1f)
+                    .glassRecipe(RoundedCornerShape(IronCorner.RadiusMd))
+                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text("TOTAL VOLUME", style = IronTypography.Footnote, color = TextTertiaryColor)
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    workout.templateName ?: "Workout",
-                    style = IronTypography.Body.copy(color = TextSecondaryColor),
-                    textAlign = TextAlign.Center
+                    "${workout.totalVolume.toInt()}kg",
+                    style = IronTypography.Display.copy(fontSize = 32.sp),
+                    color = TextPrimaryColor
                 )
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .glassRecipe(RoundedCornerShape(IronCorner.RadiusMd))
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text("VOLUME", style = IronTypography.Micro, color = TextTertiaryColor)
-                        Text(
-                            "${workout.totalVolume.toInt()}kg",
-                            style = IronTypography.Display.copy(fontSize = 24.sp),
-                            color = TextPrimaryColor
-                        )
-                    }
-                    
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .glassRecipe(RoundedCornerShape(IronCorner.RadiusMd))
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text("EXERCISES", style = IronTypography.Micro, color = TextTertiaryColor)
-                        Text(
-                            "$completedExercises",
-                            style = IronTypography.Display.copy(fontSize = 24.sp),
-                            color = TextPrimaryColor
-                        )
-                    }
-                }
+            }
+            
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .glassRecipe(RoundedCornerShape(IronCorner.RadiusMd))
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("COMPLETED EXERCISES", style = IronTypography.Footnote, color = TextTertiaryColor)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "$completedExercises",
+                    style = IronTypography.Display.copy(fontSize = 32.sp),
+                    color = TextPrimaryColor
+                )
             }
         }
-    )
+        
+        Spacer(modifier = Modifier.height(64.dp))
+        
+        Button(
+            onClick = onDone,
+            colors = ButtonDefaults.buttonColors(containerColor = TextPrimaryColor, contentColor = BgColor),
+            modifier = Modifier.fillMaxWidth().height(64.dp),
+            shape = RoundedCornerShape(IronCorner.RadiusMd)
+        ) {
+            Text("FINISH", style = IronTypography.Headline)
+        }
+    }
 }
 
 data class EditingSetInfo(

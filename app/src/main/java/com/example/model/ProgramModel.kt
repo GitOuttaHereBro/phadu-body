@@ -91,11 +91,20 @@ data class ProgramExercise(
     @Json(name = "substitution2") val flatSub2: ProgramExercise? = null,
     val prescription: ExercisePrescription? = null,
     val technique: ExerciseTechnique? = null,
-    val notes: ExerciseNotes? = null,
+    @Json(name = "notes") val directNotes: Any? = null,
     val alternatives: ExerciseAlternatives? = null,
     val logging: ExerciseLogging? = null,
     val progression: ExerciseProgression? = null
 ) {
+    val effectiveNotes: ExerciseNotes? get() = when(val n = directNotes) {
+        is String -> ExerciseNotes(exerciseNotes = n)
+        is Map<*, *> -> ExerciseNotes(
+             executionNotes = (n["executionNotes"] as? String),
+             exerciseNotes = (n["exerciseNotes"] as? String) ?: (n["notes"] as? String)
+        )
+        else -> null
+    }
+
     val videoUrl: String? get() = demoLink
 }
 
@@ -254,7 +263,7 @@ fun ProgramDay.toWorkout(weekKey: String, dayIndex: Int): Workout {
                 targetRpe = targetRpe,
                 targetReps = targetRepsVal,
                 reps = targetRepsVal,
-                notes = pex.notes?.exerciseNotes
+                notes = pex.effectiveNotes?.exerciseNotes
             ))
         }
 
@@ -266,7 +275,7 @@ fun ProgramDay.toWorkout(weekKey: String, dayIndex: Int): Workout {
             sets = setsList,
             targetRestStr = (pex.prescription?.restTime ?: pex.directRest)?.toString(),
             techniqueRequirements = if (pex.technique?.failure == true) "Failure" else null,
-            note = pex.notes?.executionNotes,
+            note = pex.effectiveNotes?.executionNotes,
             technique = pex.technique,
             substitutionOpts = subNames
         )
