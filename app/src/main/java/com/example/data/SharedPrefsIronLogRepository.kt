@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 
-class SharedPrefsIronLogRepository(context: Context) : IronLogRepository {
+class SharedPrefsIronLogRepository(private val context: Context) : IronLogRepository {
     private val prefs = context.getSharedPreferences("ironlog_db", Context.MODE_PRIVATE)
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
@@ -232,7 +232,11 @@ class SharedPrefsIronLogRepository(context: Context) : IronLogRepository {
                 
                 if (daySlot != null && daySlot == state.currentDaySlot) {
                     nextSlot = state.currentDaySlot + 1
-                    if (nextSlot >= 7) {
+                    
+                    val program = loadProgramFromAssets()
+                    val totalDays = program?.weeks?.values?.firstOrNull()?.days?.size?.takeIf { it > 0 } ?: 7
+                    
+                    if (nextSlot >= totalDays) {
                         nextSlot = 0
                         nextWeek += 1
                     }
@@ -246,6 +250,21 @@ class SharedPrefsIronLogRepository(context: Context) : IronLogRepository {
                 )
                 saveActiveProgramState(newState)
             }
+        }
+    }
+
+    private var cachedProgram: Program? = null
+    private fun loadProgramFromAssets(): Program? {
+        if (cachedProgram != null) return cachedProgram
+        return try {
+            val json = context.assets.open("jeff_nippard.json").bufferedReader().use { it.readText() }
+            val adapter = moshi.adapter(Program::class.java)
+            val parsedResult = adapter.fromJson(json)
+            cachedProgram = parsedResult
+            cachedProgram
+        } catch (e: Exception) {
+            Log.e("SharedPrefsRepo", "Failed to load local program data: ${e.message}", e)
+            null
         }
     }
 

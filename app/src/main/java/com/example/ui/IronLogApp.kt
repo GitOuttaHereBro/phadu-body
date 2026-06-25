@@ -137,10 +137,12 @@ fun IronLogApp(repository: IronLogRepository) {
                 }
             }
             composable("diagnostics") {
-                DiagnosticsScreen(
-                    repository = repository,
-                    onBack = { navController.popBackStack() }
-                )
+                ProtectedRoute(navController = navController) {
+                    com.example.ui.diagnostics.DiagnosticsScreen(
+                        repository = repository,
+                        onClose = { navController.popBackStack() }
+                    )
+                }
             }
         }
     }

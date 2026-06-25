@@ -59,6 +59,7 @@ data class LoggedExercise(
 
 @JsonClass(generateAdapter = true)
 data class WorkoutSet(
+    val id: String = "",
     val setNumber: Int = 1,
     val weight: Double = 0.0,
     val reps: Int = 0,

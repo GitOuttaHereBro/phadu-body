@@ -163,20 +163,6 @@ fun HomeScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             val p = program
             if (p != null) {
-                // STRICT VALIDATION: Compare weeks in JSON vs Database vs UI
-                val actualWeeks = p.weeks.size
-                val expectedWeeks = p._meta?.schema?.totalWeeks ?: p.program?.durationWeeks ?: 12
-                if (actualWeeks < expectedWeeks || actualWeeks < 12) {
-                    Box(modifier = Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            Icon(Icons.Outlined.Warning, contentDescription = "Error", tint = DestructiveColor, modifier = Modifier.size(64.dp))
-                            Text("Program Import Error: Weeks Missing", style = IronTypography.Title, color = DestructiveColor, textAlign = TextAlign.Center)
-                            Text("The application failed to load all 12 weeks from the JSON. Only $actualWeeks weeks were loaded.", style = IronTypography.Body, color = TextSecondaryColor, textAlign = TextAlign.Center)
-                        }
-                    }
-                    return@Scaffold
-                }
-
                 if (isInitialLoadComplete && activeProgramState == null) {
                     OnboardingView(p, repository, onProfileClick)
                 } else {
@@ -572,7 +558,7 @@ fun DashboardClean(
     
     // Session selection logic
     val progressionDayIndex = activeProgramState?.currentDaySlot ?: 0
-    val todayTargetDayIndex = if (daysList.size == 7) todayWeekday else progressionDayIndex
+    val todayTargetDayIndex = progressionDayIndex
     
     // selectedDay represents what we show on the Home card
     val selectedDay = daysList.getOrNull(todayTargetDayIndex) ?: daysList.getOrNull(progressionDayIndex)
@@ -695,12 +681,14 @@ fun DashboardClean(
                         style = IronTypography.Body.copy(color = TextPrimaryColor, fontWeight = FontWeight.Black, letterSpacing = 1.sp)
                     )
                     
-                    val cw = activeProgramState?.currentWeek ?: 1
                     val duration = program.durationWeeks.coerceAtLeast(1)
-                    val wCompleted = cw - 1
+                    val totalProgramDays = duration * (daysList.size.takeIf { it > 0 } ?: 7)
+                    val cw = activeProgramState?.currentWeek ?: 1
+                    val cDayNum = (activeProgramState?.currentDaySlot ?: 0)
+                    val daysCompleted = ((cw - 1) * (daysList.size.takeIf { it > 0 } ?: 7)) + cDayNum
+                    val completionPct = if (totalProgramDays > 0) ((daysCompleted.toFloat() / totalProgramDays.toFloat()) * 100).toInt().coerceIn(0, 100) else 0
                     val wRem = (duration - cw).coerceAtLeast(0)
-                    val completionPct = ((wCompleted.toFloat() / duration.toFloat()) * 100).toInt()
-                    val cDayNum = (activeProgramState?.currentDaySlot ?: 0) + 1
+                    val displayDayNum = cDayNum + 1
                     
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Column {
@@ -709,14 +697,14 @@ fun DashboardClean(
                         }
                         Column(horizontalAlignment = Alignment.End) {
                             Text("Current Day", style = IronTypography.Caption.copy(color = TextTertiaryColor))
-                            Text("Day $cDayNum", style = IronTypography.Body.copy(color = TextPrimaryColor, fontWeight = FontWeight.Black))
+                            Text("Day $displayDayNum", style = IronTypography.Body.copy(color = TextPrimaryColor, fontWeight = FontWeight.Black))
                         }
                     }
                     
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Column {
                             Text("Weeks Completed", style = IronTypography.Caption.copy(color = TextTertiaryColor))
-                            Text("$wCompleted", style = IronTypography.Body.copy(color = TextPrimaryColor, fontWeight = FontWeight.Black))
+                            Text("${cw - 1}", style = IronTypography.Body.copy(color = TextPrimaryColor, fontWeight = FontWeight.Black))
                         }
                         Column(horizontalAlignment = Alignment.End) {
                             Text("Weeks Remaining", style = IronTypography.Caption.copy(color = TextTertiaryColor))
@@ -912,9 +900,6 @@ fun DashboardClean(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("NEW LOG", style = IronTypography.Caption, fontWeight = FontWeight.Bold)
                 }
-            }
-            Box(modifier = Modifier.weight(0.5f).height(48.dp).glassRecipe(RoundedCornerShape(IronCorner.RadiusMd)).bouncyClick { onNavigateToDiagnostics() }, contentAlignment = Alignment.Center) {
-                Icon(Icons.Outlined.BugReport, null, tint = Color.Yellow, modifier = Modifier.size(20.dp))
             }
         }
 

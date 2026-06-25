@@ -747,7 +747,10 @@ class FirebaseIronLogRepository(private val context: Context) : IronLogRepositor
                         var nextDaySlot = state.currentDaySlot + 1
                         var nextWeek = state.currentWeek
                         
-                        if (nextDaySlot >= 7) {
+                        val program = loadProgramFromAssets()
+                        val totalDays = program?.weeks?.values?.firstOrNull()?.days?.size?.takeIf { it > 0 } ?: 7
+                        
+                        if (nextDaySlot >= totalDays) {
                             nextDaySlot = 0
                             nextWeek += 1
                         }

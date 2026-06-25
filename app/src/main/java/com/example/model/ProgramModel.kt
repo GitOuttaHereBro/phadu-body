@@ -217,6 +217,7 @@ fun ProgramDay.toWorkout(weekKey: String, dayIndex: Int): Workout {
             pex.prescription.warmup.ramp.forEach { rampSet ->
                 val targetRepsVal = rampSet.reps.takeWhile { it.isDigit() || it == ' ' }.trim().toIntOrNull() ?: 10
                 setsList.add(WorkoutSet(
+                    id = UUID.randomUUID().toString(),
                     setNumber = rampSet.setNumber,
                     isWarmup = true,
                     targetReps = targetRepsVal,
@@ -229,6 +230,7 @@ fun ProgramDay.toWorkout(weekKey: String, dayIndex: Int): Workout {
         } else if (warmupCount > 0) {
             for (i in 1..warmupCount) {
                 setsList.add(WorkoutSet(
+                    id = UUID.randomUUID().toString(),
                     setNumber = i,
                     isWarmup = true,
                     targetRpe = "Warmup",
@@ -259,6 +261,7 @@ fun ProgramDay.toWorkout(weekKey: String, dayIndex: Int): Workout {
             }
             
             setsList.add(WorkoutSet(
+                id = UUID.randomUUID().toString(),
                 setNumber = startSetNum + i,
                 isWarmup = false,
                 targetRpe = targetRpe,

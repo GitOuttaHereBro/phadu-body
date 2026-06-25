@@ -450,6 +450,33 @@ fun ActiveWorkoutScreen(
                                     }
                                 }
                                 
+                                if (isActive) {
+                                    Spacer(modifier = Modifier.height(IronSpacing.x16))
+                                    TextButton(
+                                        onClick = {
+                                            val updatedSets = ex.sets.toMutableList()
+                                            val lastSet = updatedSets.lastOrNull()
+                                            val maxSetNum = updatedSets.filter { !it.isWarmup }.maxOfOrNull { it.setNumber } ?: 0
+                                            updatedSets.add(
+                                                WorkoutSet(
+                                                    id = java.util.UUID.randomUUID().toString(),
+                                                    setNumber = maxSetNum + 1,
+                                                    targetReps = lastSet?.targetReps ?: lastSet?.reps ?: 8,
+                                                    targetWeight = lastSet?.targetWeight ?: (if (lastSet != null && lastSet.weight > 0) lastSet.weight else 20.0),
+                                                    isWarmup = false
+                                                )
+                                            )
+                                            val updatedEx = ex.copy(sets = updatedSets)
+                                            val updatedList = workout.loggedExercises.toMutableList()
+                                            updatedList[index] = updatedEx
+                                            coroutineScope.launch { repository.saveWorkout(workout.copy(loggedExercises = updatedList)) }
+                                        },
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text("+ ADD SET", style = IronTypography.Body, color = TextPrimaryColor)
+                                    }
+                                }
+                                
                                 val allSetsCompletedHere = ex.sets.isNotEmpty() && ex.sets.all { it.completedAt != null }
                                 if (isActive && allSetsCompletedHere) {
                                     Spacer(modifier = Modifier.height(IronSpacing.x24))
@@ -642,7 +669,7 @@ fun ActiveWorkoutScreen(
                         for (i in updatedSets.indices) {
                             val currSet = updatedSets[i]
                             if (currSet.isWarmup && currSet.percentOfWorking != null) {
-                                val calculated = Math.round((newVal * currSet.percentOfWorking) / 2.5) * 2.5
+                                val calculated = Math.round((newVal * currSet.percentOfWorking / 100.0) / 2.5) * 2.5
                                 updatedSets[i] = currSet.copy(weight = calculated)
                             }
                         }
@@ -746,7 +773,7 @@ fun WorkoutSummaryFullScreen(
             modifier = Modifier.fillMaxWidth().height(64.dp),
             shape = RoundedCornerShape(IronCorner.RadiusMd)
         ) {
-            Text("FINISH", style = IronTypography.Headline)
+            Text("FINISH", style = IronTypography.Headline, color = BgColor)
         }
     }
 }

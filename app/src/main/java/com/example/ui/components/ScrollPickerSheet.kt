@@ -23,6 +23,14 @@ import androidx.compose.ui.unit.sp
 import com.example.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlin.math.abs
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.List
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -36,11 +44,21 @@ fun StepperChip(
     displayValueOverride: String? = null
 ) {
     var showQuickAdjust by remember { mutableStateOf(false) }
-    
+    var localValue by remember(value) { mutableStateOf(value) }
+    var pendingChange by remember { mutableStateOf(false) }
+
     LaunchedEffect(showQuickAdjust) {
         if (showQuickAdjust) {
             delay(3000)
             showQuickAdjust = false
+        }
+    }
+
+    LaunchedEffect(localValue, pendingChange) {
+        if (pendingChange) {
+            delay(400) // Debounce time
+            onValueChange(localValue)
+            pendingChange = false
         }
     }
     
@@ -62,7 +80,8 @@ fun StepperChip(
                     .fillMaxHeight()
                     .weight(1f)
                     .clickable { 
-                        onValueChange(maxOf(0.0, value - step)) 
+                        localValue = maxOf(0.0, localValue - step)
+                        pendingChange = true
                         showQuickAdjust = true
                     },
                 contentAlignment = Alignment.Center
@@ -76,7 +95,11 @@ fun StepperChip(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.weight(2f)
         ) {
-            val displayVal = displayValueOverride ?: (if (value % 1.0 == 0.0) "${value.toInt()}" else String.format("%.1f", value))
+            val displayVal = if (pendingChange) {
+                if (localValue % 1.0 == 0.0) "${localValue.toInt()}" else String.format("%.1f", localValue)
+            } else {
+                displayValueOverride ?: (if (value % 1.0 == 0.0) "${value.toInt()}" else String.format("%.1f", value))
+            }
             Text(
                 text = displayVal,
                 style = IronTypography.Headline,
@@ -90,7 +113,8 @@ fun StepperChip(
                     .fillMaxHeight()
                     .weight(1f)
                     .clickable { 
-                        onValueChange(value + step) 
+                        localValue += step
+                        pendingChange = true
                         showQuickAdjust = true
                     },
                 contentAlignment = Alignment.Center
@@ -102,7 +126,7 @@ fun StepperChip(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScrollPickerSheet(
     initialValue: Double,
@@ -110,99 +134,69 @@ fun ScrollPickerSheet(
     onDismiss: () -> Unit,
     onDone: (Double) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    
-    var wholePart by remember { mutableStateOf(initialValue.toInt()) }
-    var decimalPart by remember { mutableStateOf(if (initialValue % 1.0 >= 0.5) 0.5 else 0.0) }
-    var repPart by remember { mutableStateOf(if (initialValue < 1.0) 1 else initialValue.toInt()) }
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = Color(0xFF1C1C1E),
-        dragHandle = { BottomSheetDefaults.DragHandle(color = Color.White.copy(alpha = 0.2f)) }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = if (type == "WEIGHT") "WEIGHT" else "REPS",
-                style = IronTypography.Caption.copy(color = TextSecondaryColor)
+    var textValue by remember { 
+        val initialText = if (type == "WEIGHT") {
+            if (initialValue % 1.0 == 0.0) initialValue.toInt().toString() else initialValue.toString()
+        } else {
+            initialValue.toInt().toString()
+        }
+        mutableStateOf(
+            androidx.compose.ui.text.input.TextFieldValue(
+                text = initialText,
+                selection = androidx.compose.ui.text.TextRange(0, initialText.length)
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Box(contentAlignment = Alignment.Center) {
-                // Shared Highlight Band
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp)
-                        .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
-                )
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (type == "WEIGHT") {
-                        val wholeItems = (0..300).map { it.toString() }
-                        val decItems = listOf(".0", ".5")
-                        
-                        val wholeState = rememberPagerState(initialPage = minOf(wholePart, 300), pageCount = { wholeItems.size })
-                        val decState = rememberPagerState(initialPage = if (decimalPart == 0.0) 0 else 1, pageCount = { decItems.size })
-                        
-                        LaunchedEffect(wholeState.currentPage) {
-                            wholePart = wholeItems[wholeState.currentPage].toInt()
-                        }
-                        LaunchedEffect(decState.currentPage) {
-                            decimalPart = if (decState.currentPage == 0) 0.0 else 0.5
-                        }
-                        
-                        Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.End) {
-                            VerticalWheelPicker(state = wholeState, items = wholeItems, modifier = Modifier.width(80.dp))
-                        }
-                        Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Start) {
-                            VerticalWheelPicker(state = decState, items = decItems, modifier = Modifier.width(60.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("kg", style = IronTypography.Headline, color = TextSecondaryColor)
-                        }
-                    } else {
-                        val repItems = (1..50).map { it.toString() }
-                        val repState = rememberPagerState(initialPage = maxOf(0, repPart - 1), pageCount = { repItems.size })
-                        
-                        LaunchedEffect(repState.currentPage) {
-                            repPart = repItems[repState.currentPage].toInt()
-                        }
-                        
-                        Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center) {
-                            VerticalWheelPicker(state = repState, items = repItems, modifier = Modifier.width(80.dp))
-                        }
+        ) 
+    }
+    val focusRequester = remember { FocusRequester() }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1C1C1E),
+        title = {
+            Text(if (type == "WEIGHT") "Enter Weight (kg)" else "Enter Reps", style = IronTypography.Title, color = TextPrimaryColor)
+        },
+        text = {
+            OutlinedTextField(
+                value = textValue,
+                onValueChange = { 
+                    // Allow only digits and a single decimal point
+                    if (it.text.isEmpty() || it.text.matches(Regex("^\\d*\\.?\\d*$"))) {
+                        textValue = it
                     }
-                }
+                },
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                textStyle = IronTypography.Display.copy(fontSize = 32.sp, textAlign = TextAlign.Center),
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = TextPrimaryColor,
+                    unfocusedBorderColor = TextSecondaryColor,
+                    focusedTextColor = TextPrimaryColor,
+                    unfocusedTextColor = TextPrimaryColor
+                )
+            )
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
             }
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
+        },
+        confirmButton = {
             Button(
-                onClick = { 
-                    onDone(if (type == "WEIGHT") wholePart + decimalPart else repPart.toDouble()) 
+                onClick = {
+                    val parsed = textValue.text.toDoubleOrNull() ?: initialValue
+                    onDone(parsed)
                     onDismiss()
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                shape = RoundedCornerShape(IronCorner.RadiusSm)
+                colors = ButtonDefaults.buttonColors(containerColor = TextPrimaryColor, contentColor = Color.Black)
             ) {
-                Text("Done", style = IronTypography.Headline.copy(color = Color.Black))
+                Text("SAVE", style = IronTypography.Headline, color = Color.Black)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("CANCEL", color = TextSecondaryColor)
             }
         }
-    }
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
